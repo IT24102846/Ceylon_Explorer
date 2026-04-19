@@ -1,0 +1,566 @@
+continue <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - Ceylon Explorer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --orange: #FF6B35; --navy: #004E89; --white: #FFFFFF;
+            --bg: #F4F6F9; --text: #2C3E50; --muted: #7F8C8D;
+            --green: #27AE60; --red: #E74C3C; --amber: #F39C12;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --radius: 14px;
+        }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+        /* ── NAVBAR placeholder (overridden by navbar-fix.js) ── */
+        .navbar { background: #fff; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+        .nav-container { max-width: 1300px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 64px; }
+        .logo { color: var(--orange); font-size: 1.2rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .nav-menu { display: flex; list-style: none; gap: 4px; align-items: center; }
+        .nav-link { color: var(--text); text-decoration: none; padding: 6px 12px; border-radius: 8px; font-size: .85rem; font-weight: 500; transition: all .2s; }
+        .nav-link:hover, .nav-link.active { color: var(--orange); background: rgba(255,107,53,.08); }
+
+        /* ── WRAPPER ── */
+        .dash-wrap { max-width: 1200px; margin: 0 auto; padding: 32px 24px 60px; }
+
+        /* ── HERO CARD ── */
+        .dash-hero {
+            background: linear-gradient(135deg, var(--navy), var(--orange));
+            border-radius: var(--radius); padding: 32px 36px;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 24px; margin-bottom: 28px; color: #fff;
+        }
+        .hero-left { display: flex; align-items: center; gap: 22px; }
+        .hero-avatar {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: rgba(255,255,255,.25); border: 3px solid rgba(255,255,255,.5);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 30px; font-weight: 700; flex-shrink: 0;
+        }
+        .hero-name { font-size: 24px; font-weight: 700; }
+        .hero-email { opacity: .75; font-size: 14px; margin-top: 4px; }
+        .hero-since { font-size: 12px; opacity: .6; margin-top: 6px; }
+        .hero-actions { display: flex; gap: 10px; flex-shrink: 0; }
+        .hero-btn {
+            padding: 10px 20px; border-radius: 10px; border: 2px solid rgba(255,255,255,.4);
+            background: rgba(255,255,255,.15); color: #fff; font-family: 'Outfit', sans-serif;
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s;
+            text-decoration: none; display: flex; align-items: center; gap: 8px;
+        }
+        .hero-btn:hover { background: rgba(255,255,255,.3); border-color: rgba(255,255,255,.7); }
+
+        /* ── STATS ROW ── */
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+        .stat-card {
+            background: var(--white); border-radius: var(--radius);
+            padding: 20px; box-shadow: var(--shadow);
+            display: flex; align-items: center; gap: 16px; transition: transform .2s;
+        }
+        .stat-card:hover { transform: translateY(-3px); }
+        .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .si-orange { background: rgba(255,107,53,.12); color: var(--orange); }
+        .si-navy  { background: rgba(0,78,137,.12); color: var(--navy); }
+        .si-green { background: rgba(39,174,96,.12); color: var(--green); }
+        .si-amber { background: rgba(243,156,18,.12); color: var(--amber); }
+        .stat-info .value { font-size: 24px; font-weight: 700; }
+        .stat-info .label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+        /* ── TABS ── */
+        .tab-bar { display: flex; gap: 6px; margin-bottom: 22px; background: #fff; border-radius: 12px; padding: 6px; box-shadow: var(--shadow); width: fit-content; }
+        .tab-btn {
+            padding: 9px 22px; border: none; border-radius: 9px;
+            background: transparent; font-family: 'Outfit', sans-serif;
+            font-size: 14px; font-weight: 600; color: var(--muted); cursor: pointer; transition: all .2s;
+        }
+        .tab-btn.active { background: var(--orange); color: #fff; box-shadow: 0 4px 12px rgba(255,107,53,.3); }
+
+        /* ── FILTER CHIPS ── */
+        .filter-row { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .chip {
+            padding: 6px 16px; border-radius: 20px; border: 1.5px solid #E0E0E0;
+            background: #fff; font-size: 13px; font-weight: 600; color: var(--muted);
+            cursor: pointer; transition: all .2s; font-family: 'Outfit', sans-serif;
+        }
+        .chip.active, .chip:hover { background: var(--navy); border-color: var(--navy); color: #fff; }
+
+        /* ── BOOKINGS GRID ── */
+        .bookings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+
+        /* ── BOOKING CARD ── */
+        .booking-card {
+            background: var(--white); border-radius: var(--radius);
+            box-shadow: var(--shadow); overflow: hidden;
+            transition: transform .25s, box-shadow .25s;
+        }
+        .booking-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.12); }
+        .card-top { padding: 18px 20px 14px; border-bottom: 1px solid #F0F0F0; display: flex; justify-content: space-between; align-items: flex-start; }
+        .booking-type-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase;
+        }
+        .type-hotel    { background: rgba(0,78,137,.1); color: var(--navy); }
+        .type-vehicle  { background: rgba(255,107,53,.1); color: var(--orange); }
+        .type-activity { background: rgba(39,174,96,.1); color: var(--green); }
+        .type-guide    { background: rgba(155,89,182,.1); color: #9B59B6; }
+        .booking-id { font-size: 12px; color: var(--muted); margin-top: 6px; }
+        .status-pill { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+        .s-confirmed { background: rgba(39,174,96,.12); color: var(--green); }
+        .s-pending   { background: rgba(243,156,18,.12); color: var(--amber); }
+        .s-cancelled { background: rgba(231,76,60,.12); color: var(--red); }
+        .s-completed { background: rgba(127,140,141,.12); color: var(--muted); }
+
+        .card-body { padding: 16px 20px; }
+        .card-body .detail-row { display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--text); margin-bottom: 8px; }
+        .card-body .detail-row i { width: 18px; text-align: center; color: var(--orange); }
+        .card-bottom { padding: 12px 20px; background: #FAFAFA; border-top: 1px solid #F0F0F0; display: flex; align-items: center; justify-content: space-between; }
+        .card-total { font-size: 18px; font-weight: 700; color: var(--text); }
+        .card-total span { font-size: 12px; color: var(--muted); font-weight: 400; }
+        .cancel-btn {
+            padding: 7px 16px; border-radius: 8px; border: 1.5px solid rgba(231,76,60,.3);
+            background: transparent; color: var(--red); font-size: 12px; font-weight: 600;
+            font-family: 'Outfit', sans-serif; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 6px;
+        }
+        .cancel-btn:hover { background: rgba(231,76,60,.08); border-color: var(--red); }
+        .past-badge { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center; padding: 60px 20px;
+            background: var(--white); border-radius: var(--radius);
+            box-shadow: var(--shadow); grid-column: 1 / -1;
+        }
+        .empty-state .empty-icon { font-size: 56px; margin-bottom: 16px; opacity: .25; color: var(--orange); }
+        .empty-state h3 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+        .empty-state p { font-size: 14px; color: var(--muted); }
+        .empty-state .explore-btn {
+            display: inline-flex; align-items: center; gap: 8px; margin-top: 20px;
+            background: var(--orange); color: #fff; padding: 12px 28px;
+            border-radius: 10px; font-weight: 600; font-size: 14px; text-decoration: none; transition: all .2s;
+        }
+        .empty-state .explore-btn:hover { background: #E55A2A; transform: translateY(-2px); }
+
+        /* ── TOAST ── */
+        #dashToast {
+            position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+            padding: 14px 20px; border-radius: 12px; font-size: 14px; font-weight: 500;
+            display: flex; align-items: center; gap: 10px; color: #fff;
+            transform: translateX(120%); opacity: 0; transition: all .3s;
+            min-width: 260px; max-width: 380px; box-shadow: 0 8px 24px rgba(0,0,0,.2);
+        }
+        #dashToast.show { transform: translateX(0); opacity: 1; }
+        #dashToast.success { background: var(--green); }
+        #dashToast.error   { background: var(--red); }
+        #dashToast.info    { background: var(--navy); }
+
+        /* ── LOADING SPINNER ── */
+        .loading { display: flex; flex-direction: column; align-items: center; padding: 60px 20px; grid-column: 1 / -1; }
+        .spinner { width: 44px; height: 44px; border: 4px solid #F0F0F0; border-top-color: var(--orange); border-radius: 50%; animation: spin .8s linear infinite; margin-bottom: 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 640px) {
+            .dash-hero { flex-direction: column; align-items: flex-start; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .hero-actions { width: 100%; }
+        }
+        @media (max-width: 400px) { .stats-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR — overridden by navbar-fix.js -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="logo"><i class="fas fa-umbrella-beach"></i> CEYLON EXPLORER</a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="hotel-complete.html" class="nav-link">Hotels</a></li>
+            <li><a href="vehicle-complete.html" class="nav-link">Vehicles</a></li>
+            <li><a href="tourguide-complete.html" class="nav-link">Guides</a></li>
+            <li><a href="activity-complete.html" class="nav-link">Activities</a></li>
+            <li><a href="itinerary.html" class="nav-link">Itinerary</a></li>
+            <li id="navLoginLi"><a href="login-complete.html" class="nav-link nav-login-btn">Login</a></li>
+            <li id="navSignupLi"><a href="signup-complete.html" class="nav-link nav-signup-btn">Sign Up</a></li>
+            <li id="navUserLi" style="display:none; position:relative;">
+                <button class="nav-user-btn" id="userMenuBtn" onclick="toggleUserMenu()">
+                    <div class="nav-avatar" id="navUserAvatar">U</div>
+                    <span id="navUserName">User</span>
+                    <i class="fas fa-chevron-down" style="font-size:10px; margin-left:3px;"></i>
+                </button>
+                <div class="nav-dropdown" id="userDropdown">
+                    <a href="user-dashboard.html" id="dashboardLink"><i class="fas fa-th-large"></i> Dashboard</a>
+                    <a href="#" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </li>
+        </ul>
+        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+    </div>
+</nav>
+
+<div class="dash-wrap">
+
+    <!-- HERO -->
+    <div class="dash-hero">
+        <div class="hero-left">
+            <div class="hero-avatar" id="heroAvatar">U</div>
+            <div>
+                <div class="hero-name" id="heroName">Loading...</div>
+                <div class="hero-email" id="heroEmail"></div>
+                <div class="hero-since" id="heroSince"></div>
+            </div>
+        </div>
+        <div class="hero-actions">
+            <a href="index.html" class="hero-btn"><i class="fas fa-compass"></i> Explore</a>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon si-orange"><i class="fas fa-calendar-check"></i></div>
+            <div class="stat-info">
+                <div class="value" id="statTotal">0</div>
+                <div class="label">Total Bookings</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon si-navy"><i class="fas fa-plane-departure"></i></div>
+            <div class="stat-info">
+                <div class="value" id="statUpcoming">0</div>
+                <div class="label">Upcoming Trips</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon si-green"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-info">
+                <div class="value" id="statCompleted">0</div>
+                <div class="label">Completed</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon si-amber"><i class="fas fa-dollar-sign"></i></div>
+            <div class="stat-info">
+                <div class="value" id="statSpent">$0</div>
+                <div class="label">Total Spent</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABS + FILTERS -->
+    <div class="tab-bar">
+        <button class="tab-btn active" id="tabUpcoming" onclick="switchTab('upcoming')"><i class="fas fa-plane-departure"></i> Upcoming</button>
+        <button class="tab-btn" id="tabPast" onclick="switchTab('past')"><i class="fas fa-history"></i> Past</button>
+        <button class="tab-btn" id="tabAll" onclick="switchTab('all')"><i class="fas fa-list"></i> All</button>
+    </div>
+
+    <div class="filter-row">
+        <button class="chip active" onclick="filterType('ALL', this)">All Types</button>
+        <button class="chip" onclick="filterType('HOTEL', this)"><i class="fas fa-hotel"></i> Hotels</button>
+        <button class="chip" onclick="filterType('VEHICLE', this)"><i class="fas fa-car"></i> Vehicles</button>
+        <button class="chip" onclick="filterType('ACTIVITY', this)"><i class="fas fa-hiking"></i> Activities</button>
+        <button class="chip" onclick="filterType('TOURGUIDE', this)"><i class="fas fa-user-tie"></i> Tour Guides</button>
+        <button class="chip" onclick="filterType('ITINERARY', this)"><i class="fas fa-map-marked-alt"></i> Trip Plans</button>
+    </div>
+
+    <!-- GRID -->
+    <div class="bookings-grid" id="bookingsGrid">
+        <div class="loading"><div class="spinner"></div><p style="color:#7F8C8D">Loading your bookings...</p></div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="dashToast"><i id="toastIcon" class="fas fa-info-circle"></i><span id="toastMsg"></span></div>
+
+<script>
+    const API = 'http://localhost:8080/api';
+    let allBookings = [];
+    let currentTab = 'upcoming';
+    let currentType = 'ALL';
+    let currentUser = null;
+
+    // Read user IMMEDIATELY (before DOMContentLoaded) — just store it
+    (function() {
+        try {
+            const str = localStorage.getItem('ceylon_current_user');
+            if (!str) { window.location.href = 'login-complete.html'; return; }
+            currentUser = JSON.parse(str);
+        } catch(e) { window.location.href = 'login-complete.html'; }
+    })();
+
+    // ── Fetch with 8-second timeout so spinner never gets stuck ──
+    async function fetchWithTimeout(url, ms = 8000) {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), ms);
+        try {
+            const res = await fetch(url, { signal: ctrl.signal });
+            clearTimeout(timer);
+            return res;
+        } catch(e) {
+            clearTimeout(timer);
+            throw e;
+        }
+    }
+
+    // ── Main init — runs when full DOM is parsed ──────────────
+    window.addEventListener('load', function() {
+        if (!currentUser) return;
+
+        // Populate hero immediately
+        const el = id => document.getElementById(id);
+        if (el('heroName'))   el('heroName').textContent   = currentUser.name  || 'Traveller';
+        if (el('heroEmail'))  el('heroEmail').textContent  = currentUser.email || '';
+        if (el('heroAvatar')) el('heroAvatar').textContent = (currentUser.name || 'U')[0].toUpperCase();
+        if (el('heroSince'))  el('heroSince').textContent  = 'Member since ' + new Date().getFullYear();
+
+        fetchBookings();
+    });
+
+
+    // ── Fetch bookings & itineraries from API ───────────────────────────────
+    async function fetchBookings() {
+        const grid = document.getElementById('bookingsGrid');
+        grid.innerHTML = '<div class="loading"><div class="spinner"></div><p style="color:#7F8C8D">Loading your bookings & trips...</p></div>';
+
+        let bookings = [];
+        let itineraries = [];
+
+        try {
+            // Use touristName endpoint — works with localStorage accounts (no real DB user ID needed)
+            const encodedName = encodeURIComponent(currentUser.name || '');
+            const res = await fetchWithTimeout(`${API}/bookings/tourist/${encodedName}`);
+            if (res.ok) bookings = await res.json();
+            else bookings = [];
+        } catch (e) {
+            bookings = []; // backend down or timeout — show empty, itineraries still load
+        }
+
+        try {
+            const res2 = await fetchWithTimeout(`${API}/itineraries`);
+            if (res2.ok) {
+                const allItineraries = await res2.json();
+                const myTrips = allItineraries.filter(i => i.touristName === currentUser.name);
+                itineraries = myTrips.map(i => ({
+                    id: i.id,
+                    bookingType: 'ITINERARY',
+                    title: i.title,
+                    startDate: i.startDate,
+                    endDate: i.endDate,
+                    totalPrice: parseFloat(i.estimatedCost) || 0,
+                    status: i.status === 'FINALIZED' ? 'CONFIRMED' : (i.status || 'DRAFT'),
+                    createdAt: i.createdAt,
+                    destinations: i.destinations || i.description || ''
+                }));
+            }
+        } catch (e) { console.warn('Itineraries fetch failed or timed out:', e.message); }
+
+        allBookings = [...bookings, ...itineraries];
+        
+        // Sort by most recent creation date first!
+        allBookings.sort((a,b) => parseDateTime(b.createdAt) - parseDateTime(a.createdAt));
+
+        updateStats();
+        renderBookings();
+    }
+
+    // ── Stats ─────────────────────────────────────────────────
+    function updateStats() {
+        const now = new Date();
+        const upcoming = allBookings.filter(b => getDate(b) >= now).length;
+        const completed = allBookings.filter(b => getDate(b) < now && b.status !== 'CANCELLED').length;
+        const spent = allBookings.reduce((s, b) => s + (b.totalPrice || 0), 0);
+
+        document.getElementById('statTotal').textContent    = allBookings.length;
+        document.getElementById('statUpcoming').textContent = upcoming;
+        document.getElementById('statCompleted').textContent = completed;
+        document.getElementById('statSpent').textContent   = '$' + spent.toFixed(0);
+    }
+
+    // ── Switch tab ────────────────────────────────────────────
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+        renderBookings();
+    }
+
+    // ── Filter by type ────────────────────────────────────────
+    function filterType(type, el) {
+        currentType = type;
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        renderBookings();
+    }
+
+    // ── Render ────────────────────────────────────────────────
+    function renderBookings() {
+        const grid = document.getElementById('bookingsGrid');
+        const now = new Date();
+
+        let list = allBookings;
+
+        // Tab filter
+        if (currentTab === 'upcoming') list = list.filter(b => getDate(b) >= now);
+        if (currentTab === 'past')     list = list.filter(b => getDate(b) < now);
+
+        // Type filter
+        if (currentType !== 'ALL') list = list.filter(b => b.bookingType === currentType);
+
+        if (list.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fas fa-suitcase-rolling"></i></div>
+                    <h3>No bookings found</h3>
+                    <p>You have no ${currentTab !== 'all' ? currentTab : ''} ${currentType !== 'ALL' ? currentType.toLowerCase() : ''} items yet.</p>
+                    <a href="index.html" class="explore-btn"><i class="fas fa-compass"></i> Start Exploring</a>
+                </div>`;
+            return;
+        }
+
+        grid.innerHTML = list.map(b => buildCard(b, now)).join('');
+    }
+
+    // ── Build booking card ────────────────────────────────────
+    function buildCard(b, now) {
+        const type = b.bookingType || 'HOTEL';
+        const isPast = getDate(b) < now;
+        const status = b.status || 'PENDING';
+        const statusClass = { CONFIRMED: 's-confirmed', PENDING: 's-pending', CANCELLED: 's-cancelled', COMPLETED: 's-completed', DRAFT: 's-pending' }[status] || 's-pending';
+
+        const typeIcon  = { HOTEL: 'fa-hotel', VEHICLE: 'fa-car', ACTIVITY: 'fa-hiking', TOURGUIDE: 'fa-user-tie', ITINERARY: 'fa-map-marked-alt' }[type] || 'fa-calendar';
+        const typeClass = { HOTEL: 'type-hotel', VEHICLE: 'type-vehicle', ACTIVITY: 'type-activity', TOURGUIDE: 'type-guide', ITINERARY: 'type-hotel' }[type] || 'type-hotel';
+
+        // Date lines
+        let dateHtml = '';
+        if (type === 'HOTEL' || type === 'ITINERARY') {
+            dateHtml = row('fa-calendar-check', (b.checkInDate || b.startDate || '') + ' → ' + (b.checkOutDate || b.endDate || ''));
+        } else if (type === 'VEHICLE') {
+            dateHtml = row('fa-calendar-check', (b.startDate || '') + ' → ' + (b.endDate || ''));
+        } else {
+            dateHtml = row('fa-calendar-day', b.startDate || b.date || '');
+        }
+
+        const extraRows = [
+            b.title ? row('fa-suitcase', b.title) : '',
+            b.destinations ? row('fa-map-signs', (b.destinations.length > 50 ? b.destinations.substring(0,50)+'...' : b.destinations)) : '',
+            b.pickupLocation ? row('fa-map-marker-alt', b.pickupLocation) : '',
+            b.dropoffLocation ? row('fa-map-pin', 'Drop-off: ' + b.dropoffLocation) : '',
+            b.numberOfGuests  ? row('fa-users', b.numberOfGuests + ' Guest(s)') : '',
+            b.numberOfPassengers ? row('fa-users', b.numberOfPassengers + ' Passenger(s)') : '',
+            b.roomType ? row('fa-bed', capitalize(b.roomType) + ' Room') : '',
+            b.paymentMethod ? row('fa-credit-card', capitalize(b.paymentMethod)) : '',
+        ].join('');
+
+        // 5-Minute Cancellation Rule Check
+        let cancelBtn = '';
+        if (!isPast && status !== 'CANCELLED') {
+            const createdTime = parseDateTime(b.createdAt);
+            const diffMins = Math.floor((now - createdTime) / 60000); // converting ms to mins
+            
+            if (diffMins <= 5) {
+                cancelBtn = `<button class="cancel-btn" onclick="cancelItem(${b.id}, '${type}')"><i class="fas fa-times-circle"></i> Cancel</button>`;
+            } else {
+                cancelBtn = `<button class="cancel-btn" style="opacity:0.5; cursor:not-allowed; border-color:#ccc; color:#888;" title="Cancellations are only allowed within 5 minutes of booking." disabled><i class="fas fa-lock"></i> Time Expired</button>`;
+            }
+        } else {
+            cancelBtn = `<span class="past-badge"><i class="fas fa-${isPast ? 'check' : 'ban'}"></i> ${isPast ? 'Completed' : 'Cancelled'}</span>`;
+        }
+
+        return `
+        <div class="booking-card">
+            <div class="card-top">
+                <div>
+                    <span class="booking-type-badge ${typeClass}"><i class="fas ${typeIcon}"></i> ${type}</span>
+                    <div class="booking-id">${type === 'ITINERARY' ? 'Plan' : 'Booking'} #${b.id} &bull; Created ${b.createdAt ? new Date(b.createdAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'N/A'}</div>
+                </div>
+                <span class="status-pill ${statusClass}">${status}</span>
+            </div>
+            <div class="card-body">
+                ${dateHtml}
+                ${extraRows}
+            </div>
+            <div class="card-bottom">
+                <div class="card-total">$${(b.totalPrice || 0).toFixed(2)} <span>total</span></div>
+                ${cancelBtn}
+            </div>
+        </div>`;
+    }
+
+    function row(icon, text) {
+        return `<div class="detail-row"><i class="fas ${icon}"></i><span>${text}</span></div>`;
+    }
+    function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : ''; }
+    function getDate(b) { return new Date(b.startDate || b.checkInDate || b.date || '2000-01-01'); }
+    function parseDateTime(d) {
+        if (!d) return new Date('2000-01-01');
+        if (Array.isArray(d)) return new Date(d[0], (d[1]||1)-1, d[2]||1, d[3]||0, d[4]||0, d[5]||0);
+        return new Date(d);
+    }
+
+    // ── Dynamic Cancel Item (5-min strict boundary) ─────────────────────────
+    async function cancelItem(id, type) {
+        if (!confirm('Are you sure you want to cancel this ' + type.toLowerCase() + '?')) return;
+        try {
+            let res;
+            if (type === 'ITINERARY') {
+                res = await fetch(API + '/itineraries/' + id, { method: 'DELETE' });
+            } else {
+                res = await fetch(API + '/bookings/' + id + '/cancel', { method: 'PUT' });
+            }
+            if (res.ok) {
+                if (type === 'ITINERARY') {
+                    allBookings = allBookings.filter(x => !(x.id === id && x.bookingType === 'ITINERARY'));
+                } else {
+                    const b = allBookings.find(x => x.id === id && x.bookingType !== 'ITINERARY');
+                    if (b) b.status = 'CANCELLED';
+                }
+                updateStats();
+                renderBookings();
+                toast((type === 'ITINERARY' ? 'Trip plan' : 'Booking') + ' #' + id + ' cancelled.', 'success');
+            } else {
+                toast('Could not cancel. Please try again.', 'error');
+            }
+        } catch (e) {
+            const b = allBookings.find(x => x.id === id);
+            if (b) b.status = 'CANCELLED';
+            updateStats();
+            renderBookings();
+            toast('Cancelled (demo mode).', 'info');
+        }
+    }
+
+    // ── Toast ─────────────────────────────────────────────────
+    function toast(msg, type = 'info') {
+        const el = document.getElementById('dashToast');
+        const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle' };
+        el.className = 'show ' + type;
+        document.getElementById('toastIcon').className = 'fas ' + (icons[type] || icons.info);
+        document.getElementById('toastMsg').textContent = msg;
+        clearTimeout(el._t);
+        el._t = setTimeout(() => el.classList.remove('show'), 3500);
+    }
+
+    // ── Sample data (backend offline fallback) ────────────────
+    function getSampleBookings() {
+        const now = new Date();
+        const future = d => new Date(now.getTime() + d * 86400000).toISOString().split('T')[0];
+        const past   = d => new Date(now.getTime() - d * 86400000).toISOString().split('T')[0];
+        return [
+            { id:1001, bookingType:'HOTEL',    checkInDate:future(5),  checkOutDate:future(8),  status:'CONFIRMED', totalPrice:320,  roomType:'DELUXE',    paymentMethod:'card',   numberOfGuests:2,    createdAt: new Date().toISOString() },
+            { id:1002, bookingType:'VEHICLE',   startDate:future(10),   endDate:future(13),      status:'PENDING',   totalPrice:240,  pickupLocation:'Colombo Fort', dropoffLocation:'Kandy', numberOfPassengers:4, createdAt: new Date().toISOString() },
+            { id:1003, bookingType:'HOTEL',    checkInDate:past(30),   checkOutDate:past(27),   status:'COMPLETED', totalPrice:580,  roomType:'SUITE',     paymentMethod:'paypal', numberOfGuests:2,    createdAt: new Date().toISOString() },
+            { id:1004, bookingType:'ACTIVITY',  startDate:future(2),    endDate:future(2),       status:'CONFIRMED', totalPrice:80,   paymentMethod:'card',   createdAt: new Date().toISOString() },
+            { id:1005, bookingType:'VEHICLE',   startDate:past(15),    endDate:past(12),        status:'COMPLETED', totalPrice:150,  pickupLocation:'Airport', numberOfPassengers:3, createdAt: new Date().toISOString() },
+        ];
+    }
+</script>
+<script src="script.js"></script>
+<script src="navbar-fix.js"></script>
+</body>
+</html>
+

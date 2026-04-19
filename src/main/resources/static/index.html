@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEYLON EXPLORER - Sri Lanka Tourism Management System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo">
+            <i class="fas fa-umbrella-beach"></i>
+            <span>CEYLON EXPLORER</span>
+        </div>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="hotel-complete.html" class="nav-link">Hotels</a></li>
+            <li><a href="vehicle-complete.html" class="nav-link">Vehicles</a></li>
+            <li><a href="tourguide-complete.html" class="nav-link">Tour Guides</a></li>
+            <li><a href="activity-complete.html" class="nav-link">Activities</a></li>
+            <li><a href="touristlocation-complete.html" class="nav-link">Locations</a></li>
+            <li><a href="itinerary.html" class="nav-link">Itinerary</a></li>
+            <li><a href="culture.html" class="nav-link">Culture&amp;Calendar</a></li>
+            <li><a href="emergency-healthcare.html" class="nav-link">Emergency</a></li>
+
+            <!-- Login button — logged out state -->
+            <li id="navLoginLi">
+                <a href="login-complete.html" class="nav-link nav-login-btn" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+            </li>
+
+            <!-- Sign Up button — logged out state -->
+            <li id="navSignupLi">
+                <a href="signup-complete.html" class="nav-link nav-signup-btn" id="signupBtn">
+                    <i class="fas fa-user-plus"></i> Sign Up
+                </a>
+            </li>
+
+            <!-- User menu — logged in state (hidden by default) -->
+            <li id="navUserLi" style="display:none; position:relative;">
+                <button class="nav-user-btn" id="userMenuBtn" onclick="toggleUserMenu()">
+                    <span id="navUserAvatar" class="nav-avatar">U</span>
+                    <span id="navUserName">User</span>
+                    <i class="fas fa-chevron-down" style="font-size:10px; margin-left:4px;"></i>
+                </button>
+                <div class="nav-dropdown" id="userDropdown">
+                    <a href="#" id="dashboardLink"><i class="fas fa-th-large"></i> Dashboard</a>
+                    <a href="#" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </li>
+        </ul>
+
+        <div class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section id="home" class="hero">
+    <div class="hero-overlay">
+        <div class="hero-content">
+            <h1>Welcome to Ceylon Explorer</h1>
+            <p>Your Complete Sri Lanka Tourism Management Platform</p>
+            <div class="hero-search">
+                <input type="text" placeholder="Search destinations, hotels, activities...">
+                <button class="search-btn"><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div class="hero-features">
+                <div class="hero-feature">
+                    <i class="fas fa-hotel"></i>
+                    <span>Hotels</span>
+                </div>
+                <div class="hero-feature">
+                    <i class="fas fa-car"></i>
+                    <span>Vehicles</span>
+                </div>
+                <div class="hero-feature">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Guides</span>
+                </div>
+                <div class="hero-feature">
+                    <i class="fas fa-hiking"></i>
+                    <span>Activities</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Hotels Section -->
+<section id="hotels" class="section">
+    <div class="container">
+        <h2 class="section-title">Featured Hotels</h2>
+        <div class="filter-bar">
+            <select id="hotelLocation">
+                <option value="">Select Location</option>
+                <option value="colombo">Colombo</option>
+                <option value="kandy">Kandy</option>
+                <option value="galle">Galle</option>
+                <option value="nuwara-eliya">Nuwara Eliya</option>
+                <option value="ella">Ella</option>
+            </select>
+            <select id="hotelPrice">
+                <option value="">Price Range</option>
+                <option value="0-50">$0 - $50</option>
+                <option value="50-100">$50 - $100</option>
+                <option value="100-200">$100 - $200</option>
+                <option value="200+">$200+</option>
+            </select>
+            <select id="hotelRating">
+                <option value="">Rating</option>
+                <option value="5">5 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="3">3 Stars</option>
+            </select>
+            <button class="filter-btn" onclick="searchHotels()">Apply Filters</button>
+        </div>
+        <div class="cards-grid" id="hotelsGrid"></div>
+    </div>
+</section>
+
+<!-- Vehicles Section -->
+<section id="vehicles" class="section bg-light">
+    <div class="container">
+        <h2 class="section-title">Vehicle Rentals</h2>
+        <div class="vehicle-types">
+            <button class="vehicle-type-btn active" onclick="filterByType('all', this)">All Vehicles</button>
+            <button class="vehicle-type-btn" onclick="filterByType('car', this)">Cars</button>
+            <button class="vehicle-type-btn" onclick="filterByType('van', this)">Vans</button>
+            <button class="vehicle-type-btn" onclick="filterByType('bike', this)">Bikes</button>
+            <button class="vehicle-type-btn" onclick="filterByType('luxury', this)">Luxury</button>
+        </div>
+        <div class="cards-grid" id="vehiclesGrid"></div>
+    </div>
+</section>
+
+<!-- Tour Guides Section -->
+<section id="guides" class="section">
+    <div class="container">
+        <h2 class="section-title">Professional Tour Guides</h2>
+        <div class="filter-bar">
+            <select id="guideLanguage">
+                <option value="">Language</option>
+                <option value="english">English</option>
+                <option value="chinese">Chinese</option>
+                <option value="french">French</option>
+                <option value="german">German</option>
+                <option value="spanish">Spanish</option>
+            </select>
+            <select id="guideSpecialty">
+                <option value="">Specialty</option>
+                <option value="cultural">Cultural Tours</option>
+                <option value="wildlife">Wildlife Safari</option>
+                <option value="adventure">Adventure</option>
+                <option value="photography">Photography</option>
+            </select>
+            <button class="filter-btn" onclick="searchGuides()">Find Guides</button>
+        </div>
+        <div class="cards-grid" id="guidesGrid"></div>
+    </div>
+</section>
+
+<!-- Activities Section -->
+<section id="activities" class="section bg-light">
+    <div class="container">
+        <h2 class="section-title">Popular Activities</h2>
+        <div class="activities-categories">
+            <div class="category-card" onclick="filterByCategory('SAFARI', this)" style="cursor: pointer;">
+                <i class="fas fa-paw"></i>
+                <h3>Safari Tours</h3>
+                <p>Wildlife experiences</p>
+            </div>
+            <div class="category-card" onclick="filterByCategory('WATER', this)" style="cursor: pointer;">
+                <i class="fas fa-ship"></i>
+                <h3>Boat Rides</h3>
+                <p>River cruises & whales</p>
+            </div>
+            <div class="category-card" onclick="filterByCategory('SPORTS', this)" style="cursor: pointer;">
+                <i class="fas fa-swimming-pool"></i>
+                <h3>Water Sports</h3>
+                <p>Diving & surfing</p>
+            </div>
+            <div class="category-card" onclick="filterByCategory('HIKING', this)" style="cursor: pointer;">
+                <i class="fas fa-mountain"></i>
+                <h3>Hiking &amp; Trekking</h3>
+                <p>Beautiful trails</p>
+            </div>
+            <div class="category-card" onclick="filterByCategory('PHOTO', this)" style="cursor: pointer;">
+                <i class="fas fa-camera"></i>
+                <h3>Photography</h3>
+                <p>Stunning landscapes</p>
+            </div>
+            <div class="category-card" onclick="filterByCategory('CULTURAL', this)" style="cursor: pointer;">
+                <i class="fas fa-landmark"></i>
+                <h3>Cultural Tours</h3>
+                <p>Heritage & temples</p>
+            </div>
+        </div>
+        
+        <h3 style="margin-top:4rem; margin-bottom: 2rem; color:var(--secondary-color); text-align:center;">Featured Activities</h3>
+        <!-- Dynamic activities grid from database -->
+        <div class="cards-grid" id="activitiesGrid"></div>
+    </div>
+</section>
+
+<!-- Tourist Locations Section -->
+<section id="locations" class="section">
+    <div class="container">
+        <h2 class="section-title">Must-Visit Destinations</h2>
+        <div class="locations-grid cards-grid" id="locationsGrid">
+            <!-- Dynamic locations will be loaded here from the database via ceylon-loader.js -->
+        </div>
+    </div>
+</section>
+
+<!-- Emergency Services Section -->
+<section id="emergency" class="section emergency-section">
+    <div class="container">
+        <h2 class="section-title">Emergency Services</h2>
+        <div class="emergency-grid">
+            <div class="emergency-card">
+                <i class="fas fa-phone-alt"></i>
+                <h3>Emergency Hotline</h3>
+                <p class="emergency-number">119</p>
+                <button class="btn-emergency">Call Now</button>
+            </div>
+            <div class="emergency-card">
+                <i class="fas fa-hospital"></i>
+                <h3>Hospitals</h3>
+                <p>Find nearest hospitals</p>
+                <button class="btn-emergency">Locate</button>
+            </div>
+            <div class="emergency-card">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Police</h3>
+                <p class="emergency-number">119</p>
+                <button class="btn-emergency">Contact</button>
+            </div>
+            <div class="emergency-card">
+                <i class="fas fa-building"></i>
+                <h3>Tourist Police</h3>
+                <p class="emergency-number">+94 11 242 1052</p>
+                <button class="btn-emergency">Call</button>
+            </div>
+            <div class="emergency-card">
+                <i class="fas fa-fire"></i>
+                <h3>Fire Service</h3>
+                <p class="emergency-number">110</p>
+                <button class="btn-emergency">Call Now</button>
+            </div>
+            <div class="emergency-card">
+                <i class="fas fa-user-md"></i>
+                <h3>Ambulance</h3>
+                <p class="emergency-number">1990</p>
+                <button class="btn-emergency">Emergency</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CEYLON EXPLORER</h3>
+                <p>Your trusted partner for exploring Sri Lanka</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#hotels">Hotels</a></li>
+                    <li><a href="#vehicles">Vehicles</a></li>
+                    <li><a href="#guides">Tour Guides</a></li>
+                    <li><a href="#activities">Activities</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQs</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <p><i class="fas fa-phone"></i> +94 11 234 5678</p>
+                <p><i class="fas fa-envelope"></i> info@ceylonexplorer.lk</p>
+                <p><i class="fas fa-map-marker-alt"></i> Colombo, Sri Lanka</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Ceylon Explorer. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Chatbot -->
+<div id="chatbot" class="chatbot">
+    <div class="chatbot-header">
+        <i class="fas fa-robot"></i>
+        <span>Ceylon Helper</span>
+        <button id="chatbotClose"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="chatbot-messages" id="chatbotMessages">
+        <div class="bot-message">
+            <p>Hello! I'm Ceylon Helper. How can I assist you today?</p>
+        </div>
+    </div>
+    <div class="chatbot-input">
+        <input type="text" id="chatbotInput" placeholder="Type your message...">
+        <button id="chatbotSend"><i class="fas fa-paper-plane"></i></button>
+    </div>
+</div>
+<button id="chatbotToggle" class="chatbot-toggle">
+    <i class="fas fa-comment-dots"></i>
+</button>
+
+<script src="script.js"></script>
+<script src="ceylon-data.js"></script>
+<script src="ceylon-loader.js"></script>
+</body>
+</html>

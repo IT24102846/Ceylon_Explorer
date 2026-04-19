@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Ceylon Explorer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --gold: #C9A84C;
+            --gold-light: #E8C97A;
+            --dark: #0D1117;
+            --dark-2: #161B24;
+            --dark-3: #1E2535;
+            --dark-4: #252D3D;
+            --text: #E8E8E8;
+            --text-muted: #8A9BB0;
+            --green: #2ECC71;
+            --red: #E74C3C;
+            --blue: #3498DB;
+            --orange: #E67E22;
+            --purple: #9B59B6;
+            --sidebar-width: 260px;
+        }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--dark-2);
+            border-right: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0;
+            height: 100vh;
+            z-index: 100;
+            transition: transform 0.3s;
+            overflow-y: auto;
+        }
+        .sidebar-logo {
+            padding: 24px 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: var(--dark); flex-shrink: 0;
+        }
+        .logo-text { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--text); line-height: 1.2; }
+        .logo-text span { display: block; font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--gold); font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
+
+        .sidebar-nav { padding: 16px 12px; flex: 1; }
+        .nav-section-title { font-size: 10px; font-weight: 600; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; padding: 12px 8px 6px; }
+
+        .nav-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 12px; border-radius: 10px;
+            color: var(--text-muted); font-size: 14px; font-weight: 500;
+            cursor: pointer; transition: all 0.2s; margin-bottom: 2px;
+            text-decoration: none; border: none; background: none; width: 100%; text-align: left;
+        }
+        .nav-item i { width: 20px; text-align: center; font-size: 15px; }
+        .nav-item:hover { background: var(--dark-3); color: var(--text); }
+        .nav-item.active { background: rgba(201,168,76,0.15); color: var(--gold); }
+        .nav-item .badge {
+            margin-left: auto; background: var(--gold); color: var(--dark);
+            font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
+        }
+
+        .sidebar-bottom {
+            padding: 16px 12px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .admin-profile {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; border-radius: 10px;
+            background: var(--dark-3);
+        }
+        .avatar {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 700; color: var(--dark); flex-shrink: 0;
+        }
+        .admin-info { flex: 1; min-width: 0; }
+        .admin-name { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .admin-role { font-size: 11px; color: var(--gold); }
+        .logout-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 15px; padding: 4px; transition: color 0.2s; }
+        .logout-btn:hover { color: var(--red); }
+
+        /* ── MAIN ── */
+        .main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            background: var(--dark-2);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 0 28px;
+            height: 64px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 50;
+        }
+        .topbar-left h1 { font-size: 18px; font-weight: 600; color: var(--text); }
+        .topbar-left p { font-size: 12px; color: var(--text-muted); }
+        .topbar-right { display: flex; align-items: center; gap: 12px; }
+        .topbar-btn {
+            width: 38px; height: 38px;
+            background: var(--dark-3); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted); cursor: pointer; font-size: 15px; transition: all 0.2s;
+            text-decoration: none;
+        }
+        .topbar-btn:hover { color: var(--gold); border-color: var(--gold); }
+        .notification-dot { position: relative; }
+        .notification-dot::after {
+            content: ''; position: absolute; top: 6px; right: 6px;
+            width: 8px; height: 8px; background: var(--red); border-radius: 50%;
+            border: 2px solid var(--dark-2);
+        }
+        .hamburger-btn {
+            display: none; background: none; border: none; color: var(--text);
+            font-size: 20px; cursor: pointer;
+        }
+
+        /* ── CONTENT ── */
+        .content { padding: 28px; flex: 1; }
+
+        /* ── PAGES ── */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* ── STATS GRID ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px; margin-bottom: 28px;
+        }
+        .stat-card {
+            background: var(--dark-2);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px; padding: 20px;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-2px); border-color: rgba(201,168,76,0.3); }
+        .stat-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .stat-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 18px;
+        }
+        .stat-icon.gold { background: rgba(201,168,76,0.15); color: var(--gold); }
+        .stat-icon.green { background: rgba(46,204,113,0.15); color: var(--green); }
+        .stat-icon.blue { background: rgba(52,152,219,0.15); color: var(--blue); }
+        .stat-icon.red { background: rgba(231,76,60,0.15); color: var(--red); }
+        .stat-icon.purple { background: rgba(155,89,182,0.15); color: var(--purple); }
+        .stat-icon.orange { background: rgba(230,126,34,0.15); color: var(--orange); }
+        .stat-change { font-size: 12px; font-weight: 600; }
+        .stat-change.up { color: var(--green); }
+        .stat-change.down { color: var(--red); }
+        .stat-value { font-size: 28px; font-weight: 700; color: var(--text); font-family: 'Playfair Display', serif; }
+        .stat-label { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+        /* ── SECTION HEADER ── */
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 18px;
+        }
+        .section-header h2 { font-size: 17px; font-weight: 600; color: var(--text); }
+        .section-header p { font-size: 13px; color: var(--text-muted); }
+
+        /* ── QUICK ACCESS GRID ── */
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px; margin-bottom: 28px;
+        }
+        .quick-card {
+            background: var(--dark-2);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px; padding: 20px;
+            cursor: pointer; transition: all 0.25s;
+            text-decoration: none;
+            display: flex; flex-direction: column; align-items: center;
+            text-align: center; gap: 10px;
+        }
+        .quick-card:hover {
+            border-color: var(--gold);
+            background: rgba(201,168,76,0.07);
+            transform: translateY(-3px);
+        }
+        .quick-card i { font-size: 28px; }
+        .quick-card span { font-size: 13px; font-weight: 500; color: var(--text); }
+        .quick-card small { font-size: 11px; color: var(--text-muted); }
+
+        /* ── MANAGE PAGE ── */
+        .manage-toolbar {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .search-box {
+            flex: 1; min-width: 200px;
+            position: relative;
+        }
+        .search-box i {
+            position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted); font-size: 14px;
+        }
+        .search-box input {
+            width: 100%; padding: 10px 12px 10px 36px;
+            background: var(--dark-3); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif;
+            font-size: 13px; outline: none; transition: border-color 0.2s;
+        }
+        .search-box input:focus { border-color: var(--gold); }
+        .search-box input::placeholder { color: rgba(138,155,176,0.5); }
+
+        .btn {
+            padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 600;
+            font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s;
+            border: none; display: flex; align-items: center; gap: 7px; white-space: nowrap;
+        }
+        .btn-gold { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--dark); }
+        .btn-gold:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,168,76,0.3); }
+        .btn-outline {
+            background: transparent; border: 1px solid rgba(255,255,255,0.12);
+            color: var(--text-muted);
+        }
+        .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+        .btn-danger { background: rgba(231,76,60,0.15); color: var(--red); border: 1px solid rgba(231,76,60,0.2); }
+        .btn-danger:hover { background: rgba(231,76,60,0.25); }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+        /* ── TABLE ── */
+        .table-wrap {
+            background: var(--dark-2);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px; overflow: hidden;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        thead tr { background: var(--dark-3); }
+        th {
+            padding: 12px 16px; text-align: left;
+            font-size: 11px; font-weight: 600; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        td { padding: 13px 16px; font-size: 13px; color: var(--text); border-top: 1px solid rgba(255,255,255,0.04); }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        .td-img {
+            width: 40px; height: 40px; border-radius: 8px;
+            background: var(--dark-3); display: flex; align-items: center; justify-content: center;
+            font-size: 18px; flex-shrink: 0;
+        }
+        .td-name { display: flex; align-items: center; gap: 12px; }
+        .badge-status {
+            padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+        }
+        .badge-active { background: rgba(46,204,113,0.15); color: var(--green); }
+        .badge-inactive { background: rgba(231,76,60,0.15); color: var(--red); }
+        .badge-pending { background: rgba(230,126,34,0.15); color: var(--orange); }
+        .actions { display: flex; gap: 6px; }
+
+        /* ── MODAL ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+            z-index: 200; display: none;
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: var(--dark-2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px; padding: 28px;
+            width: 100%; max-width: 520px;
+            max-height: 90vh; overflow-y: auto;
+            animation: modalIn 0.25s ease;
+        }
+        @keyframes modalIn {
+            from { transform: scale(0.95) translateY(10px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 22px;
+        }
+        .modal-header h3 { font-size: 18px; font-weight: 600; }
+        .modal-close {
+            background: none; border: none; color: var(--text-muted);
+            font-size: 20px; cursor: pointer; transition: color 0.2s;
+        }
+        .modal-close:hover { color: var(--red); }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%; padding: 11px 14px;
+            background: var(--dark-3); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif;
+            font-size: 14px; outline: none; transition: border-color 0.2s;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus { border-color: var(--gold); }
+        .form-group input::placeholder,
+        .form-group textarea::placeholder { color: rgba(138,155,176,0.45); }
+        .form-group select option { background: var(--dark-3); }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+
+        /* ── LINK CARDS (Page Links) ── */
+        .page-links-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+        }
+        .page-link-card {
+            background: var(--dark-2);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px; padding: 22px;
+            transition: all 0.25s;
+        }
+        .page-link-card:hover { border-color: rgba(201,168,76,0.3); transform: translateY(-2px); }
+        .plc-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .plc-icon {
+            width: 46px; height: 46px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 20px;
+        }
+        .plc-title { font-size: 15px; font-weight: 600; color: var(--text); }
+        .plc-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; }
+        .plc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .plc-btn {
+            padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+            font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s;
+            border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .plc-btn-view { background: rgba(52,152,219,0.15); color: var(--blue); }
+        .plc-btn-view:hover { background: rgba(52,152,219,0.25); }
+        .plc-btn-manage { background: rgba(201,168,76,0.15); color: var(--gold); }
+        .plc-btn-manage:hover { background: rgba(201,168,76,0.25); }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed; bottom: 24px; right: 24px;
+            padding: 13px 18px; border-radius: 10px;
+            font-size: 13px; font-weight: 500;
+            display: flex; align-items: center; gap: 9px;
+            transform: translateY(80px); opacity: 0;
+            transition: all 0.3s; z-index: 9999;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: #1a3a2a; color: var(--green); border: 1px solid rgba(46,204,113,0.3); }
+        .toast.error { background: #3a1a1a; color: var(--red); border: 1px solid rgba(231,76,60,0.3); }
+        .toast.info { background: #1a2a3a; color: var(--blue); border: 1px solid rgba(52,152,219,0.3); }
+
+        /* ── ANALYTICS ── */
+        .analytics-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 18px; margin-bottom: 28px; }
+        .chart-card {
+            background: var(--dark-2); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px; padding: 22px;
+        }
+        .chart-title { font-size: 15px; font-weight: 600; margin-bottom: 18px; }
+        .bar-chart { display: flex; align-items: flex-end; gap: 10px; height: 140px; }
+        .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .bar {
+            width: 100%; border-radius: 6px 6px 0 0;
+            background: linear-gradient(to top, var(--gold), var(--gold-light));
+            transition: height 0.8s ease; min-height: 4px;
+        }
+        .bar-label { font-size: 10px; color: var(--text-muted); }
+        .donut-wrap { display: flex; flex-direction: column; gap: 10px; }
+        .donut-item { display: flex; align-items: center; gap: 10px; }
+        .donut-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .donut-name { font-size: 13px; color: var(--text-muted); flex: 1; }
+        .donut-val { font-size: 13px; font-weight: 600; color: var(--text); }
+        .donut-bar-wrap { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+        .donut-bar { height: 100%; border-radius: 3px; }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center; padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state i { font-size: 48px; margin-bottom: 14px; opacity: 0.3; }
+        .empty-state p { font-size: 14px; }
+
+        /* ── USERS ── */
+        .user-avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: var(--dark-4); display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700; color: var(--gold);
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 1100px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .quick-grid { grid-template-columns: repeat(2, 1fr); }
+            .analytics-grid { grid-template-columns: 1fr; }
+            .page-links-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; }
+            .hamburger-btn { display: block; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .page-links-grid { grid-template-columns: 1fr; }
+            .quick-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .quick-grid { grid-template-columns: 1fr 1fr; }
+            .form-row-2 { grid-template-columns: 1fr; }
+        }
+
+        .overlay-bg {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5); z-index: 99;
+        }
+        .overlay-bg.open { display: block; }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar Overlay (mobile) -->
+<div class="overlay-bg" id="overlayBg" onclick="toggleSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon"><i class="fas fa-umbrella-beach"></i></div>
+        <div class="logo-text">CEYLON EXPLORER <span>Admin Panel</span></div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section-title">Main</div>
+        <button class="nav-item active" onclick="showPage('overview')">
+            <i class="fas fa-th-large"></i> Overview
+        </button>
+        <button class="nav-item" onclick="showPage('pages')">
+            <i class="fas fa-link"></i> Page Links
+            <span class="badge">11</span>
+        </button>
+        <button class="nav-item" onclick="showPage('analytics')">
+            <i class="fas fa-chart-bar"></i> Analytics
+        </button>
+
+        <div class="nav-section-title">Manage Content</div>
+        <button class="nav-item" onclick="showPage('hotels')">
+            <i class="fas fa-hotel"></i> Hotels
+        </button>
+        <button class="nav-item" onclick="showPage('vehicles')">
+            <i class="fas fa-car"></i> Vehicles
+        </button>
+        <button class="nav-item" onclick="showPage('guides')">
+            <i class="fas fa-user-tie"></i> Tour Guides
+        </button>
+        <button class="nav-item" onclick="showPage('activities')">
+            <i class="fas fa-hiking"></i> Activities
+        </button>
+        <button class="nav-item" onclick="showPage('locations')">
+            <i class="fas fa-map-marker-alt"></i> Locations
+        </button>
+        <button class="nav-item" onclick="showPage('itinerary')">
+            <i class="fas fa-route"></i> Itinerary
+        </button>
+        <button class="nav-item" onclick="showPage('culture')">
+            <i class="fas fa-calendar-alt"></i> Culture & Calendar
+        </button>
+        <button class="nav-item" onclick="showPage('emergency')">
+            <i class="fas fa-ambulance"></i> Emergency & Health
+        </button>
+
+        <div class="nav-section-title">System</div>
+        <button class="nav-item" onclick="showPage('users')">
+            <i class="fas fa-users"></i> Users
+        </button>
+        <button class="nav-item" onclick="showPage('bookings')">
+            <i class="fas fa-calendar-check"></i> Bookings
+        </button>
+    </nav>
+
+    <div class="sidebar-bottom">
+        <div class="admin-profile">
+            <div class="avatar" id="sidebarAvatar">A</div>
+            <div class="admin-info">
+                <div class="admin-name" id="sidebarName">Admin</div>
+                <div class="admin-role">Service Provider</div>
+            </div>
+            <button class="logout-btn" onclick="logout()" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+    <!-- Topbar -->
+    <div class="topbar">
+        <div style="display:flex;align-items:center;gap:14px;">
+            <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <div class="topbar-left">
+                <h1 id="pageTitle">Overview</h1>
+                <p id="pageSubtitle">Welcome back, Admin</p>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <a href="index.html" class="topbar-btn" title="View Website" target="_blank">
+                <i class="fas fa-external-link-alt"></i>
+            </a>
+            <button class="topbar-btn notification-dot" title="Notifications">
+                <i class="fas fa-bell"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+        <!-- ══ OVERVIEW PAGE ══ -->
+        <div class="page active" id="page-overview">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon gold"><i class="fas fa-hotel"></i></div>
+                        <span class="stat-change up" id="stat-hotels-change">↑ 0</span>
+                    </div>
+                    <div class="stat-value" id="stat-hotels">0</div>
+                    <div class="stat-label">Hotels Listed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon blue"><i class="fas fa-car"></i></div>
+                        <span class="stat-change up" id="stat-vehicles-change">↑ 0</span>
+                    </div>
+                    <div class="stat-value" id="stat-vehicles">0</div>
+                    <div class="stat-label">Vehicles Available</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon green"><i class="fas fa-user-tie"></i></div>
+                        <span class="stat-change up" id="stat-guides-change">↑ 0</span>
+                    </div>
+                    <div class="stat-value" id="stat-guides">0</div>
+                    <div class="stat-label">Tour Guides</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon purple"><i class="fas fa-users"></i></div>
+                        <span class="stat-change up">↑ 0</span>
+                    </div>
+                    <div class="stat-value" id="stat-users">0</div>
+                    <div class="stat-label">Registered Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon orange"><i class="fas fa-hiking"></i></div>
+                        <span class="stat-change up" id="stat-activities-change">↑ 0</span>
+                    </div>
+                    <div class="stat-value" id="stat-activities">0</div>
+                    <div class="stat-label">Activities</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon red"><i class="fas fa-map-marker-alt"></i></div>
+                        <span class="stat-change up" id="stat-locations-change">↑ 0</span>
+                    </div>
+                    <div class="stat-value" id="stat-locations">0</div>
+                    <div class="stat-label">Tourist Locations</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon gold"><i class="fas fa-calendar-alt"></i></div>
+                        <span class="stat-change up" id="stat-events-change">↑ 0</span>
+                    </div>
+                    <div class="stat-value" id="stat-events">0</div>
+                    <div class="stat-label">Cultural Events</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon green"><i class="fas fa-hospital"></i></div>
+                        <span class="stat-change up" id="stat-emergency-change">↑ 0</span>
+                    </div>
+                    <div class="stat-value" id="stat-emergency">0</div>
+                    <div class="stat-label">Emergency Services</div>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <div><h2>Quick Access — All Pages</h2><p>Manage or view any page directly</p></div>
+            </div>
+            <div class="quick-grid">
+                <a class="quick-card" onclick="showPage('hotels')">
+                    <i class="fas fa-hotel" style="color:var(--gold)"></i>
+                    <span>Hotels</span><small>Manage listings</small>
+                </a>
+                <a class="quick-card" onclick="showPage('vehicles')">
+                    <i class="fas fa-car" style="color:var(--blue)"></i>
+                    <span>Vehicles</span><small>Manage rentals</small>
+                </a>
+                <a class="quick-card" onclick="showPage('guides')">
+                    <i class="fas fa-user-tie" style="color:var(--green)"></i>
+                    <span>Tour Guides</span><small>Manage profiles</small>
+                </a>
+                <a class="quick-card" onclick="showPage('activities')">
+                    <i class="fas fa-hiking" style="color:var(--orange)"></i>
+                    <span>Activities</span><small>Setup activities</small>
+                </a>
+                <a class="quick-card" onclick="showPage('locations')">
+                    <i class="fas fa-map-marker-alt" style="color:var(--red)"></i>
+                    <span>Locations</span><small>Tourist spots</small>
+                </a>
+                <a class="quick-card" onclick="showPage('itinerary')">
+                    <i class="fas fa-route" style="color:var(--purple)"></i>
+                    <span>Itinerary</span><small>Plan templates</small>
+                </a>
+                <a class="quick-card" onclick="showPage('culture')">
+                    <i class="fas fa-calendar-alt" style="color:var(--gold)"></i>
+                    <span>Culture & Calendar</span><small>Events & festivals</small>
+                </a>
+                <a class="quick-card" onclick="showPage('emergency')">
+                    <i class="fas fa-ambulance" style="color:var(--red)"></i>
+                    <span>Emergency & Health</span><small>Hospitals, Spa, Ayurveda</small>
+                </a>
+            </div>
+        </div>
+
+        <!-- ══ PAGE LINKS ══ -->
+        <div class="page" id="page-pages">
+            <div class="section-header" style="margin-bottom:22px">
+                <div><h2>All Website Pages</h2><p>View user-facing pages & manage content</p></div>
+            </div>
+            <div class="page-links-grid">
+                <div class="page-link-card">
+                    <div class="plc-top">
+                        <div class="plc-icon" style="background:rgba(201,168,76,0.15);color:var(--gold)"><i class="fas fa-home"></i></div>
+                        <div class="plc-title">Home Page</div>
+                    </div>
+                    <p class="plc-desc">Main landing page with hero, featured sections, chatbot and emergency contacts.</p>
+                    <div class="plc-actions">
+                        <a href="index.html" target="_blank" class="plc-btn plc-btn-view"><i class="fas fa-eye"></i> View</a>
+                    </div>
+                </div>
+                <div class="page-link-card">
+                    <div class="plc-top">
+                        <div class="plc-icon" style="background:rgba(201,168,76,0.15);color:var(--gold)"><i class="fas fa-hotel"></i></div>
+                        <div class="plc-title">Hotels Page</div>
+                    </div>
+                    <p class="plc-desc">Displays all hotels with filters by location, price and rating.</p>
+                    <div class="plc-actions">
+                        <a href="hotel-complete.html" target="_blank" class="plc-btn plc-btn-view"><i class="fas fa-eye"></i> View</a>
+                        <button class="plc-btn plc-btn-manage" onclick="showPage('hotels')"><i class="fas fa-cog"></i> Manage</button>
+                    </div>
+                </div>
+                <div class="page-link-card">
+                    <div class="plc-top">
+                        <div class="plc-icon" style="background:rgba(52,152,219,0.15);color:var(--blue)"><i class="fas fa-car"></i></div>
+                        <div class="plc-title">Vehicles Page</div>
+                    </div>
+                    <p class="plc-desc">Vehicle rentals with type filters — cars, vans, bikes, luxury.</p>
+                    <div class="plc-actions">
+                        <a href="vehicle-complete.html" target="_blank" class="plc-btn plc-btn-view"><i class="fas fa-eye"></i> View</a>
+                        <button class="plc-btn plc-btn-manage" onclick="showPage('vehicles')"><i class="fas fa-cog"></i> Manage</button>
+                    </div>
+                </div>
+                <div class="page-link-card">
+                    <div class="plc-top">
+                        <div class="plc-icon" style="background:rgba(46,204,113,0.15);color:var(--green)"><i class="fas fa-user-tie"></i></div>
+                        <div class="plc-title">Tour Guides Page</div>
+                    </div>
+                    <p class="plc-desc">Professional guides filtered by language and specialty.</p>
+                    <div class="plc-actions">
+                        <a href="tourguide-complete.html" target="_blank" class="plc-btn plc-btn-view"><i class="fas fa-eye"></i> View</a>
+                        <button class="plc-btn plc-btn-manage" onclick="showPage('guides')"><i class="fas fa-cog"></i> Manage</button>
+                    </div>
+                </div>
+                <div class="page-link-card">
+                    <div class="plc-top">
+                        <div class="plc-icon" style="background:rgba(230,126,34,0.15);color:var(--orange)"><i class="fas fa-hiking"></i></div>
+                        <div class="plc-title">Activities Page</div>
+                    </div>
+                    <p class="plc-desc">Safari, boat rides, water sports, hiking, photography, food tours.</p>
+                    <div class="plc-actions">
+                        <a href="activity-complete.html" target="_blank" class="plc-btn plc-btn-view"><i class="fas fa-eye"></i> View</a>
+                        <button class="plc-btn plc-btn-manage" onclick="showPage('activities')"><i class="fas fa-cog"></i> Manage</button>
+                    </div>
+                </div>
+                <div class="page-link-card">
+                    <div class="plc-top">
+                        <div class="plc-icon" style="background:rgba(231,76,60,0.15);color:var(--red)"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="plc-title">Locations Page</div>
+                    </div>
+                    <p class="plc-desc">Must-visit tourist destinations across Sri Lanka.</p>
+                    <div class="plc-actions">
+                        <a href="touristlocation-complete.html" target="_blank" class="plc-btn plc-btn-view"><i class="fas fa-eye"></i> View</a>
+                        <button class="plc-btn plc-btn-manage" onclick="showPage('locations')"><i class="fas fa-cog"></i> Manage</button>
+                    </div>
+                </div>
+                <div class="page-link-card">
+                    <div class="plc-top">
+                        <div class="plc-icon" style="background:rgba(155,89,182,0.15);color:var(--purple)"><i class="fas fa-route"></i></div>
+                        <div class="plc-title">Itinerary Page</div>
+                    </div>
+                    <p class="plc-desc">Custom trip itinerary builder for tourists.</p>
+                    <div class="plc-actions">
+                        <a href="itinerary.html" target="_blank" class="plc-btn plc-btn-view"><i class="fas fa-eye"></i> View</a>
+                        <button class="plc-btn plc-btn-manage" onclick="showPage('itinerary')"><i class="fas fa-cog"></i> Manage</button>
+                    </div>
+                </div>
+                <div class="page-link-card">
+                    <div class="plc-top">
+                        <div class="plc-icon" style="background:rgba(201,168,76,0.15);color:var(--gold)"><i class="fas fa-calendar-alt"></i></div>
+                        <div class="plc-title">Culture & Calendar</div>
+                    </div>
+                    <p class="plc-desc">Sri Lankan festivals, cultural events, and calendar.</p>
+                    <div class="plc-actions">
+                        <a href="culture.html" target="_blank" class="plc-btn plc-btn-view"><i class="fas fa-eye"></i> View</a>
+                        <button class="plc-btn plc-btn-manage" onclick="showPage('culture')"><i class="fas fa-cog"></i> Manage</button>
+                    </div>
+                </div>
+                <div class="page-link-card">
+                    <div class="plc-top">
+                        <div class="plc-icon" style="background:rgba(231,76,60,0.15);color:var(--red)"><i class="fas fa-ambulance"></i></div>
+                        <div class="plc-title">Emergency & Healthcare</div>
+                    </div>
+                    <p class="plc-desc">Hospitals, Spa, Ayurveda centers and emergency contacts.</p>
+                    <div class="plc-actions">
+                        <a href="emergency-healthcare.html" target="_blank" class="plc-btn plc-btn-view"><i class="fas fa-eye"></i> View</a>
+                        <button class="plc-btn plc-btn-manage" onclick="showPage('emergency')"><i class="fas fa-cog"></i> Manage</button>
+                    </div>
+                </div>
+                <div class="page-link-card">
+                    <div class="plc-top">
+                        <div class="plc-icon" style="background:rgba(52,152,219,0.15);color:var(--blue)"><i class="fas fa-sign-in-alt"></i></div>
+                        <div class="plc-title">Login Page</div>
+                    </div>
+                    <p class="plc-desc">Tourist and admin login with role-based redirect.</p>
+                    <div class="plc-actions">
+                        <a href="login-complete.html" target="_blank" class="plc-btn plc-btn-view"><i class="fas fa-eye"></i> View</a>
+                    </div>
+                </div>
+                <div class="page-link-card">
+                    <div class="plc-top">
+                        <div class="plc-icon" style="background:rgba(46,204,113,0.15);color:var(--green)"><i class="fas fa-user-plus"></i></div>
+                        <div class="plc-title">Signup Page</div>
+                    </div>
+                    <p class="plc-desc">Tourist and Admin registration with account types.</p>
+                    <div class="plc-actions">
+                        <a href="signup-complete.html" target="_blank" class="plc-btn plc-btn-view"><i class="fas fa-eye"></i> View</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ ANALYTICS PAGE ══ -->
+        <div class="page" id="page-analytics">
+            <div class="analytics-grid">
+                <div class="chart-card">
+                    <div class="chart-title">Content Overview</div>
+                    <div class="bar-chart" id="barChart"></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">Content Distribution</div>
+                    <div class="donut-wrap" id="donutChart"></div>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-top"><div class="stat-icon gold"><i class="fas fa-database"></i></div></div>
+                    <div class="stat-value" id="ana-total">0</div>
+                    <div class="stat-label">Total Items Managed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top"><div class="stat-icon green"><i class="fas fa-users"></i></div></div>
+                    <div class="stat-value" id="ana-users">0</div>
+                    <div class="stat-label">Registered Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top"><div class="stat-icon blue"><i class="fas fa-calendar-check"></i></div></div>
+                    <div class="stat-value" id="ana-bookings">0</div>
+                    <div class="stat-label">Total Bookings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top"><div class="stat-icon purple"><i class="fas fa-star"></i></div></div>
+                    <div class="stat-value">4.9</div>
+                    <div class="stat-label">Platform Rating</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ HOTELS ══ -->
+        <div class="page" id="page-hotels">
+            <div class="manage-toolbar">
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Search hotels..." oninput="filterTable('hotels-tbody', this.value)"></div>
+                <button class="btn btn-gold" onclick="openModal('hotel')"><i class="fas fa-plus"></i> Add Hotel</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Hotel</th><th>Location</th><th>Stars</th><th>Price/Night</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="hotels-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ══ VEHICLES ══ -->
+        <div class="page" id="page-vehicles">
+            <div class="manage-toolbar">
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Search vehicles..." oninput="filterTable('vehicles-tbody', this.value)"></div>
+                <button class="btn btn-gold" onclick="openModal('vehicle')"><i class="fas fa-plus"></i> Add Vehicle</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Vehicle</th><th>Type</th><th>Seats</th><th>Price/Day</th><th>Driver?</th><th>Driver Cost/Day</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="vehicles-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ══ GUIDES ══ -->
+        <div class="page" id="page-guides">
+            <div class="manage-toolbar">
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Search guides..." oninput="filterTable('guides-tbody', this.value)"></div>
+                <button class="btn btn-gold" onclick="openModal('guide')"><i class="fas fa-plus"></i> Add Guide</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Guide</th><th>Languages</th><th>Specialty</th><th>Rate/Day</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="guides-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ══ ACTIVITIES ══ -->
+        <div class="page" id="page-activities">
+            <div class="manage-toolbar">
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Search activities..." oninput="filterTable('activities-tbody', this.value)"></div>
+                <button class="btn btn-gold" onclick="openModal('activity')"><i class="fas fa-plus"></i> Add Activity</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Activity</th><th>Category</th><th>Location</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="activities-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ══ LOCATIONS ══ -->
+        <div class="page" id="page-locations">
+            <div class="manage-toolbar">
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Search locations..." oninput="filterTable('locations-tbody', this.value)"></div>
+                <button class="btn btn-gold" onclick="openModal('location')"><i class="fas fa-plus"></i> Add Location</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Location</th><th>Province</th><th>Entry Fee</th><th>Opening Hours</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="locations-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ══ ITINERARY ══ -->
+        <div class="page" id="page-itinerary">
+            <div class="manage-toolbar">
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Search itineraries..." oninput="filterTable('itinerary-tbody', this.value)"></div>
+                <button class="btn btn-gold" onclick="openModal('itinerary')"><i class="fas fa-plus"></i> Add Itinerary</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Title</th><th>Tourist</th><th>Duration</th><th>Type</th><th>Destinations</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="itinerary-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ══ CULTURE ══ -->
+        <div class="page" id="page-culture">
+            <div class="manage-toolbar">
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Search events..." oninput="filterTable('culture-tbody', this.value)"></div>
+                <button class="btn btn-gold" onclick="openModal('culture')"><i class="fas fa-plus"></i> Add Event</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Event</th><th>Category</th><th>Date</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="culture-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ══ EMERGENCY ══ -->
+        <div class="page" id="page-emergency">
+            <div class="manage-toolbar">
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Search services..." oninput="filterTable('emergency-tbody', this.value)"></div>
+                <button class="btn btn-gold" onclick="openModal('emergency')"><i class="fas fa-plus"></i> Add Service</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Name</th><th>Type</th><th>Location</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="emergency-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ══ USERS ══ -->
+        <div class="page" id="page-users">
+            <div class="manage-toolbar">
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Search users..." oninput="filterTable('users-tbody', this.value)"></div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>User</th><th>Email</th><th>Role</th><th>Country</th><th>Joined</th><th>Actions</th></tr></thead>
+                    <tbody id="users-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ══ BOOKINGS ══ -->
+        <div class="page" id="page-bookings">
+            <div class="manage-toolbar">
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Search bookings..." oninput="filterTable('bookings-tbody', this.value)"></div>
+                <button class="btn btn-gold" onclick="openModal('booking')"><i class="fas fa-plus"></i> Add Booking</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Booking ID</th><th>Tourist</th><th>Service</th><th>Date</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="bookings-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div><!-- /content -->
+</main>
+
+<!-- ══ MODALS ══ -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modalBox">
+        <form id="modalForm" onsubmit="handleModalSubmit(event)">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Item</h3>
+                <button type="button" class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="modalBody"></div>
+        </form>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i id="toastIcon" class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
+
+<script>
+    // ── AUTH CHECK ──
+    const currentUser = JSON.parse(localStorage.getItem('ceylon_current_user') || 'null');
+    if (!currentUser || currentUser.role !== 'admin') {
+        window.location.href = 'login-complete.html';
+    }
+    if (currentUser) {
+        document.getElementById('sidebarName').textContent = currentUser.name || 'Admin';
+        document.getElementById('sidebarAvatar').textContent = (currentUser.name || 'A')[0].toUpperCase();
+        document.getElementById('pageSubtitle').textContent = `Welcome back, ${currentUser.name || 'Admin'}`;
+    }
+
+    // ── DATA STORE ──
+    const API_ENDPOINTS = {
+        hotels: '/api/hotels', vehicles: '/api/vehicles', guides: '/api/tour-guides',
+        activities: '/api/activities', locations: '/api/locations',
+        itinerary: '/api/itineraries', culture: '/api/cultural-events',
+        emergency: '/api/emergency-services', users: '/api/users', bookings: '/api/bookings'
+    };
+
+    function genId() { return Date.now().toString(36) + Math.random().toString(36).substr(2,5); }
+
+    // ── NAVIGATION ──
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('page-' + id).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(n => {
+            if (n.getAttribute('onclick') === `showPage('${id}')`) n.classList.add('active');
+        });
+        const titles = {
+            overview:'Overview', pages:'Page Links', analytics:'Analytics',
+            hotels:'Hotels Management', vehicles:'Vehicles Management', guides:'Tour Guides',
+            activities:'Activities', locations:'Tourist Locations', itinerary:'Itinerary Templates',
+            culture:'Culture & Calendar', emergency:'Emergency & Healthcare',
+            users:'Users', bookings:'Bookings'
+        };
+        document.getElementById('pageTitle').textContent = titles[id] || id;
+        renderPage(id);
+        if (window.innerWidth < 768) toggleSidebar(false);
+    }
+
+    function toggleSidebar(force) {
+        const s = document.getElementById('sidebar');
+        const o = document.getElementById('overlayBg');
+        const open = force !== undefined ? force : !s.classList.contains('open');
+        s.classList.toggle('open', open);
+        o.classList.toggle('open', open);
+    }
+
+    // ── RENDER ──
+    function renderPage(id) {
+        if (id === 'overview') updateStats();
+        else if (id === 'analytics') renderAnalytics();
+        else if (id === 'hotels') renderTable('hotels', hotelRow);
+        else if (id === 'vehicles') renderTable('vehicles', vehicleRow);
+        else if (id === 'guides') renderTable('guides', guideRow);
+        else if (id === 'activities') renderTable('activities', activityRow);
+        else if (id === 'locations') renderTable('locations', locationRow);
+        else if (id === 'itinerary') renderTable('itinerary', itineraryRow);
+        else if (id === 'culture') renderTable('culture', cultureRow);
+        else if (id === 'emergency') renderTable('emergency', emergencyRow);
+        else if (id === 'users') renderUsers();
+        else if (id === 'bookings') renderTable('bookings', bookingRow);
+    }
+
+    async function updateStats() {
+        const counts = {};
+        for (const k of Object.keys(API_ENDPOINTS)) {
+            try {
+                const res = await fetch('http://localhost:8080' + API_ENDPOINTS[k]);
+                counts[k] = res.ok ? (await res.json()).length : 0;
+            } catch(e) { counts[k] = 0; }
+        }
+        document.getElementById('stat-hotels').textContent = counts.hotels;
+        document.getElementById('stat-vehicles').textContent = counts.vehicles;
+        document.getElementById('stat-guides').textContent = counts.guides;
+        document.getElementById('stat-activities').textContent = counts.activities;
+        document.getElementById('stat-locations').textContent = counts.locations;
+        document.getElementById('stat-events').textContent = counts.culture;
+        document.getElementById('stat-emergency').textContent = counts.emergency;
+        document.getElementById('stat-users').textContent = counts.users;
+    }
+
+    async function renderTable(key, rowFn) {
+        const tbody = document.getElementById(key + '-tbody');
+        let data = [];
+        try {
+            const res = await fetch('http://localhost:8080' + API_ENDPOINTS[key]);
+            if (res.ok) data = await res.json();
+        } catch(e) { console.error('Fetch error for', key, e); }
+        
+        if (!data.length) {
+            tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><i class="fas fa-inbox"></i><p>No records yet. Click "Add" to get started.</p></div></td></tr>`;
+            return;
+        }
+        tbody.innerHTML = data.map(rowFn).join('');
+    }
+
+    // ── ROW TEMPLATES ──
+    const icons = {hotel:'🏨',vehicle:'🚗',guide:'👤',activity:'🎯',location:'📍',itinerary:'🗺️',culture:'🎭',emergency:'🏥',booking:'📋'};
+
+    function statusBadge(s) {
+        const map = { active:'badge-active', inactive:'badge-inactive', pending:'badge-pending' };
+        return `<span class="badge-status ${map[s]||'badge-active'}">${s||'active'}</span>`;
+    }
+
+    function actionBtns(key, id) {
+        return `<div class="actions">
+        <button class="btn btn-outline btn-sm" onclick="editItem('${key}','${id}')"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="deleteItem('${key}','${id}')"><i class="fas fa-trash"></i></button>
+    </div>`;
+    }
+
+    function hotelRow(h) {
+        return `<tr><td><div class="td-name"><div class="td-img">🏨</div><div><div style="font-weight:600">${h.name}</div><div style="font-size:11px;color:var(--text-muted)">${h.category||'Hotel'}</div></div></div></td><td>${h.location||'-'}</td><td>${'⭐'.repeat(parseInt(h.stars)||3)}</td><td>$${h.pricePerNight||0}/night</td><td>${statusBadge(h.status)}</td><td>${actionBtns('hotels',h.id)}</td></tr>`;
+    }
+    function vehicleRow(v) {
+        const p = v.price || v.pricePerDay || 0;
+        const driverStatus = v.driverBookable ? '<span style="color:var(--green)">Yes</span>' : '<span style="color:var(--text-light)">No</span>';
+        const driverCost = v.driverBookable ? `$${v.driverCostPerDay || 0}/day` : '-';
+        const s = v.status ? v.status.toLowerCase() : 'active';
+        return `<tr><td><div class="td-name"><div class="td-img">🚗</div><div><div style="font-weight:600">${v.name}</div><div style="font-size:11px;color:var(--text-muted)">${v.brand||''}</div></div></div></td><td>${v.type||'-'}</td><td>${v.seats||'-'}</td><td>$${p}/day</td><td>${driverStatus}</td><td>${driverCost}</td><td>${statusBadge(s)}</td><td>${actionBtns('vehicles',v.id)}</td></tr>`;
+    }
+    function guideRow(g) {
+        return `<tr><td><div class="td-name"><div class="user-avatar">${g.name[0].toUpperCase()}</div><div><div style="font-weight:600">${g.name}</div><div style="font-size:11px;color:var(--text-muted)">${g.experience||0} yrs exp</div></div></div></td><td>${g.languages||'-'}</td><td>${g.specialty||'-'}</td><td>$${g.rate||0}/day</td><td>${statusBadge(g.status)}</td><td>${actionBtns('guides',g.id)}</td></tr>`;
+    }
+    function activityRow(a) {
+        return `<tr><td><div class="td-name"><div class="td-img">🎯</div><div><div style="font-weight:600">${a.name}</div></div></div></td><td>${a.category||a.type||'-'}</td><td>${a.location||'-'}</td><td>$${a.pricePerPerson||a.price||0}</td><td>${statusBadge(a.status)}</td><td>${actionBtns('activities',a.id)}</td></tr>`;
+    }
+    function locationRow(l) {
+        return `<tr><td><div class="td-name"><div class="td-img">📍</div><div><div style="font-weight:600">${l.name}</div></div></div></td><td>${l.province||'-'}</td><td>$${l.fee||0}</td><td>${l.hours||'-'}</td><td>${statusBadge(l.status)}</td><td>${actionBtns('locations',l.id)}</td></tr>`;
+    }
+    function itineraryRow(i) {
+        const tourist = i.user && i.user.name ? i.user.name : '<span style="color:var(--text-muted)">Guest / System</span>';
+        return `<tr><td><div class="td-name"><div class="td-img">🗺️</div><div><div style="font-weight:600">${i.title}</div></div></div></td><td>${tourist}</td><td>${i.duration||'-'}</td><td>${i.type||'-'}</td><td>${i.destinations||'-'}</td><td>${statusBadge(i.status)}</td><td>${actionBtns('itinerary',i.id)}</td></tr>`;
+    }
+    function cultureRow(c) {
+        return `<tr><td><div class="td-name"><div class="td-img">🎭</div><div><div style="font-weight:600">${c.name}</div></div></div></td><td>${c.category||'-'}</td><td>${c.date||'-'}</td><td>${c.location||'-'}</td><td>${statusBadge(c.status)}</td><td>${actionBtns('culture',c.id)}</td></tr>`;
+    }
+    function emergencyRow(e) {
+        return `<tr><td><div class="td-name"><div class="td-img">${e.type==='hospital'?'🏥':e.type==='spa'?'💆':e.type==='ayurveda'?'🌿':'🚨'}</div><div><div style="font-weight:600">${e.name}</div></div></div></td><td><span style="text-transform:capitalize">${e.type||'-'}</span></td><td>${e.location||'-'}</td><td>${e.phone||'-'}</td><td>${statusBadge(e.status)}</td><td>${actionBtns('emergency',e.id)}</td></tr>`;
+    }
+    function bookingRow(b) {
+        return `<tr><td><span style="font-family:monospace;color:var(--gold)">#${b.id.substr(0,8).toUpperCase()}</span></td><td>${b.tourist||'-'}</td><td>${b.service||'-'}</td><td>${b.date||'-'}</td><td>$${b.amount||0}</td><td>${statusBadge(b.status)}</td><td>${actionBtns('bookings',b.id)}</td></tr>`;
+    }
+
+    async function renderUsers() {
+        const tbody = document.getElementById('users-tbody');
+        let users = [];
+        try {
+            const res = await fetch('http://localhost:8080/api/users');
+            if (res.ok) users = await res.json();
+        } catch(e) {}
+        if (!users.length) {
+            tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fas fa-users"></i><p>No registered users yet.</p></div></td></tr>`;
+            return;
+        }
+        tbody.innerHTML = users.map(u => `
+        <tr>
+            <td><div class="td-name"><div class="user-avatar">${(u.name||'U')[0].toUpperCase()}</div><div style="font-weight:600">${u.name||'-'}</div></div></td>
+            <td>${u.email||'-'}</td>
+            <td><span class="badge-status ${u.role==='admin'?'badge-pending':'badge-active'}">${u.role||'tourist'}</span></td>
+            <td>${u.country||'-'}</td>
+            <td>${u.joined||'-'}</td>
+            <td><button class="btn btn-danger btn-sm" onclick="deleteItem('users', '${u.id}')"><i class="fas fa-ban"></i></button></td>
+        </tr>`).join('');
+    }
+
+    // ── ANALYTICS ──
+    async function renderAnalytics() {
+        const counts = { Hotels: 0, Vehicles: 0, Guides: 0, Activities: 0, Locations: 0, Events: 0, Users: 0, Bookings: 0 };
+        try {
+            const promises = [
+                fetch('http://localhost:8080/api/hotels').then(r=>r.json()),
+                fetch('http://localhost:8080/api/vehicles').then(r=>r.json()),
+                fetch('http://localhost:8080/api/tour-guides').then(r=>r.json()),
+                fetch('http://localhost:8080/api/activities').then(r=>r.json()),
+                fetch('http://localhost:8080/api/locations').then(r=>r.json()),
+                fetch('http://localhost:8080/api/cultural-events').then(r=>r.json()),
+                fetch('http://localhost:8080/api/users').then(r=>r.json()),
+                fetch('http://localhost:8080/api/bookings').then(r=>r.json())
+            ];
+            const results = await Promise.allSettled(promises);
+            counts.Hotels = results[0].status === 'fulfilled' ? results[0].value.length : 0;
+            counts.Vehicles = results[1].status === 'fulfilled' ? results[1].value.length : 0;
+            counts.Guides = results[2].status === 'fulfilled' ? results[2].value.length : 0;
+            counts.Activities = results[3].status === 'fulfilled' ? results[3].value.length : 0;
+            counts.Locations = results[4].status === 'fulfilled' ? results[4].value.length : 0;
+            counts.Events = results[5].status === 'fulfilled' ? results[5].value.length : 0;
+            counts.Users = results[6].status === 'fulfilled' ? results[6].value.length : 0;
+            counts.Bookings = results[7].status === 'fulfilled' ? results[7].value.length : 0;
+        } catch(e) {}
+        
+        const total = counts.Hotels + counts.Vehicles + counts.Guides + counts.Activities + counts.Locations + counts.Events;
+        const mainObj = { Hotels: counts.Hotels, Vehicles: counts.Vehicles, Guides: counts.Guides, Activities: counts.Activities, Locations: counts.Locations, Events: counts.Events };
+        const colors = ['var(--gold)','var(--blue)','var(--green)','var(--orange)','var(--red)','var(--purple)'];
+        const maxVal = Math.max(...Object.values(mainObj), 1);
+
+        document.getElementById('barChart').innerHTML = Object.entries(mainObj).map(([k,v],i) =>
+            `<div class="bar-group">
+            <div class="bar" style="height:${Math.max((v/maxVal)*120,4)}px;background:${colors[i]}"></div>
+            <div class="bar-label">${k}</div>
+        </div>`
+        ).join('');
+
+        document.getElementById('donutChart').innerHTML = Object.entries(mainObj).map(([k,v],i) =>
+            `<div class="donut-item">
+            <div class="donut-dot" style="background:${colors[i]}"></div>
+            <div class="donut-name">${k}</div>
+            <div class="donut-bar-wrap"><div class="donut-bar" style="width:${total?((v/total)*100):0}%;background:${colors[i]}"></div></div>
+            <div class="donut-val">${v}</div>
+        </div>`
+        ).join('');
+
+        document.getElementById('ana-total').textContent = total;
+        document.getElementById('ana-users').textContent = counts.Users;
+        document.getElementById('ana-bookings').textContent = counts.Bookings;
+    }
+
+    // ── MODALS ──
+    const modalForms = {
+        hotel: {
+            title: 'Add Hotel',
+            fields: `
+            <div class="form-group"><label>Hotel Name</label><input id="f-name" placeholder="e.g. Jetwing Blue" required></div>
+            <div class="form-row-2">
+                <div class="form-group"><label>Location</label><select id="f-location" required><option>Colombo</option><option>Kandy</option><option>Galle</option><option>Nuwara Eliya</option><option>Ella</option><option>Mirissa</option><option>Sigiriya</option><option>Trincomalee</option></select></div>
+                <div class="form-group"><label>Stars</label><select id="f-stars" required><option>5</option><option>4</option><option>3</option><option>2</option></select></div>
+            </div>
+            <div class="form-row-2">
+                <div class="form-group"><label>Price / Night ($)</label><input id="f-price" type="number" min="0" placeholder="150" required></div>
+                <div class="form-group"><label>Category</label><select id="f-category"><option>Luxury Resort</option><option>Boutique Hotel</option><option>Beach Hotel</option><option>City Hotel</option><option>Budget</option></select></div>
+            </div>
+            <div class="form-group"><label>Cover Image (Upload)</label><input id="f-image" type="file" accept="image/*" required></div>
+            <div class="form-group"><label>Description</label><textarea id="f-description" placeholder="Brief description..."></textarea></div>
+            <div class="form-group"><label>Status</label><select id="f-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>`,
+            save: async (id) => {
+                const imgInput = document.getElementById('f-image');
+                if (id && imgInput.files.length === 0) {
+                    imgInput.required = false;
+                }
+                const item = { name:v('name'), location:v('location'), stars:v('stars')||3, pricePerNight:v('price')||0, category:v('category'), description:v('description'), status:(v('status')||'ACTIVE').toUpperCase() };
+                saveItemToApi('hotels', item, id);
+            }
+        },
+        vehicle: {
+            title: 'Add Vehicle',
+            fields: `
+            <div class="form-group"><label>Vehicle Name / Model</label><input id="f-name" placeholder="e.g. Toyota Aqua" required></div>
+            <div class="form-row-2">
+                <div class="form-group"><label>Brand</label><input id="f-brand" placeholder="Toyota" required></div>
+                <div class="form-group"><label>Type</label><select id="f-type" required><option>Car</option><option>Van</option><option>Bike</option><option>Luxury</option><option>SUV</option><option>Tuk Tuk</option></select></div>
+            </div>
+            <div class="form-row-2">
+                <div class="form-group"><label>Seats</label><input id="f-seats" type="number" min="1" placeholder="4" required></div>
+                <div class="form-group"><label>Price / Day ($)</label><input id="f-price" type="number" min="0" placeholder="50" required></div>
+            </div>
+            <div class="form-row-2">
+                <div class="form-group"><label>Driver Available</label>
+                    <select id="f-driver" onchange="const costInput = document.getElementById('f-driver-cost'); if(this.value === 'yes') { costInput.disabled = false; costInput.required = true; } else { costInput.disabled = true; costInput.value = ''; costInput.required = false; }">
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Driver Cost / Day ($)</label><input id="f-driver-cost" type="number" min="0" placeholder="15" required></div>
+            </div>
+            <div class="form-group"><label>Vehicle Image (Upload)</label><input id="f-image" type="file" accept="image/*" required></div>
+            <div class="form-group"><label>Description</label><textarea id="f-description" placeholder="Features, AC, etc..."></textarea></div>
+            <div class="form-group"><label>Status</label><select id="f-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>`,
+            save: async (id) => {
+                // Remove required from image if editing (id exists)
+                const imgInput = document.getElementById('f-image');
+                if (id && imgInput.files.length === 0) {
+                    imgInput.required = false;
+                }
+                
+                const isDriver = v('driver') === 'yes';
+                
+                const item = { 
+                    name: v('name'), 
+                    model: v('name') || 'Unknown', 
+                    year: new Date().getFullYear(),
+                    brand: v('brand'), 
+                    type: (v('type')||'CAR').toUpperCase(), 
+                    seats: parseInt(v('seats')) || 1, 
+                    capacity: parseInt(v('seats')) || 1, 
+                    pricePerDay: parseFloat(v('price')) || 0, 
+                    driverBookable: isDriver,
+                    driverCostPerDay: isDriver ? (parseFloat(v('driver-cost')) || 0) : 0,
+                    description: v('description'), 
+                    status: (v('status')||'ACTIVE').toUpperCase() 
+                };
+                saveItemToApi('vehicles', item, id);
+            }
+        },
+        guide: {
+            title: 'Add Tour Guide',
+            fields: `
+            <div class="form-group"><label>Full Name</label><input id="f-name" placeholder="e.g. Kasun Perera" required></div>
+            <div class="form-row-2">
+                <div class="form-group"><label>Languages</label><input id="f-languages" placeholder="English, French" required></div>
+                <div class="form-group"><label>Experience (years)</label><input id="f-experience" type="number" min="0" placeholder="5" required></div>
+            </div>
+            <div class="form-row-2">
+                <div class="form-group"><label>Specialty</label><select id="f-specialty" required><option>Cultural Tours</option><option>Wildlife Safari</option><option>Adventure</option><option>Photography</option><option>Food Tours</option></select></div>
+                <div class="form-group"><label>Rate / Day ($)</label><input id="f-rate" type="number" min="0" placeholder="80" required></div>
+            </div>
+            <div class="form-row-2">
+                <div class="form-group"><label>Phone</label><input id="f-phone" placeholder="+94 77 000 0000" required></div>
+                <div class="form-group"><label>Profile Image</label><input id="f-image" type="file" accept="image/*"></div>
+            </div>
+            <div class="form-group"><label>Status</label><select id="f-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>`,
+            save: async (id) => {
+                const item = {
+                    name: v('name'),
+                    languages: v('languages'),
+                    experience: parseInt(v('experience')) || 0,
+                    experienceYears: parseInt(v('experience')) || 0,
+                    specialty: v('specialty'),
+                    rate: parseFloat(v('rate')) || 0,
+                    pricePerDay: parseFloat(v('rate')) || 0,
+                    phone: v('phone'),
+                    description: v('description') || '',
+                    status: (v('status') || 'ACTIVE').toUpperCase()
+                };
+                saveItemToApi('guides', item, id);
+            }
+        },
+        activity: {
+            title: 'Add Activity',
+            fields: `
+            <div class="form-group"><label>Activity Name</label><input id="f-name" placeholder="e.g. Yala Safari Tour" required></div>
+            <div class="form-row-2">
+                <div class="form-group"><label>Category</label><select id="f-category" required><option>Safari</option><option>Water Sports</option><option>Hiking</option><option>Photography</option><option>Food Tour</option><option>Boat Ride</option><option>Cultural</option></select></div>
+                <div class="form-group"><label>Location</label><input id="f-location" placeholder="Yala National Park" required></div>
+            </div>
+            <div class="form-row-2">
+                <div class="form-group"><label>Price ($)</label><input id="f-price" type="number" min="0" placeholder="60" required></div>
+                <div class="form-group"><label>Duration</label><input id="f-duration" placeholder="3 hours" required></div>
+            </div>
+            <div class="form-group"><label>Activity Image</label><input id="f-image" type="file" accept="image/*"></div>
+            <div class="form-group"><label>Description</label><textarea id="f-description" placeholder="Activity details..."></textarea></div>
+            <div class="form-group"><label>Status</label><select id="f-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>`,
+            save: async (id) => {
+                const item = { 
+                    name:v('name'), 
+                    type:v('category').toUpperCase().replace(' ', '_'),
+                    category:v('category'), 
+                    location:v('location'), 
+                    pricePerPerson:v('price')||0, 
+                    duration:v('duration'), 
+                    maxParticipants: 10,
+                    description:v('description'), 
+                    status:(v('status')||'ACTIVE').toUpperCase() 
+                };
+                saveItemToApi('activities', item, id);
+            }
+        },
+        location: {
+            title: 'Add Tourist Location',
+            fields: `
+            <div class="form-group"><label>Location Name</label><input id="f-name" placeholder="e.g. Sigiriya Rock Fortress" required></div>
+            <div class="form-row-2">
+                <div class="form-group"><label>Province</label><select id="f-province" required><option>Central</option><option>Western</option><option>Southern</option><option>Northern</option><option>Eastern</option><option>North Western</option><option>Sabaragamuwa</option><option>Uva</option></select></div>
+                <div class="form-group"><label>Entry Fee ($)</label><input id="f-fee" type="number" min="0" placeholder="30" required></div>
+            </div>
+            <div class="form-row-2">
+                <div class="form-group"><label>Opening Hours</label><input id="f-hours" placeholder="8:00 AM - 5:30 PM"></div>
+                <div class="form-group"><label>Location Image</label><input id="f-image" type="file" accept="image/*"></div>
+            </div>
+            <div class="form-group"><label>Description</label><textarea id="f-description" placeholder="Location description..."></textarea></div>
+            <div class="form-group"><label>Status</label><select id="f-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>`,
+            save: async (id) => {
+                const item = { name:v('name'), province:v('province'), entryFee:v('fee')||'0', openingHours:v('hours'), description:v('description'), status:(v('status')||'ACTIVE').toUpperCase() };
+                saveItemToApi('locations', item, id);
+            }
+        },
+        itinerary: {
+            title: 'Add Itinerary Template',
+            fields: `
+            <div class="form-group"><label>Title</label><input id="f-title" placeholder="e.g. 7-Day Cultural Tour" required></div>
+            <div class="form-row-2">
+                <div class="form-group"><label>Duration</label><input id="f-duration" placeholder="7 Days" required></div>
+                <div class="form-group"><label>Type</label><select id="f-type" required><option>Cultural</option><option>Adventure</option><option>Beach & Relax</option><option>Wildlife</option><option>Honeymoon</option><option>Family</option></select></div>
+            </div>
+            <div class="form-group"><label>Key Destinations</label><input id="f-destinations" placeholder="Colombo, Kandy, Ella, Galle" required></div>
+            <div class="form-group"><label>Tourist Name (Optional)</label><input id="f-touristName" placeholder="Admin Template"></div>
+            <div class="form-group"><label>Package Image</label><input id="f-image" type="file" accept="image/*"></div>
+            <div class="form-group"><label>Description</label><textarea id="f-description" placeholder="Itinerary overview..."></textarea></div>
+            <div class="form-group"><label>Estimated Cost ($)</label><input id="f-cost" type="number" min="0" placeholder="800"></div>
+            <div class="form-row-2">
+                <div class="form-group"><label>Start Date</label><input id="f-startDate" type="date" required></div>
+                <div class="form-group"><label>End Date</label><input id="f-endDate" type="date" required></div>
+            </div>
+            <div class="form-group"><label>Status</label><select id="f-status"><option value="DRAFT">Draft</option><option value="FINALIZED">Finalized</option><option value="ONGOING">Ongoing</option><option value="COMPLETED">Completed</option></select></div>`,
+            save: async (id) => {
+                const startDate = v('startDate') || new Date().toISOString().split('T')[0];
+                const endDateRaw = v('endDate');
+                const endDate = endDateRaw || (() => { const d=new Date(startDate); d.setDate(d.getDate()+7); return d.toISOString().split('T')[0]; })();
+                const item = {
+                    title: v('title'),
+                    startDate: startDate,
+                    endDate: endDate,
+                    dailyPlan: v('destinations'),
+                    description: v('description'),
+                    touristName: v('touristName') || ((id) ? undefined : 'Template'),
+                    status: v('status') || 'DRAFT'
+                };
+                saveItemToApi('itinerary', item, id);
+            }
+        },
+        culture: {
+            title: 'Add Cultural Event',
+            fields: `
+            <div class="form-group"><label>Event Name</label><input id="f-name" placeholder="e.g. Esala Perahera" required></div>
+            <div class="form-row-2">
+                <div class="form-group"><label>Category</label><select id="f-category" required><option>Festival</option><option>Religious</option><option>Cultural</option><option>National Holiday</option><option>Art & Music</option></select></div>
+                <div class="form-group"><label>Date</label><input id="f-date" type="date" required></div>
+            </div>
+            <div class="form-row-2">
+                <div class="form-group"><label>Location</label><input id="f-location" placeholder="Kandy" required></div>
+                <div class="form-group"><label>Event Image</label><input id="f-image" type="file" accept="image/*"></div>
+            </div>
+            <div class="form-group"><label>Description</label><textarea id="f-description" placeholder="Event details..."></textarea></div>
+            <div class="form-group"><label>Status</label><select id="f-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>`,
+            save: async (id) => {
+                const item = { name:v('name'), category:v('category'), date:v('date'), location:v('location'), description:v('description'), status:(v('status')||'ACTIVE').toUpperCase() };
+                saveItemToApi('culture', item, id);
+            }
+        },
+        emergency: {
+            title: 'Add Emergency / Health Service',
+            fields: `
+            <div class="form-group"><label>Service Name</label><input id="f-name" placeholder="e.g. Colombo National Hospital" required></div>
+            <div class="form-row-2">
+                <div class="form-group"><label>Type</label><select id="f-type" required><option value="hospital">Hospital</option><option value="spa">Spa</option><option value="ayurveda">Ayurveda</option><option value="pharmacy">Pharmacy</option><option value="clinic">Clinic</option></select></div>
+                <div class="form-group"><label>Phone</label><input id="f-phone" placeholder="+94 11 269 1111" required></div>
+            </div>
+            <div class="form-row-2">
+                <div class="form-group"><label>Location / Address</label><input id="f-location" placeholder="Regent Street, Colombo 8" required></div>
+                <div class="form-group"><label>Opening Hours</label><input id="f-hours" placeholder="24 Hours / 8AM-6PM"></div>
+            </div>
+            <div class="form-group"><label>Image Label</label><input id="f-image" type="file" accept="image/*"></div>
+            <div class="form-group"><label>Description</label><textarea id="f-description" placeholder="Services offered..."></textarea></div>
+            <div class="form-group"><label>Status</label><select id="f-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>`,
+            save: async (id) => {
+                const item = { name:v('name'), type:v('type'), phone:v('phone'), location:v('location'), openingHours:v('hours'), description:v('description'), status:(v('status')||'ACTIVE').toUpperCase() };
+                saveItemToApi('emergency', item, id);
+            }
+        },
+        booking: {
+            title: 'Add Booking',
+            fields: `
+            <div class="form-group"><label>Tourist Name</label><input id="f-tourist" placeholder="Tourist name" required></div>
+            <div class="form-group"><label>Service</label><input id="f-service" placeholder="e.g. Jetwing Blue Hotel" required></div>
+            <div class="form-row-2">
+                <div class="form-group"><label>Date</label><input id="f-date" type="date" required></div>
+                <div class="form-group"><label>Amount ($)</label><input id="f-amount" type="number" min="0" placeholder="200" required></div>
+            </div>
+            <div class="form-group"><label>Status</label><select id="f-status"><option value="active">Confirmed</option><option value="pending">Pending</option><option value="inactive">Cancelled</option></select></div>`,
+            save: async (id) => {
+                const item = { touristName:v('tourist'), serviceName:v('service'), bookingDate:v('date'), amount:v('amount'), status:(v('status')||'PENDING').toUpperCase() };
+                saveItemToApi('bookings', item, id);
+            }
+        }
+    };
+
+    let currentModal = null;
+    let editingId = null;
+
+    function v(field) {
+        const el = document.getElementById('f-' + field);
+        return el ? el.value : '';
+    }
+
+    function openModal(type, prefill) {
+        currentModal = type;
+        editingId = prefill ? prefill.id : null;
+        const cfg = modalForms[type];
+        document.getElementById('modalTitle').textContent = prefill ? 'Edit ' + cfg.title.replace('Add ','') : cfg.title;
+        document.getElementById('modalBody').innerHTML = cfg.fields + `<div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-gold"><i class="fas fa-save"></i> Save</button></div>`;
+        if (prefill) {
+            Object.keys(prefill).forEach(k => {
+                const el = document.getElementById('f-' + k);
+                if (el) el.value = prefill[k];
+            });
+            // Show existing image preview if editing
+            if (prefill.imageUrl) {
+                const fileInput = document.getElementById('f-image');
+                if (fileInput && fileInput.parentElement) {
+                    let preview = document.getElementById('dynamic-img-preview');
+                    if (!preview) {
+                        preview = document.createElement('img');
+                        preview.id = 'dynamic-img-preview';
+                        preview.style.maxHeight = '120px';
+                        preview.style.marginTop = '10px';
+                        preview.style.borderRadius = '8px';
+                        preview.style.display = 'block';
+                        preview.style.border = '1px solid #444';
+                        fileInput.parentElement.appendChild(preview);
+                    }
+                    preview.src = prefill.imageUrl;
+                }
+            } else {
+                const preview = document.getElementById('dynamic-img-preview');
+                if (preview) preview.remove();
+            }
+        } else {
+            const preview = document.getElementById('dynamic-img-preview');
+            if (preview) preview.remove();
+        }
+        document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+
+    function handleModalSubmit(e) {
+        e.preventDefault();
+        const cfg = modalForms[currentModal];
+        if (!cfg) return;
+        cfg.save(editingId);
+    }
+
+    async function saveItemToApi(key, item, id) {
+        const fileInput = document.getElementById('f-image');
+        if (fileInput && fileInput.files.length > 0) {
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            try {
+                const uploadRes = await fetch('http://localhost:8080/api/upload', { method: 'POST', body: formData });
+                if (uploadRes.ok) {
+                    const uploadData = await uploadRes.json();
+                    if (uploadData.imageUrl) item.imageUrl = uploadData.imageUrl;
+                }
+            } catch(e) { console.error('Image upload failed', e); }
+        }
+
+        const url = id ? 'http://localhost:8080' + API_ENDPOINTS[key] + '/' + id : 'http://localhost:8080' + API_ENDPOINTS[key];
+        const method = id ? 'PUT' : 'POST';
+        try {
+            const res = await fetch(url, { method: method, headers:{'Content-Type':'application/json'}, body: JSON.stringify(item) });
+            if (!res.ok) throw new Error('API request failed');
+            closeModal();
+            renderPage(key === 'itinerary' ? 'itinerary' : key); 
+            showToast((id ? 'Updated' : 'Added') + ' successfully!', 'success');
+        } catch(e) { showToast('Error saving ' + key.replace(/s$/,''), 'error'); }
+    }
+
+    async function deleteItem(key, id) {
+        if (!confirm('Delete this item?')) return;
+        try {
+            await fetch('http://localhost:8080' + (API_ENDPOINTS[key]||('/api/'+key)) + '/' + id, { method: 'DELETE' });
+            if (key === 'users') { renderUsers(); } else { renderPage(key); }
+            showToast('Deleted successfully.', 'info');
+        } catch(e) { showToast('Error deleting', 'error'); }
+    }
+
+    async function editItem(key, id) {
+        try {
+            const res = await fetch('http://localhost:8080' + API_ENDPOINTS[key] + '/' + id);
+            const data = await res.json();
+            data.price = data.pricePerDay || data.pricePerNight || data.price || data.rate || data.amount || data.pricePerPerson;
+            data.fee = data.entryFee;
+            data.hours = data.openingHours;
+            
+            if (key === 'vehicles') {
+                data.driver = data.driverBookable ? 'yes' : 'no';
+                data['driver-cost'] = data.driverCostPerDay || '';
+            }
+
+            if (data.type) data.type = data.type.toString().charAt(0).toUpperCase() + data.type.toString().slice(1).toLowerCase();
+            if (data.status) data.status = data.status.toString().toLowerCase();
+            openModal(key.replace('ies','y').replace(/s$/,'').replace('culture','culture').replace('itinerary','itinerary'), data);
+            
+            if (key === 'vehicles') {
+                const fDriver = document.getElementById('f-driver');
+                if (fDriver) fDriver.dispatchEvent(new Event('change'));
+            }
+        } catch(e) { showToast('Error fetching item', 'error'); }
+    }
+
+    function deleteUser(id) {
+        deleteItem('users', id);
+    }
+
+    // ── FILTER ──
+    function filterTable(tbodyId, query) {
+        const rows = document.querySelectorAll('#' + tbodyId + ' tr');
+        rows.forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(query.toLowerCase()) ? '' : 'none';
+        });
+    }
+
+    // ── TOAST ──
+    function showToast(msg, type='success') {
+        const t = document.getElementById('toast');
+        document.getElementById('toastMsg').textContent = msg;
+        document.getElementById('toastIcon').className = type === 'success' ? 'fas fa-check-circle' : type === 'error' ? 'fas fa-times-circle' : 'fas fa-info-circle';
+        t.className = `toast ${type} show`;
+        setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    // ── LOGOUT ──
+    function logout() {
+        localStorage.removeItem('ceylon_current_user');
+        window.location.href = 'login-complete.html';
+    }
+
+    // ── INIT ──
+    updateStats();
+</script>
+</body>
+</html>

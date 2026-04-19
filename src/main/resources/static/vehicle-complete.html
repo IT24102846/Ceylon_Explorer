@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Rentals - CEYLON EXPLORER</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--primary-color:#FF6B35;--secondary-color:#004E89;--accent-color:#1A936F;--text-dark:#2C3E50;--text-light:#7F8C8D;--bg-light:#F8F9FA;--white:#FFFFFF;--success:#27AE60;--warning:#F39C12;--danger:#E74C3C;--shadow:0 2px 10px rgba(0,0,0,0.1);--shadow-lg:0 5px 20px rgba(0,0,0,0.15)}
+        body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;line-height:1.6;color:var(--text-dark)}
+        .container{max-width:1200px;margin:0 auto;padding:0 20px}
+
+        /* NAVBAR */
+        .navbar{background:var(--white);box-shadow:var(--shadow);position:sticky;top:0;z-index:1000}
+        .nav-container{max-width:1400px;margin:0 auto;padding:0 2rem;height:64px;display:flex;justify-content:space-between;align-items:center}
+        .logo{display:flex;align-items:center;font-size:1.4rem;font-weight:bold;color:var(--primary-color);text-decoration:none;flex-shrink:0}
+        .logo i{margin-right:8px;font-size:1.6rem}
+        .nav-menu{display:flex;list-style:none;gap:2px;align-items:center;margin:0;padding:0;flex-wrap:nowrap}
+        .nav-link{text-decoration:none;color:var(--text-dark);font-weight:500;font-size:13.5px;transition:color 0.3s;padding:8px 10px;border-radius:6px;white-space:nowrap;display:inline-block}
+        .nav-link:hover,.nav-link.active{color:var(--primary-color);background:rgba(255,107,53,0.07)}
+        .hamburger{display:none;flex-direction:column;cursor:pointer;gap:5px;padding:4px}
+        .hamburger span{display:block;width:24px;height:2px;background:var(--text-dark);border-radius:2px;transition:0.3s}
+        .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+        .hamburger.open span:nth-child(2){opacity:0}
+        .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+        @media(max-width:900px){
+            .hamburger{display:flex}
+            .nav-menu{position:fixed;top:64px;left:0;right:0;flex-direction:column;align-items:stretch;background:var(--white);padding:12px 16px 20px;box-shadow:var(--shadow-lg);gap:2px;transform:translateY(-110%);transition:transform 0.3s ease;z-index:999}
+            .nav-menu.open{transform:translateY(0)}
+            .nav-link{font-size:14px;padding:11px 14px}
+        }
+
+        /* Page Header */
+        .page-header{background:linear-gradient(135deg,var(--secondary-color),var(--primary-color));color:var(--white);padding:3rem 0;text-align:center}
+        .page-header h1{font-size:2.5rem;margin-bottom:.5rem}
+
+        /* Search */
+        .search-section{background:var(--bg-light);padding:2rem 0}
+        .search-box{background:var(--white);padding:2rem;border-radius:10px;box-shadow:var(--shadow)}
+        .search-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
+        .search-input label{display:block;margin-bottom:.5rem;font-weight:500;color:var(--text-dark)}
+        .search-input label i{color:var(--primary-color);margin-right:5px}
+        .search-input select,.search-input input{width:100%;padding:.75rem;border:2px solid #E0E0E0;border-radius:5px;font-size:1rem}
+        .btn-search{width:100%;padding:.75rem;background:var(--secondary-color);color:var(--white);border:none;border-radius:5px;font-size:1rem;font-weight:bold;cursor:pointer;transition:background .3s}
+        .btn-search:hover{background:#003A6B}
+
+        /* Type tabs */
+        .vehicle-types-section{background:var(--white);padding:2rem 0;border-bottom:1px solid #E0E0E0}
+        .vehicle-type-tabs{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap}
+        .type-tab{padding:.75rem 1.5rem;background:var(--white);border:2px solid var(--secondary-color);color:var(--secondary-color);border-radius:25px;cursor:pointer;font-weight:bold;transition:all .3s}
+        .type-tab:hover,.type-tab.active{background:var(--secondary-color);color:var(--white)}
+
+        /* Vehicles grid */
+        .vehicles-section{padding:3rem 0}
+        .results-header{margin-bottom:2rem}
+        .results-header h2{color:var(--secondary-color);margin-bottom:.5rem}
+        .vehicles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:2rem}
+        .vehicle-card{background:var(--white);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);transition:transform .3s,box-shadow .3s;cursor:pointer}
+        .vehicle-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg)}
+        .vehicle-image{height:220px;background-size:cover;background-position:center;position:relative}
+        .vehicle-badge{position:absolute;top:1rem;right:1rem;background:var(--accent-color);color:var(--white);padding:.4rem .9rem;border-radius:25px;font-weight:bold;font-size:.85rem}
+        .vehicle-content{padding:1.3rem}
+        .vehicle-content h3{font-size:1.2rem;margin-bottom:.3rem;color:var(--secondary-color)}
+        .vehicle-type{color:var(--text-light);margin-bottom:.3rem;font-size:.9rem}
+        .vehicle-features{display:flex;gap:1rem;margin:.5rem 0;color:var(--text-dark);font-size:.9rem}
+        .vehicle-features span{display:flex;align-items:center;gap:.4rem}
+
+        /* Star rating on card */
+        .card-rating{display:flex;align-items:center;gap:6px;margin:.4rem 0}
+        .card-stars{color:#F39C12;font-size:.95rem;letter-spacing:1px}
+        .card-rating-num{font-weight:700;color:#F39C12;font-size:.9rem}
+        .card-rating-count{font-size:.8rem;color:var(--text-light)}
+
+        .vehicle-footer{display:flex;justify-content:space-between;align-items:center;padding-top:.8rem;border-top:1px solid #E0E0E0}
+        .vehicle-price{display:flex;flex-direction:column}
+        .price-value{font-size:1.7rem;font-weight:bold;color:var(--primary-color)}
+        .price-unit{font-size:.85rem;color:var(--text-light)}
+        .btn-rent-now{padding:.7rem 1.3rem;background:var(--primary-color);color:var(--white);border:none;border-radius:25px;font-weight:bold;cursor:pointer;transition:background .3s;font-size:.9rem}
+        .btn-rent-now:hover{background:#E55A2A}
+
+        /* ═══════════════════════════════════════
+           MODAL FIX — key changes:
+           1. display:block (not flex) → proper scroll
+           2. padding-top:24px → modal starts below viewport top
+           3. .modal-content margin:0 auto 40px → centered + bottom space
+           4. no align-items:center → content starts from top
+        ═══════════════════════════════════════ */
+        .modal{
+            display:none;
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,.72);
+            z-index:2000;
+            overflow-y:auto;
+            padding:24px 16px 40px;  /* top gap so content not hidden under navbar */
+        }
+        .modal.active{display:block}
+
+        .modal-content{
+            background:var(--white);
+            border-radius:12px;
+            max-width:1100px;
+            width:100%;
+            margin:0 auto;          /* horizontally centered; scroll handles vertical */
+            position:relative;
+            animation:slideDown .28s ease;
+        }
+        @keyframes slideDown{from{transform:translateY(-24px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+        .close{
+            position:sticky;        /* stays visible while scrolling */
+            top:0;
+            float:right;
+            margin:12px 14px -36px 0;
+            font-size:2rem;
+            cursor:pointer;
+            color:var(--text-light);
+            z-index:10;
+            background:var(--white);
+            border-radius:50%;
+            width:36px;height:36px;
+            display:flex;align-items:center;justify-content:center;
+            box-shadow:var(--shadow);
+        }
+        .close:hover{color:var(--text-dark)}
+
+        .booking-container{display:grid;grid-template-columns:1fr 1fr;gap:2rem;padding:2.5rem}
+        .booking-left{border-right:1px solid #E0E0E0;padding-right:2rem}
+        .booking-left h2{color:var(--secondary-color);margin-bottom:.9rem;font-size:1.4rem}
+        .booking-left img{width:100%;border-radius:10px;margin-bottom:1rem;height:200px;object-fit:cover}
+        .vehicle-details p{margin-bottom:.65rem;color:var(--text-dark);font-size:.95rem}
+        .price-tag{font-size:1.4rem;font-weight:bold;color:var(--primary-color);margin:.7rem 0}
+        .vehicle-features-list{background:var(--bg-light);padding:.9rem;border-radius:8px;margin:.7rem 0}
+        .vehicle-features-list h4{margin-bottom:.4rem;color:var(--secondary-color);font-size:.9rem}
+        .feature-tag{display:inline-block;background:var(--white);padding:.3rem .8rem;margin:.2rem;border-radius:20px;font-size:.82rem}
+        .driver-info{background:linear-gradient(135deg,var(--accent-color),#16A068);color:var(--white);padding:.85rem 1rem;border-radius:8px;margin:.7rem 0}
+        .driver-info h4{margin-bottom:.3rem;font-size:.9rem}
+        .driver-info p{font-size:.85rem}
+
+        /* ══ RATING SYSTEM ══ */
+        .rating-section{margin-top:1.2rem;padding-top:1.2rem;border-top:2px solid #F0F0F0}
+        .rating-section-title{font-size:1rem;font-weight:700;color:var(--secondary-color);margin-bottom:1rem;display:flex;align-items:center;gap:6px}
+
+        /* Average score box */
+        .avg-box{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#fff8f0,#fff3e6);border:1.5px solid #FFD4B8;border-radius:12px;padding:12px 16px;margin-bottom:1rem}
+        .avg-score{font-size:2.6rem;font-weight:800;color:var(--primary-color);line-height:1}
+        .avg-right{}
+        .avg-stars-row{color:#F39C12;font-size:1.15rem;letter-spacing:2px}
+        .avg-label{font-size:.8rem;color:var(--text-light);margin-top:2px}
+
+        /* Reviews scroll list */
+        .reviews-scroll{max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;padding-right:4px}
+        .reviews-scroll::-webkit-scrollbar{width:3px}
+        .reviews-scroll::-webkit-scrollbar-thumb{background:var(--primary-color);border-radius:4px}
+
+        .review-item{background:var(--bg-light);border-radius:8px;padding:10px 12px}
+        .review-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px}
+        .review-author{font-weight:600;font-size:.83rem;color:var(--text-dark)}
+        .review-stars-date{text-align:right}
+        .review-star-txt{color:#F39C12;font-size:.78rem}
+        .review-date-txt{font-size:.73rem;color:var(--text-light)}
+        .review-body{font-size:.83rem;color:var(--text-dark);line-height:1.5}
+        .no-reviews{text-align:center;color:var(--text-light);font-size:.85rem;padding:18px}
+
+        /* Write review */
+        .write-review{background:var(--bg-light);border-radius:10px;padding:12px;margin-top:.5rem}
+        .write-review-title{font-size:.85rem;font-weight:600;color:var(--text-dark);margin-bottom:8px}
+
+        /* Interactive stars */
+        .star-picker{display:flex;gap:4px;margin-bottom:8px}
+        .star-picker span{font-size:1.7rem;color:#ddd;cursor:pointer;transition:color .12s;user-select:none}
+        .star-picker span.lit{color:#F39C12}
+
+        .review-textarea{width:100%;padding:.6rem .75rem;border:2px solid #E0E0E0;border-radius:8px;font-size:.85rem;font-family:inherit;resize:vertical;min-height:64px;outline:none;transition:border-color .2s}
+        .review-textarea:focus{border-color:var(--primary-color)}
+        .review-submit-row{display:flex;justify-content:flex-end;margin-top:8px}
+        .btn-submit-review{padding:.55rem 1.2rem;background:var(--secondary-color);color:var(--white);border:none;border-radius:20px;font-weight:700;cursor:pointer;font-size:.82rem;transition:background .25s}
+        .btn-submit-review:hover{background:#003A6B}
+
+        /* Booking form */
+        .booking-right h3{color:var(--secondary-color);margin-bottom:1.2rem}
+        .form-group{margin-bottom:1.1rem}
+        .form-group label{display:block;margin-bottom:.4rem;font-weight:500;color:var(--text-dark);font-size:.9rem}
+        .form-group input,.form-group select,.form-group textarea{width:100%;padding:.7rem;border:2px solid #E0E0E0;border-radius:5px;font-size:.95rem;font-family:inherit}
+        .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--primary-color)}
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+        .price-summary{background:var(--bg-light);padding:1.1rem;border-radius:10px;margin:1rem 0}
+        .price-summary h4{color:var(--secondary-color);margin-bottom:.8rem;font-size:.9rem}
+        .price-row{display:flex;justify-content:space-between;margin-bottom:.55rem;color:var(--text-dark);font-size:.88rem}
+        .price-row.total{border-top:2px solid #D0D0D0;padding-top:.55rem;margin-top:.55rem;font-size:.95rem}
+        .payment-title{color:var(--secondary-color);margin:1rem 0 .7rem;font-size:.95rem}
+        .payment-methods{margin-bottom:1rem}
+        .payment-option{display:block;padding:.85rem;margin-bottom:.55rem;border:2px solid #E0E0E0;border-radius:5px;cursor:pointer;transition:all .3s;font-size:.9rem}
+        .payment-option:hover{border-color:var(--primary-color)}
+        .payment-option input[type="radio"]{margin-right:8px}
+        .btn-book{width:100%;padding:.95rem;background:var(--success);color:var(--white);border:none;border-radius:6px;font-size:1rem;font-weight:bold;cursor:pointer;transition:background .3s}
+        .btn-book:hover{background:#229954}
+        .btn-book:disabled{background:#95A5A6;cursor:not-allowed}
+
+        /* Toast notification */
+        .toast{position:fixed;bottom:28px;right:28px;padding:13px 20px;border-radius:10px;font-size:.88rem;font-weight:600;z-index:9999;opacity:0;transform:translateY(16px);transition:all .3s;pointer-events:none;display:flex;align-items:center;gap:9px}
+        .toast.show{opacity:1;transform:translateY(0)}
+        .toast.success{background:#0D3320;color:#2ECC71;border:1px solid rgba(46,204,113,.35)}
+        .toast.error{background:#3B0E0E;color:#E74C3C;border:1px solid rgba(231,76,60,.35)}
+
+        /* Footer */
+        .footer{background:var(--text-dark);color:var(--white);padding:3rem 0 1rem;margin-top:3rem}
+        .footer-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem;margin-bottom:2rem}
+        .footer-section h3,.footer-section h4{margin-bottom:1rem;color:var(--primary-color)}
+        .footer-section ul{list-style:none}
+        .footer-section ul li{margin-bottom:.5rem}
+        .footer-section a{color:var(--white);text-decoration:none}
+        .footer-section a:hover{color:var(--primary-color)}
+        .footer-bottom{text-align:center;padding-top:2rem;border-top:1px solid rgba(255,255,255,.1)}
+        .no-results{text-align:center;padding:3rem;color:var(--text-light);font-size:1.2rem}
+
+        @media(max-width:768px){
+            .booking-container{grid-template-columns:1fr;padding:1.5rem}
+            .booking-left{border-right:none;border-bottom:1px solid #E0E0E0;padding-right:0;padding-bottom:1.5rem}
+            .search-row{grid-template-columns:1fr}
+            .vehicles-grid{grid-template-columns:1fr}
+            .vehicle-type-tabs{flex-direction:column}
+            .form-row{grid-template-columns:1fr}
+        }
+    </style>
+</head>
+<body>
+
+<!-- Toast -->
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="logo">
+            <i class="fas fa-umbrella-beach"></i>
+            <span>CEYLON EXPLORER</span>
+        </a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="hotel-complete.html" class="nav-link">Hotels</a></li>
+            <li><a href="vehicle-complete.html" class="nav-link active">Vehicles</a></li>
+            <li><a href="tourguide-complete.html" class="nav-link">Tour Guides</a></li>
+            <li><a href="activity-complete.html" class="nav-link">Activities</a></li>
+            <li><a href="touristlocation-complete.html" class="nav-link">Locations</a></li>
+            <li><a href="itinerary.html" class="nav-link">Itinerary</a></li>
+            <li><a href="culture.html" class="nav-link">Culture&amp;Calendar</a></li>
+            <li><a href="emergency-healthcare.html" class="nav-link">Emergency</a></li>
+        </ul>
+        <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+</nav>
+
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-car"></i> Vehicle Rentals</h1>
+        <p>Explore Sri Lanka with our reliable vehicles and professional drivers</p>
+    </div>
+</section>
+
+<!-- Search -->
+<section class="search-section">
+    <div class="container">
+        <div class="search-box">
+            <div class="search-row">
+                <div class="search-input">
+                    <label><i class="fas fa-car"></i> Vehicle Type</label>
+                    <select id="filterType">
+                        <option value="">All Types</option>
+                        <option value="CAR">Cars</option>
+                        <option value="VAN">Vans</option>
+                        <option value="LUXURY">Luxury</option>
+                        <option value="BUS">Bus</option>
+                        <option value="BIKE">Bikes</option>
+                    </select>
+                </div>
+                <div class="search-input">
+                    <label><i class="fas fa-calendar"></i> Pickup Date</label>
+                    <input type="date" id="pickupDate">
+                </div>
+                <div class="search-input">
+                    <label><i class="fas fa-calendar"></i> Return Date</label>
+                    <input type="date" id="returnDate">
+                </div>
+                <div class="search-input">
+                    <label><i class="fas fa-users"></i> Passengers</label>
+                    <input type="number" id="passengers" min="1" value="4">
+                </div>
+                <div class="search-input">
+                    <button class="btn-search" onclick="searchVehicles()">
+                        <i class="fas fa-search"></i> Search Vehicles
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Type tabs -->
+<section class="vehicle-types-section">
+    <div class="container">
+        <div class="vehicle-type-tabs">
+            <button class="type-tab active" onclick="filterByType('all',this)"><i class="fas fa-th"></i> All Vehicles</button>
+            <button class="type-tab" onclick="filterByType('CAR',this)"><i class="fas fa-car"></i> Cars</button>
+            <button class="type-tab" onclick="filterByType('VAN',this)"><i class="fas fa-van-shuttle"></i> Vans</button>
+            <button class="type-tab" onclick="filterByType('LUXURY',this)"><i class="fas fa-car-side"></i> Luxury</button>
+            <button class="type-tab" onclick="filterByType('BUS',this)"><i class="fas fa-bus"></i> Bus</button>
+            <button class="type-tab" onclick="filterByType('BIKE',this)"><i class="fas fa-motorcycle"></i> Bikes</button>
+        </div>
+    </div>
+</section>
+
+<!-- Vehicles grid -->
+<section class="vehicles-section">
+    <div class="container">
+        <div class="results-header">
+            <h2>Available Vehicles</h2>
+            <p id="resultsCount">Loading vehicles...</p>
+        </div>
+        <div class="vehicles-grid" id="vehiclesGrid"></div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════
+     RENTAL MODAL
+     display:block + overflow-y:auto
+     → full scroll, nothing hidden
+═══════════════════════════════ -->
+<div id="rentalModal" class="modal" onclick="modalOverlayClick(event)">
+    <div class="modal-content">
+        <!-- Sticky close button -->
+        <span class="close" onclick="closeModal()" title="Close">&times;</span>
+
+        <div class="booking-container">
+
+            <!-- ── LEFT: Details + Rating ── -->
+            <div class="booking-left">
+                <h2 id="modalVehicleName"></h2>
+                <img id="modalVehicleImage" src="" alt="Vehicle">
+
+                <div class="vehicle-details">
+                    <p><i class="fas fa-car"></i> Type: <span id="modalType"></span></p>
+                    <p><i class="fas fa-users"></i> Capacity: <span id="modalCapacity"></span> persons</p>
+                    <p><i class="fas fa-cog"></i> <span id="modalModel"></span> (<span id="modalYear"></span>)</p>
+                    <p class="price-tag">$<span id="modalPrice"></span> / day</p>
+                </div>
+
+                <div class="vehicle-features-list" id="modalFeatures"></div>
+
+                <div class="driver-info">
+                    <h4><i class="fas fa-user-tie"></i> Professional Driver Included</h4>
+                    <p>Experienced, licensed driver for your entire journey</p>
+                </div>
+
+                <!-- ══ RATING SECTION ══ -->
+                <div class="rating-section">
+                    <div class="rating-section-title">
+                        <i class="fas fa-star" style="color:#F39C12"></i> Customer Reviews
+                    </div>
+
+                    <!-- Average score -->
+                    <div class="avg-box">
+                        <div class="avg-score" id="avgScore">—</div>
+                        <div class="avg-right">
+                            <div class="avg-stars-row" id="avgStarsRow">☆☆☆☆☆</div>
+                            <div class="avg-label" id="avgLabel">No reviews yet</div>
+                        </div>
+                    </div>
+
+                    <!-- Past reviews list -->
+                    <div class="reviews-scroll" id="reviewsScroll">
+                        <div class="no-reviews">No reviews yet — be the first! 🌟</div>
+                    </div>
+
+                    <!-- Write a review -->
+                    <div class="write-review">
+                        <div class="write-review-title"><i class="fas fa-pen"></i> Write a Review</div>
+
+                        <!-- Clickable star picker -->
+                        <div class="star-picker" id="starPicker">
+                            <span data-v="1">★</span>
+                            <span data-v="2">★</span>
+                            <span data-v="3">★</span>
+                            <span data-v="4">★</span>
+                            <span data-v="5">★</span>
+                        </div>
+
+                        <textarea class="review-textarea" id="reviewText" placeholder="Share your experience with this vehicle... (optional)"></textarea>
+                        <div class="review-submit-row">
+                            <button class="btn-submit-review" onclick="submitReview()">
+                                <i class="fas fa-paper-plane"></i> Submit Review
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── RIGHT: Booking form ── -->
+            <div class="booking-right">
+                <h3>Complete Your Rental</h3>
+                <form id="vehicleRentalForm" onsubmit="handleRental(event)">
+                    <input type="hidden" id="selectedVehicleId">
+
+                    <div class="form-group">
+                        <label>Pickup Date &amp; Time</label>
+                        <input type="datetime-local" id="rentalPickup" required onchange="calculateRentalPrice()">
+                    </div>
+                    <div class="form-group">
+                        <label>Return Date &amp; Time</label>
+                        <input type="datetime-local" id="rentalReturn" required onchange="calculateRentalPrice()">
+                    </div>
+                    <div class="form-group">
+                        <label>Pickup Location</label>
+                        <input type="text" id="pickupLocation" placeholder="Hotel name or address" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Drop-off Location</label>
+                        <input type="text" id="dropoffLocation" placeholder="Hotel name or address" required>
+                    </div>
+                    <div class="form-row" id="driverOptionRow" style="display:none;">
+                        <div class="form-group">
+                            <label>Include Professional Driver?</label>
+                            <select id="rentalIncludeDriver" onchange="calculateRentalPrice()">
+                                <option value="yes">Yes (Recommended)</option>
+                                <option value="no">No (Self-Drive)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Number of Passengers</label>
+                        <input type="number" id="rentalPassengers" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Special Requirements (Optional)</label>
+                        <textarea id="specialRequirements" rows="2"></textarea>
+                    </div>
+
+                    <div class="price-summary">
+                        <h4>Rental Summary</h4>
+                        <div class="price-row"><span>Price per day:</span><span>$<span id="summaryPricePerDay">0</span></span></div>
+                        <div class="price-row"><span>Number of days:</span><span id="summaryDays">0</span></div>
+                        <div class="price-row"><span>Driver charges:</span><span>$<span id="summaryDriverCharge">0</span></span></div>
+                        <div class="price-row"><span>Service charge (10%):</span><span>$<span id="summaryServiceCharge">0</span></span></div>
+                        <div class="price-row total">
+                            <span><strong>Total:</strong></span>
+                            <span><strong>$<span id="summaryTotal">0</span></strong></span>
+                        </div>
+                    </div>
+
+                    <h4 class="payment-title"><i class="fas fa-credit-card"></i> Payment Method</h4>
+                    <div class="payment-methods">
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="card" checked onchange="togglePaymentSection()">
+                            <span><i class="fas fa-credit-card"></i> Credit/Debit Card</span>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="paypal" onchange="togglePaymentSection()">
+                            <span><i class="fab fa-paypal"></i> PayPal</span>
+                        </label>
+                    </div>
+
+                    <div id="cardPaymentSection">
+                        <div class="form-group">
+                            <label>Card Number</label>
+                            <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCardNumber(this)">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Expiry Date</label>
+                                <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)">
+                            </div>
+                            <div class="form-group">
+                                <label>CVV</label>
+                                <input type="text" id="cardCVV" placeholder="123" maxlength="3">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Cardholder Name</label>
+                            <input type="text" id="cardName" placeholder="Name on card">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-book">
+                        <i class="fas fa-lock"></i> Confirm &amp; Pay $<span id="finalTotal">0</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CEYLON EXPLORER</h3>
+                <p>Your trusted partner for exploring Sri Lanka</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="hotel-complete.html">Hotels</a></li>
+                    <li><a href="vehicle-complete.html">Vehicles</a></li>
+                    <li><a href="tourguide-complete.html">Tour Guides</a></li>
+                    <li><a href="activity-complete.html">Activities</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Ceylon Explorer. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    /* ═══════════════════════════════════════════════
+       CEYLON EXPLORER — Vehicle Rentals JS
+       Features:
+         • Navbar mobile toggle
+         • Load / filter vehicles
+         • Modal open with scroll-to-top
+         • Rating & Review system (localStorage)
+         • Star picker (click to select)
+         • Price calculator
+         • Rental form handler
+    ═══════════════════════════════════════════════ */
+
+    const API_BASE = 'http://localhost:8080/api';
+    let currentType   = 'all';
+    let activeVehicleId = null;
+    let activeVehicle = null;
+    let pickedStars   = 0;
+
+    // ── Navbar ──────────────────────────────────────
+    function toggleMenu() {
+        document.getElementById('navMenu').classList.toggle('open');
+        document.getElementById('hamburger').classList.toggle('open');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadVehicles();
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('pickupDate').setAttribute('min', today);
+        document.getElementById('returnDate').setAttribute('min', today);
+
+        document.querySelectorAll('.nav-link').forEach(l => l.addEventListener('click', () => {
+            document.getElementById('navMenu').classList.remove('open');
+            document.getElementById('hamburger').classList.remove('open');
+        }));
+
+        // Star picker setup
+        document.querySelectorAll('#starPicker span').forEach(star => {
+            star.addEventListener('click', () => {
+                pickedStars = parseInt(star.dataset.v);
+                updateStarPicker(pickedStars);
+            });
+            star.addEventListener('mouseenter', () => updateStarPicker(parseInt(star.dataset.v), true));
+            star.addEventListener('mouseleave', () => updateStarPicker(pickedStars));
+        });
+    });
+
+    function updateStarPicker(n, hover=false) {
+        document.querySelectorAll('#starPicker span').forEach((s,i) => {
+            s.classList.toggle('lit', i < n);
+        });
+    }
+
+    // ── Toast ────────────────────────────────────────
+    function toast(msg, type='success') {
+        const el = document.getElementById('toast');
+        el.querySelector('i').className = type === 'success'
+            ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+        document.getElementById('toastMsg').textContent = msg;
+        el.className = `toast ${type} show`;
+        setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    // ── Card helpers ─────────────────────────────────
+    function formatCardNumber(i){ let v=i.value.replace(/\s/g,''); i.value=v.match(/.{1,4}/g)?.join(' ')||v; }
+    function formatExpiry(i){ let v=i.value.replace(/\D/g,''); if(v.length>=2) v=v.slice(0,2)+'/'+v.slice(2,4); i.value=v; }
+    function togglePaymentSection(){
+        document.getElementById('cardPaymentSection').style.display =
+            document.querySelector('input[name="paymentMethod"]:checked').value === 'card' ? 'block' : 'none';
+    }
+
+    // ── Filter / load ────────────────────────────────
+    let currentPassengerFilter = 0;
+
+    function filterByType(type, btn) {
+        currentType = type;
+        currentPassengerFilter = 0; 
+        document.querySelectorAll('.type-tab').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        document.getElementById('filterType').value = type === 'all' ? '' : type;
+        loadVehicles(type);
+    }
+    
+    function searchVehicles() { 
+        let type = document.getElementById('filterType').value;
+        if (!type) type = 'all';
+        
+        currentPassengerFilter = parseInt(document.getElementById('passengers').value) || 0;
+        
+        currentType = type;
+        document.querySelectorAll('.type-tab').forEach(b => b.classList.remove('active'));
+        
+        let matched = false;
+        document.querySelectorAll('.type-tab').forEach(t => {
+            if (t.getAttribute('onclick').includes("'" + type + "'")) {
+                t.classList.add('active');
+                matched = true;
+            }
+        });
+        if (!matched && document.querySelectorAll('.type-tab').length > 0) {
+            document.querySelectorAll('.type-tab')[0].classList.add('active');
+        }
+
+        loadVehicles(type);
+    }
+
+    function loadVehicles(type='all') {
+        const url = API_BASE + '/vehicles' + (type !== 'all' ? `?type=${type}` : '');
+        fetch(url).then(r=>r.json()).then(data => {
+            if (currentPassengerFilter > 0) {
+                data = data.filter(v => (parseInt(v.seats) || parseInt(v.capacity) || 0) >= currentPassengerFilter);
+            }
+            displayVehicles(data);
+        }).catch(() => displaySampleVehicles(type));
+    }
+
+    // ── Rating storage ───────────────────────────────
+    function getReviews(vid) {
+        try { return JSON.parse(localStorage.getItem('ce_vr_'+vid)||'[]'); } catch { return []; }
+    }
+    function saveReviews(vid, arr) {
+        localStorage.setItem('ce_vr_'+vid, JSON.stringify(arr));
+    }
+    function calcAvg(arr) {
+        if (!arr.length) return 0;
+        return arr.reduce((s,r)=>s+r.stars,0) / arr.length;
+    }
+    function starStr(n) {
+        // n = 0..5, returns filled/empty stars
+        let s='';
+        for(let i=1;i<=5;i++) s += i<=Math.round(n) ? '★' : '☆';
+        return s;
+    }
+
+    // ── Display vehicles ─────────────────────────────
+    function displayVehicles(vehicles) {
+        const grid = document.getElementById('vehiclesGrid');
+        document.getElementById('resultsCount').textContent = `${vehicles.length} vehicles found`;
+        grid.innerHTML = '';
+        if (!vehicles.length) { grid.innerHTML='<p class="no-results">No vehicles found.</p>'; return; }
+        vehicles.forEach(v => grid.appendChild(createVehicleCard(v)));
+    }
+
+    function createVehicleCard(v) {
+        const reviews = getReviews(v.id);
+        const avg     = calcAvg(reviews);
+        const hasRating = reviews.length > 0;
+
+        const card = document.createElement('div');
+        card.className = 'vehicle-card';
+        card.onclick = () => openRentalModal(v);
+
+        card.innerHTML = `
+        <div class="vehicle-image" style="background-image:url('${v.imageUrl||'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400'}')">
+            <span class="vehicle-badge">${v.type}</span>
+        </div>
+        <div class="vehicle-content">
+            <h3>${v.name}</h3>
+            <p class="vehicle-type"><i class="fas fa-car"></i> ${v.model||v.type}</p>
+            <div class="card-rating">
+                <span class="card-stars">${starStr(hasRating ? avg : 0)}</span>
+                ${hasRating ? `<span class="card-rating-num">${avg.toFixed(1)}</span>` : ''}
+                <span class="card-rating-count">${hasRating ? `(${reviews.length})` : 'No reviews'}</span>
+            </div>
+            <div class="vehicle-features">
+                <span><i class="fas fa-users"></i> ${v.capacity} seats</span>
+                <span><i class="fas fa-user-tie"></i> With Driver</span>
+            </div>
+            <div class="vehicle-footer">
+                <div class="vehicle-price">
+                    <span class="price-value">$${v.pricePerDay}</span>
+                    <span class="price-unit">/ day</span>
+                </div>
+                <button class="btn-rent-now"
+                    onclick="event.stopPropagation();openRentalModal(${JSON.stringify(v).replace(/"/g,'&quot;')})">
+                    <i class="fas fa-key"></i> Rent Now
+                </button>
+            </div>
+        </div>`;
+        return card;
+    }
+
+    // ── Open modal ───────────────────────────────────
+    function openRentalModal(v) {
+        activeVehicleId = v.id;
+        activeVehicle = v;
+        pickedStars     = 0;
+        updateStarPicker(0);
+        document.getElementById('reviewText').value = '';
+
+        // Pre-fill dates from search bar if available
+        const searchPickup = document.getElementById('pickupDate').value;
+        const searchReturn = document.getElementById('returnDate').value;
+        document.getElementById('rentalPickup').value = searchPickup ? searchPickup + 'T09:00' : '';
+        document.getElementById('rentalReturn').value = searchReturn ? searchReturn + 'T17:00' : '';
+        
+        // Fill details
+        document.getElementById('selectedVehicleId').value   = v.id;
+        document.getElementById('modalVehicleName').textContent = v.name;
+        document.getElementById('modalVehicleImage').src      = v.imageUrl||'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600';
+        document.getElementById('modalType').textContent      = v.type;
+        document.getElementById('modalCapacity').textContent  = v.capacity;
+        document.getElementById('modalModel').textContent     = v.model||v.type;
+        document.getElementById('modalYear').textContent      = v.year||'2020';
+        document.getElementById('modalPrice').textContent     = v.pricePerDay;
+        document.getElementById('summaryPricePerDay').textContent = v.pricePerDay;
+
+        document.getElementById('modalFeatures').innerHTML =
+            '<h4>Vehicle Features</h4>' + (v.features
+                ? v.features.split(',').map(f=>`<span class="feature-tag"><i class="fas fa-check"></i> ${f.trim()}</span>`).join('')
+                : '<span class="feature-tag"><i class="fas fa-check"></i> Air Conditioning</span>');
+
+        // Show driver option only if bookable
+        const driverRow = document.getElementById('driverOptionRow');
+        if (v.driverBookable) {
+            driverRow.style.display = 'grid';
+            document.getElementById('rentalIncludeDriver').value = 'yes';
+        } else {
+            driverRow.style.display = 'none';
+            document.getElementById('rentalIncludeDriver').value = 'no';
+        }
+
+        refreshRatingUI(v.id);
+        calculateRentalPrice();
+
+        // ── KEY FIX: scroll overlay to top before showing ──
+        const modal = document.getElementById('rentalModal');
+        modal.scrollTop = 0;
+        modal.classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('rentalModal').classList.remove('active');
+        activeVehicleId = null;
+    }
+
+    function modalOverlayClick(e) {
+        if (e.target === document.getElementById('rentalModal')) closeModal();
+    }
+
+    // ── Rating UI ────────────────────────────────────
+    function refreshRatingUI(vid) {
+        const reviews = getReviews(vid);
+        const avg     = calcAvg(reviews);
+        const hasR    = reviews.length > 0;
+
+        document.getElementById('avgScore').textContent   = hasR ? avg.toFixed(1) : '—';
+        document.getElementById('avgStarsRow').textContent = starStr(hasR ? avg : 0);
+        document.getElementById('avgLabel').textContent   = hasR
+            ? `${reviews.length} review${reviews.length!==1?'s':''}`
+            : 'No reviews yet';
+
+        const scroll = document.getElementById('reviewsScroll');
+        if (!hasR) {
+            scroll.innerHTML = '<div class="no-reviews">No reviews yet — be the first! 🌟</div>';
+            return;
+        }
+
+        scroll.innerHTML = reviews.slice().reverse().map(r => `
+        <div class="review-item">
+            <div class="review-top">
+                <span class="review-author">
+                    <i class="fas fa-user-circle" style="color:var(--primary-color)"></i> ${r.author}
+                </span>
+                <div class="review-stars-date">
+                    <div class="review-star-txt">${starStr(r.stars)} ${r.stars}/5</div>
+                    <div class="review-date-txt">${r.date}</div>
+                </div>
+            </div>
+            ${r.text ? `<div class="review-body">${r.text}</div>` : ''}
+        </div>`).join('');
+    }
+
+    function submitReview() {
+        if (!activeVehicleId) return;
+
+        if (pickedStars === 0) {
+            toast('Please select a star rating first!', 'error');
+            return;
+        }
+
+        const text = document.getElementById('reviewText').value.trim();
+
+        // Get current user
+        let user = null;
+        try { user = JSON.parse(localStorage.getItem('ceylon_current_user')); } catch {}
+        const author = (user && user.name) ? user.name : 'Anonymous';
+
+        const newReview = {
+            stars : pickedStars,
+            text  : text,
+            author: author,
+            date  : new Date().toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'})
+        };
+
+        const reviews = getReviews(activeVehicleId);
+        reviews.push(newReview);
+        saveReviews(activeVehicleId, reviews);
+
+        // Reset input
+        pickedStars = 0;
+        updateStarPicker(0);
+        document.getElementById('reviewText').value = '';
+
+        // Refresh rating UI inside modal
+        refreshRatingUI(activeVehicleId);
+
+        // Refresh cards on page (shows updated star count)
+        loadVehicles(currentType);
+
+        toast('Review submitted! Thank you ★', 'success');
+    }
+
+    // ── Price calculator ─────────────────────────────
+    function calculateRentalPrice() {
+        const ppd = parseFloat(document.getElementById('modalPrice').textContent);
+        const p   = document.getElementById('rentalPickup').value;
+        const r   = document.getElementById('rentalReturn').value;
+        if (!p || !r || !activeVehicle) return;
+
+        const days = Math.ceil((new Date(r) - new Date(p)) / 86400000);
+        if (days <= 0) { alert('Return date must be after pickup date'); return; }
+
+        const sub   = ppd * days;
+        
+        let drv = 0;
+        if (activeVehicle.driverBookable && document.getElementById('rentalIncludeDriver').value === 'yes') {
+            drv = days * (activeVehicle.driverCostPerDay || 25);
+        }
+
+        const svc   = (sub + drv) * 0.10;
+        const total = sub + drv + svc;
+
+        document.getElementById('summaryDays').textContent          = days;
+        document.getElementById('summaryDriverCharge').textContent  = drv.toFixed(2);
+        document.getElementById('summaryServiceCharge').textContent = svc.toFixed(2);
+        document.getElementById('summaryTotal').textContent         = total.toFixed(2);
+        document.getElementById('finalTotal').textContent           = total.toFixed(2);
+    }
+
+    // ── Rental form submit ───────────────────────────
+    function handleRental(e) {
+        e.preventDefault();
+        const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+        if (method === 'card') {
+            if (document.getElementById('cardNumber').value.replace(/\s/g,'').length < 13) { toast('Invalid card number','error'); return; }
+            if (document.getElementById('cardExpiry').value.length !== 5)                  { toast('Invalid expiry date','error'); return; }
+            if (document.getElementById('cardCVV').value.length < 3)                       { toast('Invalid CVV','error'); return; }
+            if (!document.getElementById('cardName').value.trim())                         { toast('Enter cardholder name','error'); return; }
+        }
+
+        const btn  = e.target.querySelector('button[type="submit"]');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        btn.disabled  = true;
+
+        // Prepare booking payload
+        const currentUser = JSON.parse(localStorage.getItem('ceylon_current_user') || '{}');
+        const bookingData = {
+            bookingType: 'VEHICLE',
+            vehicleId: parseInt(activeVehicleId) || null,
+            touristName: currentUser.name || 'Guest',
+            startDate: document.getElementById('rentalPickup').value,
+            endDate: document.getElementById('rentalReturn').value,
+            pickupLocation: document.getElementById('pickupLocation').value,
+            dropoffLocation: document.getElementById('dropoffLocation').value,
+            numberOfPassengers: parseInt(document.getElementById('rentalPassengers').value) || 1,
+            specialRequirements: document.getElementById('specialRequirements').value,
+            includeDriver: activeVehicle.driverBookable && document.getElementById('rentalIncludeDriver').value === 'yes',
+            totalPrice: parseFloat(document.getElementById('summaryTotal').textContent) || 0,
+            paymentMethod: method
+        };
+
+        fetch(`${API_BASE}/bookings`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + (localStorage.getItem('authToken') || '')
+            },
+            body: JSON.stringify(bookingData)
+        })
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Booking failed on server');
+            return data;
+        })
+        .then(data => {
+            btn.innerHTML = orig;
+            btn.disabled  = false;
+            closeModal();
+            toast('Rental confirmed! Booking ID: ' + data.id, 'success');
+        })
+        .catch(err => {
+            console.error('Booking Error:', err);
+            btn.innerHTML = orig;
+            btn.disabled  = false;
+            toast(err.message || 'Booking failed: Ensure backend is running.', 'error');
+        });
+    }
+
+    // ── Sample vehicles ──────────────────────────────
+    function displaySampleVehicles(type='all') {
+        const all = [
+            {id:'v1', name:'Toyota KDH Van',   type:'VAN',    capacity:8,  pricePerDay:80,  model:'KDH',     year:2020, imageUrl:'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400', features:'AC,Music System,WiFi,Luggage Space'},
+            {id:'v2', name:'Toyota Premio',    type:'CAR',    capacity:4,  pricePerDay:50,  model:'Premio',  year:2019, imageUrl:'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400', features:'AC,Leather Seats,Music System'},
+            {id:'v3', name:'Mercedes S-Class', type:'LUXURY', capacity:4,  pricePerDay:120, model:'S-Class', year:2021, imageUrl:'https://images.unsplash.com/photo-1563720360172-67b8f3dce741?w=400', features:'AC,Premium Sound,WiFi,Leather'},
+            {id:'v4', name:'Toyota Coaster',   type:'BUS',    capacity:25, pricePerDay:150, model:'Coaster', year:2020, imageUrl:'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400', features:'AC,Reclining Seats,Music System'},
+            {id:'v5', name:'Honda CBR 250R',   type:'BIKE',   capacity:2,  pricePerDay:30,  model:'CBR 250R',year:2021, imageUrl:'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=400', features:'Helmet Included,GPS'},
+            {id:'v6', name:'Honda Vezel',      type:'CAR',    capacity:5,  pricePerDay:60,  model:'Vezel',   year:2020, imageUrl:'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=400', features:'AC,Music System,Bluetooth'},
+        ];
+        
+        let filtered = type === 'all' ? all : all.filter(v => v.type === type);
+        if (currentPassengerFilter > 0) {
+            filtered = filtered.filter(v => (parseInt(v.seats) || parseInt(v.capacity) || 0) >= currentPassengerFilter);
+        }
+        
+        displayVehicles(filtered);
+    }
+</script>
+
+</body>
+</html>

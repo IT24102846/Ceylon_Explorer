@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emergency & Healthcare - CEYLON EXPLORER</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Outfit', -apple-system, sans-serif;
+      line-height: 1.6;
+      color: #2C3E50;
+      background: #F8F9FA;
+    }
+
+    /* Navigation — overridden by navbar-fix.js */
+    .navbar {
+      background: #FFFFFF;
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: white;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .nav-menu {
+      display: flex;
+      list-style: none;
+      gap: 2rem;
+    }
+
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      transition: all 0.3s;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .signup-btn {
+      background: white;
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 5px;
+    }
+
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background: white;
+      transition: 0.3s;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #004E89 0%, #FF6B35 100%);
+      padding: 4rem 2rem;
+      text-align: center;
+      color: white;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.3rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Section */
+    .section {
+      padding: 4rem 2rem;
+    }
+
+    .bg-light {
+      background: #f8f9fa;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 3rem;
+      color: #333;
+    }
+
+    /* Emergency Grid */
+    .emergency-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+
+    .emergency-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .emergency-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .emergency-card.urgent {
+      border: 3px solid #FF6B35;
+    }
+
+    .emergency-card i {
+      font-size: 3rem;
+      color: #004E89;
+      margin-bottom: 1rem;
+    }
+
+    .emergency-card.urgent i {
+      color: #FF6B35;
+    }
+
+    .emergency-number {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #FF6B35;
+      margin: 1rem 0;
+    }
+
+    .emergency-desc {
+      color: #666;
+      margin-bottom: 1rem;
+    }
+
+    .btn-emergency {
+      background: #FF6B35;
+      color: white;
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 25px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-emergency:hover {
+      background: #E55A2A;
+      transform: scale(1.05);
+    }
+
+    .btn-secondary {
+      background: #004E89;
+      color: white;
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-secondary:hover {
+      background: #003A6B;
+    }
+
+    /* Cards Grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    /* Services Tags */
+    .services-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin: 1rem 0;
+    }
+
+    .service-tag {
+      background: rgba(255,107,53,0.1);
+      color: #FF6B35;
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+
+    /* Healthcare Cards */
+    .healthcare-card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
+
+    .healthcare-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .healthcare-header {
+      background: linear-gradient(135deg, #004E89 0%, #FF6B35 100%);
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .healthcare-header.ayurveda {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .healthcare-header.spa {
+      background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+    }
+
+    .healthcare-header.government {
+      background: linear-gradient(135deg, #004E89 0%, #1A936F 100%);
+    }
+
+    .healthcare-body {
+      padding: 1.5rem;
+    }
+
+    .healthcare-body h3 {
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+
+    .location-info {
+      color: #666;
+      margin: 0.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .package-item {
+      background: #f8f9fa;
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border-radius: 10px;
+      border-left: 4px solid #FF6B35;
+    }
+
+    .package-price {
+      color: #FF6B35;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    /* Tips Grid */
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+    }
+
+    .tip-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .tip-card i {
+      color: #11998e;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .tip-card h3 {
+      margin-bottom: 1rem;
+      color: #333;
+    }
+
+    /* Footer */
+    .footer {
+      background: #2c3e50;
+      color: white;
+      padding: 3rem 2rem 1rem;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .footer-section h3, .footer-section h4 {
+      margin-bottom: 1rem;
+    }
+
+    .footer-section ul {
+      list-style: none;
+    }
+
+    .footer-section ul li {
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-section a {
+      color: #bdc3c7;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-section a:hover {
+      color: white;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .social-links a {
+      width: 40px;
+      height: 40px;
+      background: #34495e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.3s;
+    }
+
+    .social-links a:hover {
+      background: #667eea;
+      transform: translateY(-3px);
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 2rem;
+      border-top: 1px solid #34495e;
+    }
+
+    /* Tab Navigation */
+    .tab-navigation {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: white;
+      border: 2px solid #004E89;
+      color: #004E89;
+      padding: 1rem 2rem;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .tab-btn:hover {
+      background: rgba(0,78,137,0.07);
+    }
+
+    .tab-btn.active {
+      background: #FF6B35;
+      border-color: #FF6B35;
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-menu {
+        position: fixed;
+        left: -100%;
+        top: 70px;
+        flex-direction: column;
+        background: #FFFFFF;
+        width: 100%;
+        text-align: center;
+        transition: 0.3s;
+        padding: 2rem 0;
+      }
+
+      .nav-menu.active {
+        left: 0;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+
+      .hero h1 {
+        font-size: 2rem;
+      }
+
+      .section-title {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<!-- Navigation Bar -->
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="logo">
+      <i class="fas fa-umbrella-beach"></i>
+      <span>CEYLON EXPLORER</span>
+    </div>
+    <ul class="nav-menu" id="navMenu">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="hotel-complete.html" class="nav-link">Hotels</a></li>
+      <li><a href="vehicle-complete.html" class="nav-link">Vehicles</a></li>
+      <li><a href="tourguide-complete.html" class="nav-link">Tour Guides</a></li>
+      <li><a href="activity-complete.html" class="nav-link">Activities</a></li>
+      <li><a href="touristlocation-complete.html" class="nav-link">Locations</a></li>
+      <li><a href="itinerary.html" class="nav-link">Itinerary</a></li>
+      <li><a href="culture.html" class="nav-link">Culture&Calender</a></li>
+      <li><a href="emergency-healthcare.html" class="nav-link">Emergency</a></li>
+    </ul>
+    <div class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+  <i class="fas fa-heartbeat" style="font-size: 60px; margin-bottom: 20px;"></i>
+  <h1>Emergency & Healthcare Services</h1>
+  <p>Your complete guide to medical services and emergency contacts in Sri Lanka</p>
+</section>
+
+<!-- Tab Navigation -->
+<section class="section">
+  <div class="container">
+    <div class="tab-navigation">
+      <button class="tab-btn active" onclick="switchTab('emergency')">
+        <i class="fas fa-phone-alt"></i> Emergency Services
+      </button>
+      <button class="tab-btn" onclick="switchTab('hospitals')">
+        <i class="fas fa-hospital"></i> Hospitals
+      </button>
+      <button class="tab-btn" onclick="switchTab('ayurveda')">
+        <i class="fas fa-leaf"></i> Ayurveda
+      </button>
+      <button class="tab-btn" onclick="switchTab('spa')">
+        <i class="fas fa-spa"></i> Wellness & Spa
+      </button>
+    </div>
+
+    <!-- Emergency Services Tab -->
+    <div id="emergency" class="tab-content active">
+      <h2 class="section-title">Primary Emergency Numbers</h2>
+      <div class="emergency-grid">
+        <div class="emergency-card urgent">
+          <i class="fas fa-phone-alt"></i>
+          <h3>General Emergency</h3>
+          <p class="emergency-number">119</p>
+          <p class="emergency-desc">24/7 Emergency Response Center</p>
+          <a href="tel:119" class="btn-emergency">Call Now</a>
+        </div>
+        <div class="emergency-card urgent">
+          <i class="fas fa-ambulance"></i>
+          <h3>Ambulance Service</h3>
+          <p class="emergency-number">1990</p>
+          <p class="emergency-desc">Medical Emergency & Ambulance</p>
+          <a href="tel:1990" class="btn-emergency">Call Now</a>
+        </div>
+        <div class="emergency-card urgent">
+          <i class="fas fa-fire"></i>
+          <h3>Fire & Rescue</h3>
+          <p class="emergency-number">110</p>
+          <p class="emergency-desc">Fire Department Emergency Line</p>
+          <a href="tel:110" class="btn-emergency">Call Now</a>
+        </div>
+        <div class="emergency-card">
+          <i class="fas fa-shield-alt"></i>
+          <h3>Tourist Police</h3>
+          <p class="emergency-number">+94 11 242 1052</p>
+          <p class="emergency-desc">24/7 Tourist Police Hotline</p>
+          <a href="tel:+94112421052" class="btn-emergency">Call</a>
+        </div>
+        <div class="emergency-card">
+          <i class="fas fa-car-crash"></i>
+          <h3>Accident Service</h3>
+          <p class="emergency-number">011 2691111</p>
+          <p class="emergency-desc">Road Accident Emergency</p>
+          <a href="tel:0112691111" class="btn-emergency">Call</a>
+        </div>
+        <div class="emergency-card">
+          <i class="fas fa-shield-virus"></i>
+          <h3>Disaster Management</h3>
+          <p class="emergency-number">117</p>
+          <p class="emergency-desc">Disaster Management Center</p>
+          <a href="tel:117" class="btn-emergency">Call</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hospitals Tab -->
+    <div id="hospitals" class="tab-content">
+      <h2 class="section-title">Healthcare Facilities in Sri Lanka</h2>
+
+      <!-- ── DB: Dynamic Section ── -->
+      <div id="db-hospitals-section" style="margin-bottom:2rem;"></div>
+
+      <!-- Free Government Hospitals (Static Fallback) -->
+      <h3 id="static-gov-title" style="text-align: center; margin: 3rem 0 2rem; color: #004E89; font-size: 2rem;">
+        <i class="fas fa-hospital"></i> Free Government Hospitals
+      </h3>
+      <div class="cards-grid" id="static-gov-grid">
+        <div class="healthcare-card">
+          <div class="healthcare-header government">
+            <h3>National Hospital of Sri Lanka</h3>
+            <p>Main Referral Hospital - Colombo</p>
+          </div>
+          <div class="healthcare-body">
+            <div class="location-info"><i class="fas fa-map-marker-alt"></i><span>Regent Street, Colombo 07</span></div>
+            <div class="location-info"><i class="fas fa-phone"></i><a href="tel:+94112691111">+94 11 269 1111</a></div>
+            <div class="services-list"><span class="service-tag">Emergency 24/7</span><span class="service-tag">ICU</span><span class="service-tag">Surgery</span><span class="service-tag">FREE</span></div>
+            <div class="package-item"><strong>Services:</strong> All medical services completely free for Sri Lankan citizens and emergency care for tourists</div>
+          </div>
+        </div>
+        <div class="healthcare-card">
+          <div class="healthcare-header government">
+            <h3>Colombo South Teaching Hospital</h3>
+            <p>Major Government Hospital</p>
+          </div>
+          <div class="healthcare-body">
+            <div class="location-info"><i class="fas fa-map-marker-alt"></i><span>Kalubowila, Dehiwala</span></div>
+            <div class="location-info"><i class="fas fa-phone"></i><a href="tel:+94112778000">+94 11 277 8000</a></div>
+            <div class="services-list"><span class="service-tag">Emergency</span><span class="service-tag">Cardiac</span><span class="service-tag">Trauma</span><span class="service-tag">FREE</span></div>
+            <div class="package-item"><strong>Specialties:</strong> Cardiology, Neurology, Oncology - Free treatment</div>
+          </div>
+        </div>
+        <div class="healthcare-card">
+          <div class="healthcare-header government">
+            <h3>Teaching Hospital Kandy</h3>
+            <p>Central Province Main Hospital</p>
+          </div>
+          <div class="healthcare-body">
+            <div class="location-info"><i class="fas fa-map-marker-alt"></i><span>William Gopallawa Mawatha, Kandy</span></div>
+            <div class="location-info"><i class="fas fa-phone"></i><a href="tel:+94812233337">+94 81 223 3337</a></div>
+            <div class="services-list"><span class="service-tag">24/7 Emergency</span><span class="service-tag">Maternity</span><span class="service-tag">FREE</span></div>
+            <div class="package-item"><strong>Coverage:</strong> Complete medical services free for all patients</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Premium Private Hospitals (Static Fallback) -->
+      <h3 id="static-pvt-title" style="text-align: center; margin: 3rem 0 2rem; color: #004E89; font-size: 2rem;">
+        <i class="fas fa-hospital-alt"></i> Premium Private Hospitals
+      </h3>
+      <div class="cards-grid">
+        <div class="healthcare-card">
+          <div class="healthcare-header"><h3>Asiri Central Hospital</h3><p>Leading Private Healthcare</p></div>
+          <div class="healthcare-body">
+            <div class="location-info"><i class="fas fa-map-marker-alt"></i><span>114 Norris Canal Road, Colombo 10</span></div>
+            <div class="location-info"><i class="fas fa-phone"></i><a href="tel:+94114665500">+94 11 466 5500</a></div>
+            <div class="services-list"><span class="service-tag">Emergency 24/7</span><span class="service-tag">Premium Care</span><span class="service-tag">International Standards</span></div>
+            <div class="package-item"><strong>Health Checkup Package:</strong><p class="package-price">LKR 15,000 - 50,000</p><small>Comprehensive health screening, blood tests, cardiac assessment</small></div>
+          </div>
+        </div>
+        <div class="healthcare-card">
+          <div class="healthcare-header"><h3>Lanka Hospitals</h3><p>JCI Accredited Hospital</p></div>
+          <div class="healthcare-body">
+            <div class="location-info"><i class="fas fa-map-marker-alt"></i><span>578 Elvitigala Mawatha, Colombo 05</span></div>
+            <div class="location-info"><i class="fas fa-phone"></i><a href="tel:+94115530000">+94 11 553 0000</a></div>
+            <div class="services-list"><span class="service-tag">JCI Accredited</span><span class="service-tag">Specialist Care</span><span class="service-tag">Medical Tourism</span></div>
+            <div class="package-item"><strong>Executive Health Package:</strong><p class="package-price">LKR 35,000 - 75,000</p><small>Full body checkup, specialist consultation, imaging</small></div>
+          </div>
+        </div>
+        <div class="healthcare-card">
+          <div class="healthcare-header"><h3>Durdans Hospital</h3><p>Historic Private Hospital</p></div>
+          <div class="healthcare-body">
+            <div class="location-info"><i class="fas fa-map-marker-alt"></i><span>3 Alfred Place, Colombo 03</span></div>
+            <div class="location-info"><i class="fas fa-phone"></i><a href="tel:+94112140000">+94 11 214 0000</a></div>
+            <div class="services-list"><span class="service-tag">Cardiology Excellence</span><span class="service-tag">Premium</span><span class="service-tag">24/7</span></div>
+            <div class="package-item"><strong>Wellness Package:</strong><p class="package-price">LKR 25,000 - 60,000</p><small>Preventive health screening, lifestyle consultation</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+        <div class="healthcare-card">
+          <div class="healthcare-header government">
+            <h3>National Hospital of Sri Lanka</h3>
+            <p>Main Referral Hospital - Colombo</p>
+          </div>
+          <div class="healthcare-body">
+            <div class="location-info">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Regent Street, Colombo 07</span>
+            </div>
+            <div class="location-info">
+              <i class="fas fa-phone"></i>
+              <a href="tel:+94112691111">+94 11 269 1111</a>
+            </div>
+            <div class="services-list">
+              <span class="service-tag">Emergency 24/7</span>
+              <span class="service-tag">ICU</span>
+              <span class="service-tag">Surgery</span>
+              <span class="service-tag">FREE</span>
+            </div>
+            <div class="package-item">
+              <strong>Services:</strong> All medical services completely free for Sri Lankan citizens and emergency care for tourists
+            </div>
+          </div>
+        </div>
+
+        <div class="healthcare-card">
+          <div class="healthcare-header government">
+            <h3>Colombo South Teaching Hospital</h3>
+            <p>Major Government Hospital</p>
+          </div>
+          <div class="healthcare-body">
+            <div class="location-info">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Kalubowila, Dehiwala</span>
+            </div>
+            <div class="location-info">
+              <i class="fas fa-phone"></i>
+              <a href="tel:+94112778000">+94 11 277 8000</a>
+            </div>
+            <div class="services-list">
+              <span class="service-tag">Emergency</span>
+              <span class="service-tag">Cardiac</span>
+              <span class="service-tag">Trauma</span>
+              <span class="service-tag">FREE</span>
+            </div>
+            <div class="package-item">
+              <strong>Specialties:</strong> Cardiology, Neurology, Oncology - Free treatment
+            </div>
+          </div>
+        </div>
+
+        <div class="healthcare-card">
+          <div class="healthcare-header government">
+            <h3>Teaching Hospital Kandy</h3>
+            <p>Central Province Main Hospital</p>
+          </div>
+          <div class="healthcare-body">
+            <div class="location-info">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>William Gopallawa Mawatha, Kandy</span>
+            </div>
+            <div class="location-info">
+              <i class="fas fa-phone"></i>
+              <a href="tel:+94812233337">+94 81 223 3337</a>
+            </div>
+            <div class="services-list">
+              <span class="service-tag">24/7 Emergency</span>
+              <span class="service-tag">Maternity</span>
+              <span class="service-tag">FREE</span>
+            </div>
+            <div class="package-item">
+              <strong>Coverage:</strong> Complete medical services free for all patients
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Private Hospitals -->
+      <h3 style="text-align: center; margin: 3rem 0 2rem; color: #004E89; font-size: 2rem;">
+        <i class="fas fa-hospital-alt"></i> Premium Private Hospitals
+      </h3>
+      <div class="cards-grid">
+        <div class="healthcare-card">
+          <div class="healthcare-header">
+            <h3>Asiri Central Hospital</h3>
+            <p>Leading Private Healthcare</p>
+          </div>
+          <div class="healthcare-body">
+            <div class="location-info">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>114 Norris Canal Road, Colombo 10</span>
+            </div>
+            <div class="location-info">
+              <i class="fas fa-phone"></i>
+              <a href="tel:+94114665500">+94 11 466 5500</a>
+            </div>
+            <div class="services-list">
+              <span class="service-tag">Emergency 24/7</span>
+              <span class="service-tag">Premium Care</span>
+              <span class="service-tag">International Standards</span>
+            </div>
+            <div class="package-item">
+              <strong>Health Checkup Package:</strong>
+              <p class="package-price">LKR 15,000 - 50,000</p>
+              <small>Comprehensive health screening, blood tests, cardiac assessment</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="healthcare-card">
+          <div class="healthcare-header">
+            <h3>Lanka Hospitals</h3>
+            <p>JCI Accredited Hospital</p>
+          </div>
+          <div class="healthcare-body">
+            <div class="location-info">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>578 Elvitigala Mawatha, Colombo 05</span>
+            </div>
+            <div class="location-info">
+              <i class="fas fa-phone"></i>
+              <a href="tel:+94115530000">+94 11 553 0000</a>
+            </div>
+            <div class="services-list">
+              <span class="service-tag">JCI Accredited</span>
+              <span class="service-tag">Specialist Care</span>
+              <span class="service-tag">Medical Tourism</span>
+            </div>
+            <div class="package-item">
+              <strong>Executive Health Package:</strong>
+              <p class="package-price">LKR 35,000 - 75,000</p>
+              <small>Full body checkup, specialist consultation, imaging</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="healthcare-card">
+          <div class="healthcare-header">
+            <h3>Durdans Hospital</h3>
+            <p>Historic Private Hospital</p>
+          </div>
+          <div class="healthcare-body">
+            <div class="location-info">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>3 Alfred Place, Colombo 03</span>
+            </div>
+            <div class="location-info">
+              <i class="fas fa-phone"></i>
+              <a href="tel:+94112140000">+94 11 214 0000</a>
+            </div>
+            <div class="services-list">
+              <span class="service-tag">Cardiology Excellence</span>
+              <span class="service-tag">Premium</span>
+              <span class="service-tag">24/7</span>
+            </div>
+            <div class="package-item">
+              <strong>Wellness Package:</strong>
+              <p class="package-price">LKR 25,000 - 60,000</p>
+              <small>Preventive health screening, lifestyle consultation</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ayurveda Tab -->
+    <div id="ayurveda" class="tab-content">
+      <h2 class="section-title">Traditional Ayurveda Hospitals & Centers</h2>
+      <div class="cards-grid">
+        <div class="healthcare-card">
+          <div class="healthcare-header ayurveda">
+            <h3>Siddhalepa Ayurveda Hospital</h3>
+            <p>Authentic Ayurvedic Treatment</p>
+          </div>
+          <div class="healthcare-body">
+            <div class="location-info">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Mount Lavinia, Colombo</span>
+            </div>
+            <div class="location-info">
+              <i class="fas fa-phone"></i>
+              <a href="tel:+94112738622">+94 11 273 8622</a>
+            </div>
+            <div class="services-list">
+              <span class="service-tag">Traditional Ayurveda</span>
+              <span class="service-tag">Panchakarma</span>
+              <span class="service-tag">Herbal Medicine</span>
+            </div>
+            <div class="package-item">
+              <strong>7-Day Detox Package:</strong>
+              <p class="package-price">LKR 85,000</p>
+              <small>Full board, treatments, herbal medicines, consultation</small>
+            </div>
+            <div class="package-item">
+              <strong>14-Day Rejuvenation:</strong>
+              <p class="package-price">LKR 150,000</p>
+              <small>Panchakarma therapy, yoga, meditation, organic meals</small>
+            </div>
+            <a href="#" class="btn-secondary" style="margin-top: 1rem;">Book Treatment</a>
+          </div>
+        </div>
+
+        <div class="healthcare-card">
+          <div class="healthcare-header ayurveda">
+            <h3>Barberyn Ayurveda Resorts</h3>
+            <p>Beach Resort Ayurveda</p>
+          </div>
+          <div class="healthcare-body">
+            <div class="location-info">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Beruwala & Weligama</span>
+            </div>
+            <div class="location-info">
+              <i class="fas fa-phone"></i>
+              <a href="tel:+94342275577">+94 34 227 5577</a>
+            </div>
+            <div class="services-list">
+              <span class="service-tag">Luxury Resort</span>
+              <span class="service-tag">Beachfront</span>
+              <span class="service-tag">Traditional Healing</span>
+            </div>
+            <div class="package-item">
+              <strong>14-Day Wellness:</strong>
+              <p class="package-price">USD 1,800 - 2,500</p>
+              <small>Ayurveda treatments, beach accommodation, all meals</small>
+            </div>
+            <div class="package-item">
+              <strong>21-Day Deep Healing:</strong>
+              <p class="package-price">USD 3,000 - 4,000</p>
+              <small>Intensive Panchakarma, luxury accommodation</small>
+            </div>
+            <a href="#" class="btn-secondary" style="margin-top: 1rem;">View Packages</a>
+          </div>
+        </div>
+
+        <div class="healthcare-card">
+          <div class="healthcare-header ayurveda">
+            <h3>Ayurveda Pavilions</h3>
+            <p>Boutique Ayurveda Resort</p>
+          </div>
+          <div class="healthcare-body">
+            <div class="location-info">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Negombo</span>
+            </div>
+            <div class="location-info">
+              <i class="fas fa-phone"></i>
+              <a href="tel:+94312277971">+94 31 227 7971</a>
+            </div>
+            <div class="services-list">
+              <span class="service-tag">Boutique</span>
+              <span class="service-tag">Personalized Care</span>
+              <span class="service-tag">Organic</span>
+            </div>
+            <div class="package-item">
+              <strong>Stress Relief (7 Days):</strong>
+              <p class="package-price">USD 1,200</p>
+              <small>Stress management, yoga, Ayurveda therapy</small>
+            </div>
+            <div class="package-item">
+              <strong>Weight Management (14 Days):</strong>
+              <p class="package-price">USD 2,200</p>
+              <small>Custom diet, herbal treatments, fitness coaching</small>
+            </div>
+            <a href="#" class="btn-secondary" style="margin-top: 1rem;">Book Now</a>
+          </div>
+        </div>
+
+        <div class="healthcare-card">
+          <div class="healthcare-header ayurveda">
+            <h3>Jetwing Ayurveda Pavilions</h3>
+            <p>Award-Winning Ayurveda</p>
+          </div>
+          <div class="healthcare-body">
+            <div class="location-info">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Negombo</span>
+            </div>
+            <div class="location-info">
+              <i class="fas fa-phone"></i>
+              <a href="tel:+94312279797">+94 31 227 9797</a>
+            </div>
+            <div class="services-list">
+              <span class="service-tag">Award Winner</span>
+              <span class="service-tag">Eco-Friendly</span>
+              <span class="service-tag">Organic Garden</span>
+            </div>
+            <div class="package-item">
+              <strong>Detox Program (10 Days):</strong>
+              <p class="package-price">USD 1,600</p>
+              <small>Body cleansing, herbal treatments, yoga sessions</small>
+            </div>
+            <a href="#" class="btn-secondary" style="margin-top: 1rem;">Enquire Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spa & Wellness Tab -->
+    <div id="spa" class="tab-content">
+      <h2 class="section-title">Premium Spa & Wellness Centers</h2>
+      <div class="cards-grid">
+        <div class="healthcare-card">
+          <div class="healthcare-header spa">
+            <h3>Ceylon Spa by Shangri-La</h3>
+            <p>Luxury Urban Spa</p>
+          </div>
+          <div class="healthcare-body">
+            <div class="location-info">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Shangri-La Hotel, Colombo 02</span>
+            </div>
+            <div class="location-info">
+              <i class="fas fa-phone"></i>
+              <a href="tel:+94117888288">+94 11 788 8288</a>
+            </div>
+            <div class="services-list">
+              <span class="service-tag">Luxury</span>
+              <span class="service-tag">International</span>
+              <span class="service-tag">City Center</span>
+            </div>
+            <div class="package-item">
+              <strong>Signature Massage (90min):</strong>
+              <p class="package-price">LKR 18,000</p>
+              <small>Traditional Sri Lankan massage with herbal oils</small>
+            </div>
+            <div class="package-item">
+              <strong>Spa Day Package:</strong>
+              <p class="package-price">LKR 35,000</p>
+              <small>Body scrub, massage, facial, pool access</small>
+            </div>
+            <a href="#" class="btn-secondary" style="margin-top: 1rem;">Book Appointment</a>
+          </div>
+        </div>
+
+        <div class="healthcare-card">
+          <div class="healthcare-header spa">
+            <h3>Anantara Peace Haven Spa</h3>
+            <p>Beachfront Wellness</p>
+          </div>
+          <div class="healthcare-body">
+            <div class="location-info">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Tangalle, Southern Province</span>
+            </div>
+            <div class="location-info">
+              <i class="fas fa-phone"></i>
+              <a href="tel:+94472241500">+94 47 224 1500</a>
+            </div>
+            <div class="services-list">
+              <span class="service-tag">Beach Resort</span>
+              <span class="service-tag">Holistic</span>
+              <span class="service-tag">Luxury</span>
+            </div>
+            <div class="package-item">
+              <strong>Ceylon Ritual (120min):</strong>
+              <p class="package-price">USD 180</p>
+              <small>Traditional scrub, bath, massage combination</small>
+            </div>
+            <div class="package-item">
+              <strong>Wellness Retreat (3 Days):</strong>
+              <p class="package-price">USD 600</p>
+              <small>Daily treatments, yoga, healthy meals</small>
+            </div>
+            <a href="#" class="btn-secondary" style="margin-top: 1rem;">Reserve Now</a>
+          </div>
+        </div>
+
+        <div class="healthcare-card">
+          <div class="healthcare-header spa">
+            <h3>Santani Wellness Resort</h3>
+            <p>Mountain Wellness Retreat</p>
+          </div>
+          <div class="healthcare-body">
+            <div class="location-info">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Werapitiya, Kandy</span>
+            </div>
+            <div class="location-info">
+              <i class="fas fa-phone"></i>
+              <a href="tel:+94812059000">+94 81 205 9000</a>
+            </div>
+            <div class="services-list">
+              <span class="service-tag">Award Winner</span>
+              <span class="service-tag">Eco-Resort</span>
+              <span class="service-tag">Holistic</span>
+            </div>
+            <div class="package-item">
+              <strong>Detox & Wellness (7 Days):</strong>
+              <p class="package-price">USD 2,100</p>
+              <small>Detox program, spa treatments, healthy cuisine</small>
+            </div>
+            <div class="package-item">
+              <strong>Mind & Body Reset (14 Days):</strong>
+              <p class="package-price">USD 4,000</p>
+              <small>Complete wellness transformation program</small>
+            </div>
+            <a href="#" class="btn-secondary" style="margin-top: 1rem;">Learn More</a>
+          </div>
+        </div>
+
+        <div class="healthcare-card">
+          <div class="healthcare-header spa">
+            <h3>The Fortress Spa</h3>
+            <p>Coastal Luxury Spa</p>
+          </div>
+          <div class="healthcare-body">
+            <div class="location-info">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Koggala, Galle</span>
+            </div>
+            <div class="location-info">
+              <i class="fas fa-phone"></i>
+              <a href="tel:+94912386400">+94 91 238 6400</a>
+            </div>
+            <div class="services-list">
+              <span class="service-tag">Luxury</span>
+              <span class="service-tag">Ocean View</span>
+              <span class="service-tag">Premium</span>
+            </div>
+            <div class="package-item">
+              <strong>Ocean Bliss Treatment:</strong>
+              <p class="package-price">LKR 22,000</p>
+              <small>Sea salt scrub, seaweed wrap, massage</small>
+            </div>
+            <div class="package-item">
+              <strong>Couples Spa Package:</strong>
+              <p class="package-price">LKR 60,000</p>
+              <small>Private suite, synchronized massage, champagne</small>
+            </div>
+            <a href="#" class="btn-secondary" style="margin-top: 1rem;">Book Experience</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Emergency Tips -->
+<section class="section bg-light">
+  <div class="container">
+    <h2 class="section-title">Healthcare Tips for Tourists</h2>
+    <div class="tips-grid">
+      <div class="tip-card">
+        <i class="fas fa-check-circle"></i>
+        <h3>Travel Insurance</h3>
+        <p>Always have comprehensive travel insurance covering medical emergencies and evacuation.</p>
+      </div>
+      <div class="tip-card">
+        <i class="fas fa-check-circle"></i>
+        <h3>Vaccination Records</h3>
+        <p>Keep vaccination certificates handy. Recommended: Hepatitis A & B, Typhoid, Tetanus.</p>
+      </div>
+      <div class="tip-card">
+        <i class="fas fa-check-circle"></i>
+        <h3>Medical Documents</h3>
+        <p>Carry copies of prescriptions and medical history in English.</p>
+      </div>
+      <div class="tip-card">
+        <i class="fas fa-check-circle"></i>
+        <h3>Emergency Contacts</h3>
+        <p>Save local emergency numbers and your embassy contact in your phone.</p>
+      </div>
+      <div class="tip-card">
+        <i class="fas fa-check-circle"></i>
+        <h3>Pharmacies</h3>
+        <p>Most medications available. Major cities have 24/7 pharmacies.</p>
+      </div>
+      <div class="tip-card">
+        <i class="fas fa-check-circle"></i>
+        <h3>Water Safety</h3>
+        <p>Drink bottled water. Available everywhere at affordable prices.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>CEYLON EXPLORER</h3>
+        <p>Your trusted partner for exploring Sri Lanka</p>
+        <div class="social-links">
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="hotel-complete.html">Hotels</a></li>
+          <li><a href="vehicle-complete.html">Vehicles</a></li>
+          <li><a href="tourguide-complete.html">Tour Guides</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#">Help Center</a></li>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">FAQs</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Contact</h4>
+        <p><i class="fas fa-phone"></i> +94 11 234 5678</p>
+        <p><i class="fas fa-envelope"></i> info@ceylonexplorer.lk</p>
+        <p><i class="fas fa-map-marker-alt"></i> Colombo, Sri Lanka</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Ceylon Explorer. All Rights Reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Tab switching function
+  function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabName).classList.add('active');
+    event.target.closest('.tab-btn').classList.add('active');
+    if (tabName === 'hospitals' || tabName === 'ayurveda' || tabName === 'spa') loadDbServices();
+  }
+
+  // Load emergency services from DB
+  async function loadDbServices() {
+    const container = document.getElementById('db-hospitals-section');
+    if (!container) return;
+    try {
+      const res = await fetch('http://localhost:8080/api/emergency-services');
+      if (!res.ok) return;
+      const data = await res.json();
+      const active = data.filter(s => s.status === 'ACTIVE' || s.status === 'active');
+      if (!active.length) return;
+
+      // Group by type
+      const groups = {};
+      active.forEach(s => {
+        const t = (s.type || 'other').toLowerCase();
+        if (!groups[t]) groups[t] = [];
+        groups[t].push(s);
+      });
+
+      const typeConfig = {
+        hospital:  { label: '🏥 Hospitals (from Database)', headerClass: 'government', icon: 'fas fa-hospital' },
+        clinic:    { label: '🏥 Clinics (from Database)',   headerClass: 'government', icon: 'fas fa-clinic-medical' },
+        ayurveda:  { label: '🌿 Ayurveda Centers (from Database)', headerClass: 'ayurveda', icon: 'fas fa-leaf' },
+        spa:       { label: '💆 Wellness & Spa (from Database)',   headerClass: 'spa',      icon: 'fas fa-spa' },
+        pharmacy:  { label: '💊 Pharmacies (from Database)', headerClass: '', icon: 'fas fa-pills' },
+        other:     { label: '📋 Other Services (from Database)', headerClass: '', icon: 'fas fa-notes-medical' },
+      };
+
+      let html = '';
+      for (const [type, items] of Object.entries(groups)) {
+        const cfg = typeConfig[type] || typeConfig.other;
+        html += `<h3 style="text-align:center;margin:2.5rem 0 1.5rem;color:#004E89;font-size:1.6rem;"><i class="${cfg.icon}"></i> ${cfg.label}</h3>`;
+        html += '<div class="cards-grid">';
+        items.forEach(s => {
+          html += `
+            <div class="healthcare-card" style="animation:fadeIn .4s ease;">
+              <div class="healthcare-header ${cfg.headerClass}">
+                <h3>${s.name}</h3>
+                <p style="text-transform:capitalize">${s.type} · ${s.hours || 'See contact for hours'}</p>
+              </div>
+              <div class="healthcare-body">
+                <div class="location-info"><i class="fas fa-map-marker-alt"></i><span>${s.location}</span></div>
+                <div class="location-info"><i class="fas fa-phone"></i><a href="tel:${s.phone}">${s.phone}</a></div>
+                ${s.description ? `<div class="package-item"><strong>About:</strong> ${s.description}</div>` : ''}
+              </div>
+            </div>`;
+        });
+        html += '</div>';
+      }
+      container.innerHTML = '<h3 style="text-align:center;margin-bottom:1rem;color:#11998e;font-size:1.1rem;"><i class="fas fa-database"></i> Live from Database</h3>' + html;
+    } catch(e) {
+      console.log('DB services not available, showing static data');
+    }
+  }
+
+  // Load on page init
+  document.addEventListener('DOMContentLoaded', () => loadDbServices());
+
+  // Mobile menu toggle
+  const hamburger = document.getElementById('hamburger');
+  const navMenu = document.getElementById('navMenu');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active');
+    navMenu.classList.toggle('active');
+  });
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+      hamburger.classList.remove('active');
+      navMenu.classList.remove('active');
+    });
+  });
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      const href = this.getAttribute('href');
+      if (href !== '#') {
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+
+<!-- ══════════════ SOS FLOATING BUTTON ══════════════ -->
+<button id="sosFab" onclick="openSOS()" title="SOS Emergency" style="
+  position:fixed; bottom:28px; right:28px; z-index:9999;
+  width:60px; height:60px; border-radius:50%; border:none;
+  background:#E74C3C; color:#fff; font-size:22px; font-weight:900;
+  cursor:pointer; box-shadow:0 6px 20px rgba(231,76,60,0.55);
+  animation:sosPulse 2s ease-in-out infinite;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Outfit',sans-serif;">SOS</button>
+
+<style>
+  @keyframes sosPulse {
+    0%,100%{box-shadow:0 6px 20px rgba(231,76,60,0.55),0 0 0 0 rgba(231,76,60,0.4);}
+    50%{box-shadow:0 6px 20px rgba(231,76,60,0.55),0 0 0 14px rgba(231,76,60,0.0);}
+  }
+  .sos-overlay{
+    display:none;position:fixed;inset:0;z-index:10000;
+    background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);
+    align-items:center;justify-content:center;padding:20px;
+  }
+  .sos-overlay.open{display:flex;}
+  .sos-modal{
+    background:#fff;border-radius:20px;width:100%;max-width:560px;
+    overflow:hidden;animation:modalIn .3s ease;
+    box-shadow:0 20px 60px rgba(0,0,0,0.3);
+  }
+  @keyframes modalIn{from{transform:scale(.93)translateY(20px);opacity:0}to{transform:scale(1)translateY(0);opacity:1}}
+  .sos-header{
+    background:linear-gradient(135deg,#C0392B,#E74C3C);
+    padding:28px 28px 20px; color:#fff; position:relative;
+  }
+  .sos-header h2{font-size:24px;font-weight:800;display:flex;align-items:center;gap:12px;font-family:'Outfit',sans-serif;}
+  .sos-header p{font-size:13px;opacity:.85;margin-top:6px;}
+  .sos-close{position:absolute;top:16px;right:20px;background:rgba(255,255,255,.2);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+  .sos-close:hover{background:rgba(255,255,255,.4);}
+  .sos-numbers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:20px;}
+  .sos-num-card{
+    background:#FFF5F5;border:2px solid rgba(231,76,60,.15);
+    border-radius:14px;padding:16px 10px;text-align:center;
+    transition:all .2s;text-decoration:none;
+  }
+  .sos-num-card:hover{background:#FFECEC;border-color:#E74C3C;transform:translateY(-2px);}
+  .sos-num-card .sos-icon{font-size:26px;margin-bottom:8px;}
+  .sos-num-card .sos-name{font-size:12px;font-weight:700;color:#2C3E50;margin-bottom:4px;font-family:'Outfit',sans-serif;}
+  .sos-num-card .sos-tel{font-size:22px;font-weight:800;color:#E74C3C;font-family:'Outfit',sans-serif;}
+  .sos-num-card small{font-size:10px;color:#7F8C8D;display:block;margin-top:3px;}
+  .sos-map-section{padding:0 20px 20px;}
+  .sos-map-section h3{font-size:15px;font-weight:700;color:#2C3E50;margin-bottom:10px;font-family:'Outfit',sans-serif;display:flex;align-items:center;gap:8px;}
+  #sosMap{height:240px;border-radius:12px;overflow:hidden;border:2px solid #F0F0F0;}
+  .sos-map-status{font-size:12px;color:#7F8C8D;margin-top:8px;padding:8px 12px;background:#F8F9FA;border-radius:8px;display:flex;align-items:center;gap:8px;}
+  .map-tab-btn{
+    border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;
+    font-family:'Outfit',sans-serif;cursor:pointer;margin:0 4px 12px 0;transition:all .2s;
+  }
+  .map-tab-btn.active{background:#E74C3C;color:#fff;}
+  .map-tab-btn:not(.active){background:#F0F0F0;color:#2C3E50;}
+  .map-tab-btn:not(.active):hover{background:#E0E0E0;}
+</style>
+
+<!-- SOS MODAL -->
+<div class="sos-overlay" id="sosOverlay" onclick="closeSOS(event)">
+  <div class="sos-modal">
+    <div class="sos-header">
+      <h2>🚨 Emergency SOS</h2>
+      <p>Tap a number to call immediately. Your location is being detected.</p>
+      <button class="sos-close" onclick="closeSOS()">✕</button>
+    </div>
+
+    <div class="sos-numbers">
+      <a href="tel:119" class="sos-num-card">
+        <div class="sos-icon">🚔</div>
+        <div class="sos-name">Police / Emergency</div>
+        <div class="sos-tel">119</div>
+        <small>24/7 Response</small>
+      </a>
+      <a href="tel:1990" class="sos-num-card">
+        <div class="sos-icon">🚑</div>
+        <div class="sos-name">Ambulance</div>
+        <div class="sos-tel">1990</div>
+        <small>Medical Emergency</small>
+      </a>
+      <a href="tel:110" class="sos-num-card">
+        <div class="sos-icon">🚒</div>
+        <div class="sos-name">Fire & Rescue</div>
+        <div class="sos-tel">110</div>
+        <small>Fire Department</small>
+      </a>
+      <a href="tel:+94112421052" class="sos-num-card">
+        <div class="sos-icon">👮</div>
+        <div class="sos-name">Tourist Police</div>
+        <div class="sos-tel">11 242 1052</div>
+        <small>Visitors Hotline</small>
+      </a>
+      <a href="tel:1926" class="sos-num-card">
+        <div class="sos-icon">🏥</div>
+        <div class="sos-name">Health Hotline</div>
+        <div class="sos-tel">1926</div>
+        <small>Medical Advice</small>
+      </a>
+      <a href="tel:117" class="sos-num-card">
+        <div class="sos-icon">🌊</div>
+        <div class="sos-name">Disaster Mgmt</div>
+        <div class="sos-tel">117</div>
+        <small>Disaster Center</small>
+      </a>
+    </div>
+
+    <div class="sos-map-section">
+      <h3><i class="fas fa-map-marked-alt" style="color:#E74C3C"></i> Nearby Medical Services</h3>
+      <div style="margin-bottom:10px;">
+        <button class="map-tab-btn active" onclick="filterMap('all',this)">All</button>
+        <button class="map-tab-btn" onclick="filterMap('hospital',this)">Hospitals</button>
+        <button class="map-tab-btn" onclick="filterMap('ayurveda',this)">Ayurveda</button>
+        <button class="map-tab-btn" onclick="filterMap('spa',this)">Spa &amp; Wellness</button>
+      </div>
+      <div id="sosMap"></div>
+      <div class="sos-map-status" id="mapStatus">
+        <i class="fas fa-circle-notch fa-spin"></i> Detecting your location...
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="script.js"></script>
+<script src="navbar-fix.js"></script>
+<script src="ceylon-data.js"></script>
+<script src="ceylon-loader.js"></script>
+<script>
+// ══════════════════════════════════════════
+// PHASE 5A — SOS Modal + GPS Map (Enhanced)
+// ══════════════════════════════════════════
+const API_SOS = 'http://localhost:8080/api';
+let sosMap = null;
+let userMarker = null;
+let userRadiusCircle = null;
+let serviceMarkers = [];
+let allServices = [];
+let userLatLng = null;
+let mapInitialized = false;
+const NEARBY_RADIUS_KM = 25; // Show services within 25km
+
+// ── Comprehensive Sri Lanka Medical Services ──────────────
+const STATIC_SERVICES = [
+  // ──── HOSPITALS ────
+  { name:'National Hospital of Sri Lanka',    type:'hospital', phone:'+94112691111', location:'Colombo 07',   lat:6.9271,  lng:79.8612 },
+  { name:'Colombo South Teaching Hospital',   type:'hospital', phone:'+94112778000', location:'Dehiwala',     lat:6.8569,  lng:79.8694 },
+  { name:'Teaching Hospital Kandy',           type:'hospital', phone:'+94812233337', location:'Kandy',        lat:7.2906,  lng:80.6337 },
+  { name:'Asiri Central Hospital',            type:'hospital', phone:'+94114665500', location:'Colombo 10',   lat:6.9100,  lng:79.8785 },
+  { name:'Lanka Hospitals',                   type:'hospital', phone:'+94115530000', location:'Colombo 05',   lat:6.8902,  lng:79.8635 },
+  { name:'Durdans Hospital',                  type:'hospital', phone:'+94112140000', location:'Colombo 03',   lat:6.9054,  lng:79.8567 },
+  { name:'Nawaloka Hospital',                 type:'hospital', phone:'+94115577111', location:'Colombo 02',   lat:6.9143,  lng:79.8469 },
+  { name:'Ninewells Hospital',                type:'hospital', phone:'+94112595959', location:'Colombo 09',   lat:6.9218,  lng:79.8745 },
+  { name:'Hemas Hospital Wattala',            type:'hospital', phone:'+94112939000', location:'Wattala',      lat:6.9897,  lng:79.8973 },
+  { name:'Hemas Hospital Galle',              type:'hospital', phone:'+94912222595', location:'Galle',        lat:6.0328,  lng:80.2168 },
+  { name:'Teaching Hospital Galle',           type:'hospital', phone:'+94912222261', location:'Galle',        lat:6.0317,  lng:80.2209 },
+  { name:'Teaching Hospital Jaffna',          type:'hospital', phone:'+94212222261', location:'Jaffna',       lat:9.6615,  lng:80.0255 },
+  { name:'Kurunegala Teaching Hospital',      type:'hospital', phone:'+94372222261', location:'Kurunegala',   lat:7.4818,  lng:80.3609 },
+  { name:'Ratnapura General Hospital',        type:'hospital', phone:'+94452222261', location:'Ratnapura',    lat:6.6828,  lng:80.3992 },
+  { name:'Batticaloa Teaching Hospital',      type:'hospital', phone:'+94652222261', location:'Batticaloa',   lat:7.7164,  lng:81.6937 },
+  { name:'Trincomalee Teaching Hospital',     type:'hospital', phone:'+94262222261', location:'Trincomalee',  lat:8.5711,  lng:81.2335 },
+  { name:'Base Hospital Negombo',             type:'hospital', phone:'+94312222261', location:'Negombo',      lat:7.2111,  lng:79.8366 },
+  { name:'Matara Teaching Hospital',          type:'hospital', phone:'+94412222261', location:'Matara',       lat:5.9449,  lng:80.5484 },
+  { name:'Anuradhapura Teaching Hospital',    type:'hospital', phone:'+94252222261', location:'Anuradhapura', lat:8.3114,  lng:80.3989 },
+  { name:'Badulla General Hospital',          type:'hospital', phone:'+94552222261', location:'Badulla',      lat:6.9934,  lng:81.0550 },
+  { name:'Base Hospital Kalutara',            type:'hospital', phone:'+94342222261', location:'Kalutara',     lat:6.5854,  lng:79.9607 },
+  { name:'Polonnaruwa General Hospital',      type:'hospital', phone:'+94272222261', location:'Polonnaruwa',  lat:7.9332,  lng:81.0000 },
+
+  // ──── AYURVEDA ────
+  { name:'Siddhalepa Ayurveda Hospital',      type:'ayurveda', phone:'+94112738622', location:'Mount Lavinia',lat:6.8296,  lng:79.8711 },
+  { name:'Ayurveda Teaching Hospital',        type:'ayurveda', phone:'+94112694185', location:'Borella, Colombo',lat:6.9084,lng:79.8806 },
+  { name:'Heritance Ayurveda Maha Gedara',    type:'ayurveda', phone:'+94312227779', location:'Negombo',      lat:7.2058,  lng:79.8367 },
+  { name:'Jetwing Ayurveda Pavilions',        type:'ayurveda', phone:'+94312239000', location:'Negombo',      lat:7.2143,  lng:79.8311 },
+  { name:'Aida Ayurveda Resort',              type:'ayurveda', phone:'+94332226060', location:'Hikkaduwa',    lat:6.1398,  lng:80.1032 },
+  { name:'Barberyn Ayurveda Resort',          type:'ayurveda', phone:'+94342275585', location:'Beruwala',     lat:6.4738,  lng:79.9844 },
+  { name:'Samahita Retreat Ayurveda',         type:'ayurveda', phone:'+94914380298', location:'Galle',        lat:6.0180,  lng:80.2486 },
+  { name:'Kairali Ayurveda Village',          type:'ayurveda', phone:'+94812224120', location:'Kandy',        lat:7.2710,  lng:80.6357 },
+  { name:'Tri Ayurveda Retreat',              type:'ayurveda', phone:'+94372222456', location:'Kurunegala',   lat:7.4750,  lng:80.3620 },
+  { name:'Kotmale Ayurveda Centre',           type:'ayurveda', phone:'+94522225234', location:'Nuwara Eliya', lat:6.9597,  lng:80.7718 },
+
+  // ──── SPA & WELLNESS ────
+  { name:'Jetwing Spa Colombo',               type:'spa', phone:'+94112345221', location:'Colombo 03',       lat:6.9044,  lng:79.8528 },
+  { name:'Anantara Spa Tangalle',             type:'spa', phone:'+94472240000', location:'Tangalle',         lat:6.0211,  lng:80.7992 },
+  { name:'Amangalla Spa',                     type:'spa', phone:'+94912233388', location:'Galle Fort',       lat:6.0272,  lng:80.2168 },
+  { name:'Cinnamon Lodge Spa Habarana',       type:'spa', phone:'+94662270011', location:'Habarana',        lat:8.0513,  lng:80.7500 },
+  { name:'Heritance Tea Factory Spa',         type:'spa', phone:'+94522228600', location:'Nuwara Eliya',     lat:6.8994,  lng:80.7167 },
+  { name:'Kahanda Kanda Spa',                 type:'spa', phone:'+94912282800', location:'Koggala, Galle',  lat:6.0034,  lng:80.2867 },
+  { name:'Jetwing Lagoon Spa',                type:'spa', phone:'+94312228861', location:'Negombo Beach',    lat:7.2284,  lng:79.8292 },
+  { name:'Spa Ceylon Colombo City',           type:'spa', phone:'+94112695095', location:'Colombo 07',      lat:6.9100,  lng:79.8520 },
+  { name:'Alila Spa Diwa Galle',              type:'spa', phone:'+94912313000', location:'Ahangama, Galle', lat:5.9891,  lng:80.3602 },
+  { name:'The Fortress Spa Galle',            type:'spa', phone:'+94912438000', location:'Koggala',         lat:5.9957,  lng:80.3105 },
+];
+
+
+
+const TYPE_ICONS = {
+  hospital: { color:'#E74C3C', icon:'🏥' },
+  clinic:   { color:'#FF6B35', icon:'🏥' },
+  ayurveda: { color:'#27AE60', icon:'🌿' },
+  spa:      { color:'#9B59B6', icon:'💆' },
+  pharmacy: { color:'#3498DB', icon:'💊' },
+  other:    { color:'#7F8C8D', icon:'📋' },
+};
+
+function openSOS() {
+  document.getElementById('sosOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (!mapInitialized) initSosMap();
+}
+
+function closeSOS(e) {
+  if (e && e.target !== document.getElementById('sosOverlay') && e.type === 'click') return;
+  document.getElementById('sosOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+async function initSosMap() {
+  mapInitialized = true;
+  // Init Leaflet map centred on Sri Lanka
+  sosMap = L.map('sosMap', { zoomControl: true }).setView([7.8731, 80.7718], 8);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(sosMap);
+
+  // Load services from API and combine with static
+  try {
+    const res = await fetch(`${API_SOS}/emergency-services`);
+    if (res.ok) {
+      const data = await res.json();
+      // Combine API Data + Static Data (so the map is never empty)
+      allServices = [...data, ...STATIC_SERVICES];
+    } else { allServices = STATIC_SERVICES; }
+  } catch { allServices = STATIC_SERVICES; }
+
+  plotMarkers('all');
+
+  // Get user GPS
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        userLatLng = [pos.coords.latitude, pos.coords.longitude];
+        // User marker with pulsing circle
+        userMarker = L.circleMarker(userLatLng, {
+          radius:10, fillColor:'#004E89', color:'#fff',
+          weight:3, opacity:1, fillOpacity:0.9
+        }).addTo(sosMap).bindPopup('<b>📍 Your Location</b>').openPopup();
+        sosMap.setView(userLatLng, 13);
+        const dist = nearest(userLatLng);
+        document.getElementById('mapStatus').innerHTML =
+          `<i class="fas fa-check-circle" style="color:#27AE60"></i> Location found. Nearest: <b>${dist.name}</b> — <a href="tel:${dist.phone}">${dist.phone}</a>`;
+        
+        // Re-plot to trigger radius circle if 'All' is active
+        const activeFilter = document.querySelector('.map-tab-btn.active').textContent.toLowerCase();
+        if (activeFilter === 'all') plotMarkers('all');
+
+      },
+      err => {
+        document.getElementById('mapStatus').innerHTML =
+          '<i class="fas fa-map-marker-alt" style="color:#F39C12"></i> Showing Sri Lanka services. Enable location for nearest hospital.';
+      }
+    );
+  } else {
+    document.getElementById('mapStatus').innerHTML = '<i class="fas fa-info-circle"></i> Location not supported. Tap a service to call.';
+  }
+}
+
+function makeIcon(type) {
+  const cfg = TYPE_ICONS[(type || '').toLowerCase()] || TYPE_ICONS.other;
+  return L.divIcon({
+    html: `<div style="background:${cfg.color};width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid #fff;">${cfg.icon}</div>`,
+    iconSize:[36,36], iconAnchor:[18,18], className:''
+  });
+}
+
+function getDistanceKm(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
+function plotMarkers(filter) {
+  serviceMarkers.forEach(m => sosMap.removeLayer(m));
+  if (userRadiusCircle) {
+    sosMap.removeLayer(userRadiusCircle);
+    userRadiusCircle = null;
+  }
+  serviceMarkers = [];
+  
+  let list = filter === 'all' ? allServices : allServices.filter(s => (s.type || '').toLowerCase() === filter.toLowerCase());
+  
+  // If 'all' is selected and user location is known, filter by radius (e.g. 25km)
+  if (filter === 'all' && userLatLng) {
+    list = list.filter(s => {
+      const lat = s.lat || s.latitude;
+      const lng = s.lng || s.longitude;
+      if (!lat || !lng) return false;
+      const dist = getDistanceKm(userLatLng[0], userLatLng[1], lat, lng);
+      return dist <= NEARBY_RADIUS_KM;
+    });
+
+    // Draw a circle to show the search radius
+    userRadiusCircle = L.circle(userLatLng, {
+      color: '#E74C3C',
+      fillColor: '#E74C3C',
+      fillOpacity: 0.05,
+      radius: NEARBY_RADIUS_KM * 1000,
+      dashArray: '5, 5'
+    }).addTo(sosMap);
+    
+    // Fit map bounds to show the user and nearby markers if there are any
+    if (list.length > 0) {
+      const group = new L.featureGroup([userMarker, ...list.map(s => L.marker([s.lat || s.latitude, s.lng || s.longitude]))]);
+      sosMap.fitBounds(group.getBounds().pad(0.1));
+    }
+  }
+
+  list.forEach(s => {
+    const lat = s.lat || s.latitude;
+    const lng = s.lng || s.longitude;
+    if (!lat || !lng) return;
+    
+    let distHtml = '';
+    if (userLatLng) {
+        const dist = getDistanceKm(userLatLng[0], userLatLng[1], lat, lng);
+        distHtml = `<br><span style="font-size:11px;color:#E74C3C;font-weight:bold;">📍 ${dist.toFixed(1)} km away</span>`;
+    }
+
+    const m = L.marker([lat, lng], { icon: makeIcon(s.type) })
+      .addTo(sosMap)
+      .bindPopup(`
+        <div style="font-family:'Outfit',sans-serif;min-width:180px;">
+          <b style="font-size:14px;">${s.name}</b><br>
+          <span style="font-size:12px;color:#7F8C8D;text-transform:capitalize;">${s.type} · ${s.location}</span>${distHtml}<br><br>
+          <a href="tel:${s.phone}" style="background:#E74C3C;color:#fff;padding:6px 14px;border-radius:20px;text-decoration:none;font-size:13px;font-weight:700;">
+            📞 ${s.phone}
+          </a>
+        </div>`);
+    serviceMarkers.push(m);
+  });
+  
+  if (filter !== 'all' && serviceMarkers.length > 0) {
+      const group = new L.featureGroup(serviceMarkers);
+      if (userMarker) group.addLayer(userMarker);
+      sosMap.fitBounds(group.getBounds().pad(0.1));
+  }
+}
+
+function filterMap(type, btn) {
+  document.querySelectorAll('.map-tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (sosMap) plotMarkers(type);
+}
+
+function nearest(latlng) {
+  if (!allServices.length) return { name:'National Hospital', phone:'011 269 1111' };
+  return allServices.reduce((best, s) => {
+    const lat = s.lat || s.latitude || 6.9;
+    const lng = s.lng || s.longitude || 79.8;
+    const d = Math.hypot(lat - latlng[0], lng - latlng[1]);
+    return (!best._d || d < best._d) ? {...s, _d:d} : best;
+  }, {});
+}
+
+// Keyboard ESC closes modal
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSOS(); });
+</script>
+</body>
+</html>

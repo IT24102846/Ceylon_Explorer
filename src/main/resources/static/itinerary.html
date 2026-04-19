@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Your Trip - Ceylon Explorer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color:#FF6B35;--secondary-color:#004E89;--accent-color:#1A936F;
+            --text-dark:#2C3E50;--text-light:#7F8C8D;--bg-light:#F8F9FA;--white:#FFFFFF;
+            --teal: #004E89; --teal-light: #FF6B35; --gold: #FF6B35; --gold-light: #FFCDB5; /* Mapped old vars to new */
+            --cream:#F8F9FA;--dark:#004E89;--text:#2C3E50;--muted:#7F8C8D;
+            --shadow:0 8px 32px rgba(0,0,0,0.12);--radius:16px;
+            --danger:#e74c3c;--success:#27ae60;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{background:var(--bg-light);color:var(--text);}
+
+        /* NAV — overridden entirely by navbar-fix.js */
+        .navbar{background:#FFFFFF;position:sticky;top:0;z-index:1000;box-shadow:0 2px 10px rgba(0,0,0,.1);}
+        .nav-container{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:64px;}
+        .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#FF6B35;font-size:1.3rem;font-weight:700;}
+        .nav-menu{display:flex;list-style:none;gap:4px;align-items:center;}
+        .nav-menu a{color:#2C3E50;text-decoration:none;padding:6px 12px;border-radius:8px;font-size:.82rem;font-weight:600;transition:all .2s;}
+        .nav-menu a:hover,.nav-menu a.active{color:#FF6B35;background:rgba(255,107,53,.08);}
+
+        /* HERO */
+        .page-hero{background:linear-gradient(135deg,var(--secondary-color),var(--primary-color));padding:60px 24px 40px;text-align:center;position:relative;overflow:hidden;}
+        .page-hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23FFFFFF' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");}
+        .page-hero h1{font-size:2.6rem;color:#fff;margin-bottom:10px;position:relative;}
+        .page-hero h1 span{color:#FFCDB5;}
+        .page-hero p{color:rgba(255,255,255,.9);font-size:1rem;position:relative;}
+
+        /* LAYOUT */
+        .builder-container{max-width:1400px;margin:0 auto;padding:28px 24px;display:grid;grid-template-columns:270px 1fr 310px;gap:22px;align-items:start;}
+
+        /* SIDEBAR */
+        .sidebar{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;position:sticky;top:80px;}
+        .sidebar-header{background:var(--secondary-color);color:#fff;padding:16px 20px;font-size:1rem;font-weight:600;display:flex;align-items:center;gap:10px;}
+        .sidebar-search{padding:14px;border-bottom:1px solid #eee;}
+        .sidebar-search input{width:100%;padding:9px 12px;border:1.5px solid #e0e0e0;border-radius:10px;font-size:.83rem;outline:none;transition:border .2s;}
+        .sidebar-search input:focus{border-color:var(--primary-color);}
+        .activity-filters{padding:10px 14px;display:flex;gap:5px;flex-wrap:wrap;border-bottom:1px solid #eee;}
+        .filter-chip{padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;border:1.5px solid #e0e0e0;background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;}
+        .filter-chip.active,.filter-chip:hover{background:var(--primary-color);border-color:var(--primary-color);color:#fff;}
+        .activities-list{max-height:500px;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;}
+        .activities-list::-webkit-scrollbar{width:4px;}
+        .activities-list::-webkit-scrollbar-thumb{background:var(--primary-color);border-radius:4px;}
+        .activity-item{background:#fff9f6;border:1.5px solid #FFE0D6;border-radius:12px;padding:11px;cursor:grab;transition:all .2s;user-select:none;}
+        .activity-item:hover{border-color:var(--primary-color);box-shadow:0 4px 12px rgba(255,107,53,.1);transform:translateY(-1px);}
+        .activity-item.dragging{opacity:.4;}
+        .act-header{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+        .act-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:#fff;flex-shrink:0;}
+        .activity-item h4{font-size:.8rem;font-weight:700;color:var(--dark);line-height:1.3;}
+        .activity-item p{font-size:.72rem;color:var(--muted);margin-bottom:5px;}
+        .act-meta{display:flex;justify-content:space-between;align-items:center;}
+        .act-cost{font-size:.76rem;font-weight:700;color:var(--primary-color);}
+        .act-dur{font-size:.7rem;color:var(--muted);}
+        .drag-hint{font-size:.65rem;color:#bbb;display:flex;align-items:center;gap:4px;margin-top:5px;}
+
+        /* BOARD */
+        .itinerary-board{display:flex;flex-direction:column;gap:18px;}
+        .board-controls{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:var(--radius);padding:14px 20px;box-shadow:var(--shadow);}
+        .board-controls h2{font-size:1.2rem;color:var(--dark);}
+        .board-actions{display:flex;gap:8px;}
+        .btn-teal{background:var(--primary-color);color:#fff;border:none;padding:9px 18px;border-radius:10px;font-size:.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s;}
+        .btn-teal:hover{background:#E55A2A;transform:translateY(-1px);}
+        .btn-gold{background:var(--secondary-color);color:#fff;border:none;padding:9px 18px;border-radius:10px;font-size:.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s;}
+        .btn-gold:hover{background:#003A6B;}
+        .btn-outline{background:transparent;color:var(--primary-color);border:1.5px solid var(--primary-color);padding:8px 16px;border-radius:10px;font-size:.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s;}
+        .btn-outline:hover{background:var(--primary-color);color:#fff;}
+        .btn-ai{background:linear-gradient(135deg, #8e44ad, #9b59b6);color:#fff;border:none;padding:9px 18px;border-radius:10px;font-size:.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s;box-shadow: 0 4px 15px rgba(142, 68, 173, 0.3);}
+        .btn-ai:hover{background:linear-gradient(135deg, #9b59b6, #8e44ad);transform:translateY(-1px);box-shadow: 0 6px 20px rgba(142, 68, 173, 0.4);}
+        .btn-ai i { animation: pulseAI 2s infinite; }
+        @keyframes pulseAI { 0% { opacity: 0.7; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.7; transform: scale(0.9); } }
+
+
+        .trip-info-bar{display:flex;gap:14px;background:#fff;border-radius:var(--radius);padding:14px 20px;box-shadow:var(--shadow);}
+        .trip-field{display:flex;flex-direction:column;gap:4px;flex:1;}
+        .trip-field label{font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+        .trip-field input,.trip-field select{border:1.5px solid #e0e0e0;border-radius:8px;padding:7px 11px;font-size:.82rem;outline:none;transition:border .2s;color:var(--dark);}
+        .trip-field input:focus,.trip-field select:focus{border-color:var(--primary-color);}
+
+        .days-container{display:flex;flex-direction:column;gap:14px;}
+        .day-column{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+        .day-header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:linear-gradient(135deg,var(--secondary-color),var(--primary-color));color:#fff;}
+        .day-header-left{display:flex;align-items:center;gap:10px;}
+        .day-num{width:34px;height:34px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.95rem;}
+        .day-title-in{background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.4);color:#fff;font-family:'Playfair Display',serif;font-size:.95rem;font-weight:600;outline:none;min-width:160px;}
+        .day-title-in::placeholder{color:rgba(255,255,255,.6);}
+        .day-date-lbl{font-size:.72rem;color:rgba(255,255,255,.65);margin-top:2px;}
+        .day-stats{display:flex;align-items:center;gap:10px;font-size:.8rem;}
+        .day-cost-badge{background:rgba(255,255,255,.2);padding:3px 10px;border-radius:20px;font-weight:700;}
+        .day-rm-btn{background:rgba(255,255,255,.15);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:background .2s;}
+        .day-rm-btn:hover{background:rgba(231,76,60,.5);}
+
+        .drop-zone{min-height:90px;padding:10px;display:flex;flex-direction:column;gap:7px;transition:all .2s;}
+        .drop-zone.drag-over{background:rgba(13,110,110,.06);outline:2px dashed var(--teal);outline-offset:-4px;border-radius:8px;}
+        .empty-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70px;color:#ccc;font-size:.8rem;gap:6px;}
+        .empty-drop i{font-size:1.3rem;}
+
+        .placed-item{background:linear-gradient(135deg,#f8fffe,#e8f6f3);border:1.5px solid #d0ece8;border-radius:11px;padding:10px 12px;display:flex;align-items:center;gap:10px;transition:all .2s;cursor:grab;animation:slideIn .3s ease;}
+        @keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+        .placed-item:hover{border-color:var(--teal);box-shadow:0 4px 10px rgba(13,110,110,.1);}
+        .placed-item.dragging{opacity:.4;}
+        .placed-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.9rem;color:#fff;flex-shrink:0;}
+        .placed-info{flex:1;}
+        .placed-info h4{font-size:.82rem;font-weight:700;color:var(--dark);margin-bottom:2px;}
+        .placed-info p{font-size:.72rem;color:var(--muted);}
+        .placed-cost{font-size:.88rem;font-weight:700;color:var(--teal);}
+        .placed-rm{background:transparent;border:none;color:#ccc;cursor:pointer;font-size:.85rem;padding:3px;transition:color .2s;}
+        .placed-rm:hover{color:var(--danger);}
+        .placed-time{background:transparent;border:none;border-bottom:1px dashed #ccc;color:var(--teal);font-size:.74rem;font-weight:700;font-family:'Lato',sans-serif;outline:none;width:60px;text-align:center;}
+
+        .day-footer{padding:8px 10px;border-top:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;}
+        .add-custom-btn{background:transparent;border:1.5px dashed #ccc;color:var(--muted);padding:5px 12px;border-radius:8px;font-size:.74rem;font-family:'Lato',sans-serif;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s;}
+        .add-custom-btn:hover{border-color:var(--teal);color:var(--teal);}
+        .day-total{font-size:.78rem;font-weight:700;color:var(--dark);}
+        .day-total span{color:var(--teal);}
+
+        /* MAP */
+        .map-section{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+        .map-header{background:var(--dark);color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;font-family:'Playfair Display',serif;font-size:.95rem;font-weight:600;}
+        .map-container{height:300px;width:100%;background:#e8f5f4;}
+        #leafletMap{height:100%;width:100%;}
+        .leaflet-routing-container { display: none !important; } /* Hide default routing box */
+
+        /* COST PANEL */
+        .cost-panel{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;position:sticky;top:80px;}
+        .cost-header{background:linear-gradient(135deg,var(--dark),#0d3d3d);color:#fff;padding:16px 20px;font-family:'Playfair Display',serif;font-size:1rem;font-weight:600;display:flex;align-items:center;gap:10px;}
+        .cost-body{padding:18px;}
+        .sect-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:10px;}
+        .cost-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #f5f5f5;font-size:.82rem;}
+        .cost-row:last-child{border-bottom:none;}
+        .cost-row-label{color:var(--text);display:flex;align-items:center;gap:7px;}
+        .cost-row-label i{color:var(--teal);font-size:.75rem;width:14px;}
+        .cost-row-value{font-weight:700;color:var(--dark);}
+        .cost-divider{height:1px;background:linear-gradient(90deg,var(--teal),var(--gold));margin:14px 0;}
+        .cost-total-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;}
+        .cost-total-label{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:600;color:var(--dark);}
+        .cost-total-value{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--teal);}
+        .cost-per{font-size:.72rem;color:var(--muted);text-align:right;margin-bottom:4px;}
+
+        .hotel-sel,.vehicle-sel{border-radius:11px;padding:12px;margin-bottom:14px;}
+        .hotel-sel{background:#f8fffe;border:1.5px solid #d0ece8;}
+        .vehicle-sel{background:#fffbf0;border:1.5px solid #f0e0b0;}
+        .hotel-sel label,.vehicle-sel label{font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:7px;}
+        .hotel-sel select,.vehicle-sel select{width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:7px 10px;font-size:.8rem;font-family:'Lato',sans-serif;outline:none;color:var(--dark);cursor:pointer;margin-bottom:6px;}
+        .hotel-price-prev{font-size:.78rem;color:var(--teal);font-weight:700;}
+        .vehicle-price-prev{font-size:.78rem;color:var(--gold);font-weight:700;}
+
+        .persons-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:10px;background:#f8f9fa;border-radius:9px;}
+        .persons-row label{font-size:.8rem;font-weight:700;color:var(--text);}
+        .persons-ctrl{display:flex;align-items:center;gap:9px;}
+        .pax-btn{width:26px;height:26px;border-radius:50%;border:2px solid var(--teal);background:transparent;color:var(--teal);font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;transition:all .2s;}
+        .pax-btn:hover{background:var(--teal);color:#fff;}
+        #personCount{font-size:.95rem;font-weight:700;color:var(--dark);min-width:18px;text-align:center;}
+
+        .chart-bar-row{margin-bottom:8px;}
+        .chart-bar-label{display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:3px;color:var(--text);}
+        .chart-bar-track{height:5px;background:#f0f0f0;border-radius:4px;overflow:hidden;}
+        .chart-bar-fill{height:100%;border-radius:4px;transition:width .6s ease;}
+
+        .save-btn{width:100%;background:linear-gradient(135deg,var(--teal),var(--teal-light));color:#fff;border:none;padding:13px;border-radius:11px;font-size:.9rem;font-weight:700;font-family:'Lato',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:all .3s;margin-top:14px;}
+        .save-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(13,110,110,.25);}
+        .share-btn{width:100%;background:transparent;color:var(--gold);border:1.5px solid var(--gold);padding:10px;border-radius:11px;font-size:.84rem;font-weight:700;font-family:'Lato',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:all .2s;margin-top:8px;}
+        .share-btn:hover{background:var(--gold);color:var(--dark);}
+
+        /* TOAST */
+        .toast{position:fixed;bottom:22px;right:22px;background:var(--dark);color:#fff;padding:13px 18px;border-radius:12px;display:flex;align-items:center;gap:9px;font-size:.84rem;font-weight:600;z-index:9999;transform:translateY(70px);opacity:0;transition:all .4s cubic-bezier(.175,.885,.32,1.275);box-shadow:0 8px 24px rgba(0,0,0,.3);}
+        .toast.show{transform:translateY(0);opacity:1;}
+        .toast.success i{color:var(--success);}
+        .toast.info i{color:var(--gold);}
+
+        /* MODAL */
+        .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9000;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+        .modal-overlay.open{display:flex;}
+        .modal-box{background:#fff;border-radius:var(--radius);padding:26px;max-width:420px;width:90%;animation:modalIn .3s ease;}
+        @keyframes modalIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+        .modal-box h3{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--dark);margin-bottom:18px;padding-bottom:10px;border-bottom:2px solid var(--gold);}
+        .mfg{margin-bottom:12px;}
+        .mfg label{display:block;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+        .mfg input,.mfg select{width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:9px 12px;font-size:.82rem;font-family:'Lato',sans-serif;outline:none;transition:border .2s;}
+        .mfg input:focus,.mfg select:focus{border-color:var(--teal);}
+        .modal-actions{display:flex;gap:10px;margin-top:18px;}
+        .modal-actions button{flex:1;}
+        .btn-cancel{background:#f5f5f5;color:var(--text);border:none;padding:11px;border-radius:10px;font-size:.84rem;font-weight:700;font-family:'Lato',sans-serif;cursor:pointer;}
+        .btn-cancel:hover{background:#e8e8e8;}
+
+        /* AI WIZARD MODAL */
+        .ai-wizard-box { max-width: 500px; padding: 0; overflow: hidden; background: #fff; }
+        .ai-wizard-header { background: linear-gradient(135deg, #2c3e50, #8e44ad); color: white; padding: 24px; text-align: center; position: relative; }
+        .ai-wizard-header h3 { color: white; border: none; margin-bottom: 5px; padding: 0; font-size: 1.4rem; }
+        .ai-wizard-header p { font-size: 0.85rem; opacity: 0.9; }
+        .ai-wizard-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+        .ai-field-row { display: flex; gap: 16px; }
+        .ai-field { flex: 1; }
+        .ai-field label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+        .ai-number-in { width: 100%; border: 1.5px solid #e0e0e0; border-radius: 10px; padding: 12px; font-size: 1rem; font-family: 'Lato', sans-serif; text-align: center; font-weight: bold; outline: none; }
+        .ai-number-in:focus { border-color: #8e44ad; }
+        .ai-select-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .ai-opt { border: 1.5px solid #e0e0e0; border-radius: 10px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.2s; font-size: 0.8rem; font-weight: 600; color: var(--muted); user-select: none; }
+        .ai-opt:hover { border-color: #bb8fce; background: #faf5fd; }
+        .ai-opt.active { border-color: #8e44ad; background: rgba(142,68,173,0.08); color: #8e44ad; }
+        .ai-opt i { display: block; font-size: 1.2rem; margin-bottom: 6px; }
+        
+        .ai-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; color: white; backdrop-filter: blur(8px); }
+        .ai-overlay.active { display: flex; }
+        .ai-spinner { width: 80px; height: 80px; border: 4px solid rgba(255,255,255,0.1); border-left-color: #8e44ad; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        .ai-msg { font-size: 1.2rem; font-family: 'Playfair Display', serif; font-weight: 600; letter-spacing: 1px; animation: pulseText 1.5s infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes pulseText { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
+
+
+        .footer{background:var(--dark);color:rgba(255,255,255,.5);text-align:center;padding:20px;font-size:.8rem;margin-top:40px;}
+        .footer a{color:var(--gold);text-decoration:none;}
+
+        @media(max-width:1100px){.builder-container{grid-template-columns:250px 1fr;}.cost-panel{position:static;}}
+        @media(max-width:768px){.builder-container{grid-template-columns:1fr;}.nav-menu{display:none;}.page-hero h1{font-size:1.7rem;}.trip-info-bar{flex-direction:column;}}
+    </style>
+</head>
+<body>
+
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="logo"><i class="fas fa-umbrella-beach"></i> CEYLON EXPLORER</a>
+        
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="hotel-complete.html" class="nav-link">Hotels</a></li>
+            <li><a href="vehicle-complete.html" class="nav-link">Vehicles</a></li>
+            <li><a href="tourguide-complete.html" class="nav-link">Guides</a></li>
+            <li><a href="activity-complete.html" class="nav-link">Activities</a></li>
+            <li><a href="itinerary.html" class="nav-link">Itinerary</a></li>
+            <li id="navLoginLi"><a href="login-complete.html" class="nav-link nav-login-btn">Login</a></li>
+            <li id="navSignupLi"><a href="signup-complete.html" class="nav-link nav-signup-btn">Sign Up</a></li>
+            <li id="navUserLi" style="display:none; position:relative;">
+                <button class="nav-user-btn" id="userMenuBtn" onclick="toggleUserMenu()">
+                    <div class="nav-avatar" id="navUserAvatar">U</div>
+                    <span id="navUserName">User</span>
+                    <i class="fas fa-chevron-down" style="font-size:10px; margin-left:3px;"></i>
+                </button>
+                <div class="nav-dropdown" id="userDropdown">
+                    <a href="user-dashboard.html" id="dashboardLink"><i class="fas fa-th-large"></i> Dashboard</a>
+                    <a href="#" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </li>
+        </ul>
+        <div class="hamburger" id="hamburger">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+</nav>
+
+<div class="page-hero">
+    <h1 data-i18n="hero_title">Plan Your <span>Sri Lanka</span> Adventure</h1>
+    <p data-i18n="hero_sub">Drag &amp; drop activities to build your perfect day-by-day itinerary</p>
+</div>
+
+<div class="builder-container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header"><i class="fas fa-th-large"></i><span data-i18n="activities_label">Activities &amp; Places</span></div>
+        <div class="sidebar-search">
+            <input type="text" id="activitySearch" placeholder="Search activities..." oninput="renderActivities()">
+        </div>
+        <div class="activity-filters">
+            <button class="filter-chip active" onclick="filterCat('all',this)">All</button>
+            <button class="filter-chip" onclick="filterCat('cultural',this)">Cultural</button>
+            <button class="filter-chip" onclick="filterCat('wildlife',this)">Wildlife</button>
+            <button class="filter-chip" onclick="filterCat('adventure',this)">Adventure</button>
+            <button class="filter-chip" onclick="filterCat('beach',this)">Beach</button>
+            <button class="filter-chip" onclick="filterCat('food',this)">Food</button>
+        </div>
+        <div class="activities-list" id="activitiesList"></div>
+    </aside>
+
+    <!-- BOARD -->
+    <div class="itinerary-board">
+        <div class="board-controls">
+            <h2 data-i18n="my_itinerary">My Itinerary</h2>
+            <div class="board-actions">
+                <button class="btn-ai" onclick="openAIPlanner()"><i class="fas fa-magic"></i> AI Auto-Plan</button>
+                <button class="btn-outline" onclick="clearAll()"><i class="fas fa-trash-alt"></i> Clear</button>
+                <button class="btn-teal" onclick="addDay()"><i class="fas fa-plus"></i> Add Day</button>
+                <button class="btn-gold" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+            </div>
+        </div>
+
+        <div class="trip-info-bar">
+            <div class="trip-field">
+                <label data-i18n="trip_name">Trip Name</label>
+                <input type="text" id="tripName" placeholder="My Sri Lanka Journey">
+            </div>
+            <div class="trip-field">
+                <label data-i18n="start_date">Start Date</label>
+                <input type="date" id="startDate" onchange="renderDays()">
+            </div>
+            <div class="trip-field">
+                <label data-i18n="currency">Currency</label>
+                <select id="currencySelect" onchange="updateCosts()">
+                    <option value="USD">🇺🇸 USD ($)</option>
+                    <option value="LKR">🇱🇰 LKR (Rs)</option>
+                    <option value="EUR">🇪🇺 EUR (€)</option>
+                    <option value="GBP">🇬🇧 GBP (£)</option>
+                    <option value="AUD">🇦🇺 AUD (A$)</option>
+                    <option value="CNY">🇨🇳 CNY (¥)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="days-container" id="daysContainer"></div>
+
+        <div class="map-section">
+            <div class="map-header">
+                <span><i class="fas fa-map-marked-alt"></i> Route Map</span>
+                <span style="font-size:.74rem;color:rgba(255,255,255,.45);font-family:Lato,sans-serif;">Your live travel route</span>
+            </div>
+            <div class="map-container">
+                <div id="leafletMap"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COST PANEL -->
+    <aside class="cost-panel">
+        <div class="cost-header"><i class="fas fa-calculator"></i><span data-i18n="cost_estimator">Trip Cost Estimator</span></div>
+        <div class="cost-body">
+            <div class="persons-row">
+                <label data-i18n="persons">Persons</label>
+                <div class="persons-ctrl">
+                    <button class="pax-btn" onclick="changePax(-1)">−</button>
+                    <span id="personCount">2</span>
+                    <button class="pax-btn" onclick="changePax(1)">+</button>
+                </div>
+            </div>
+
+            <div class="hotel-sel">
+                <label data-i18n="select_hotel">Select Hotel</label>
+                <select id="hotelSelect" onchange="updateCosts()">
+                    <option value="0">No Hotel</option>
+                    <option value="45">Budget Guesthouse ($45/night)</option>
+                    <option value="80">Boutique Hotel ($80/night)</option>
+                    <option value="120">4-Star Resort ($120/night)</option>
+                    <option value="200">5-Star Luxury ($200/night)</option>
+                    <option value="350">Ultra-Luxury Villa ($350/night)</option>
+                </select>
+                <div class="hotel-price-prev" id="hotelPrev">$0 for 0 nights</div>
+            </div>
+
+            <div class="vehicle-sel">
+                <label data-i18n="select_vehicle">Select Vehicle</label>
+                <select id="vehicleSelect" onchange="updateCosts()">
+                    <option value="0">No Vehicle</option>
+                    <option value="30">Tuk-Tuk ($30/day)</option>
+                    <option value="50">Economy Car ($50/day)</option>
+                    <option value="80">Van with Driver ($80/day)</option>
+                    <option value="120">Premium SUV ($120/day)</option>
+                    <option value="200">Luxury Minivan ($200/day)</option>
+                </select>
+                <div class="vehicle-price-prev" id="vehiclePrev">$0 for 0 days</div>
+            </div>
+
+            <div class="sect-title">Cost Breakdown</div>
+            <div class="cost-row"><span class="cost-row-label"><i class="fas fa-hotel"></i>Accommodation</span><span class="cost-row-value" id="hotelCost">$0</span></div>
+            <div class="cost-row"><span class="cost-row-label"><i class="fas fa-car"></i>Transport</span><span class="cost-row-value" id="vehicleCost">$0</span></div>
+            <div class="cost-row"><span class="cost-row-label"><i class="fas fa-hiking"></i>Activities</span><span class="cost-row-value" id="activitiesCost">$0</span></div>
+            <div class="cost-row"><span class="cost-row-label"><i class="fas fa-utensils"></i>Food (est.)</span><span class="cost-row-value" id="foodCost">$0</span></div>
+            <div class="cost-row"><span class="cost-row-label"><i class="fas fa-shield-alt"></i>Insurance</span><span class="cost-row-value" id="insuranceCost">$0</span></div>
+
+            <div style="margin:14px 0;">
+                <div class="chart-bar-row"><div class="chart-bar-label"><span>Hotel</span><span id="hotelPct">0%</span></div><div class="chart-bar-track"><div class="chart-bar-fill" id="hotelBar" style="width:0%;background:var(--teal)"></div></div></div>
+                <div class="chart-bar-row"><div class="chart-bar-label"><span>Transport</span><span id="vehiclePct">0%</span></div><div class="chart-bar-track"><div class="chart-bar-fill" id="vehicleBar" style="width:0%;background:var(--gold)"></div></div></div>
+                <div class="chart-bar-row"><div class="chart-bar-label"><span>Activities</span><span id="activitiesPct">0%</span></div><div class="chart-bar-track"><div class="chart-bar-fill" id="activitiesBar" style="width:0%;background:#9b59b6"></div></div></div>
+                <div class="chart-bar-row"><div class="chart-bar-label"><span>Food &amp; Other</span><span id="foodPct">0%</span></div><div class="chart-bar-track"><div class="chart-bar-fill" id="foodBar" style="width:0%;background:#e67e22"></div></div></div>
+            </div>
+
+            <div class="cost-divider"></div>
+            <div class="cost-total-row"><span class="cost-total-label">Total Estimate</span><span class="cost-total-value" id="totalCost">$0</span></div>
+            <div class="cost-per" id="perPerson">$0 per person</div>
+
+            <button class="save-btn" onclick="saveItinerary()"><i class="fas fa-bookmark"></i><span data-i18n="save_itinerary">Save Itinerary</span></button>
+            <button class="share-btn" onclick="shareIt()"><i class="fas fa-share-alt"></i><span data-i18n="share">Share Trip Plan</span></button>
+        </div>
+    </aside>
+</div>
+
+<!-- CUSTOM MODAL -->
+<div class="modal-overlay" id="customModal">
+    <div class="modal-box">
+        <h3>Add Custom Activity</h3>
+        <div class="mfg"><label>Activity Name</label><input type="text" id="cName" placeholder="e.g. Visit Tea Factory"></div>
+        <div class="mfg"><label>Location</label><input type="text" id="cLocation" placeholder="e.g. Nuwara Eliya"></div>
+        <div class="mfg"><label>Cost per person (USD)</label><input type="number" id="cCost" placeholder="0" min="0"></div>
+        <div class="mfg"><label>Duration</label><select id="cDuration"><option>1 hour</option><option>2 hours</option><option>3 hours</option><option>Half day</option><option>Full day</option></select></div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+            <button class="btn-teal" onclick="addCustom()"><i class="fas fa-plus"></i> Add</button>
+        </div>
+    </div>
+</div>
+
+<!-- AI PLANNER MODAL -->
+<div class="modal-overlay" id="aiModal">
+    <div class="modal-box ai-wizard-box">
+        <div class="ai-wizard-header">
+            <h3><i class="fas fa-robot"></i> Smart AI Planner</h3>
+            <p>Let our algorithm build your perfect itinerary instantly.</p>
+        </div>
+        <div class="ai-wizard-body">
+            <div class="ai-field">
+                <label>How many days?</label>
+                <input type="number" id="aiDays" class="ai-number-in" min="1" max="14" value="5">
+            </div>
+            <div class="ai-field">
+                <label>Budget Tier</label>
+                <div class="ai-select-grid" id="aiBudget">
+                    <div class="ai-opt" data-val="budget"><i class="fas fa-piggy-bank"></i> Budget</div>
+                    <div class="ai-opt active" data-val="comfort"><i class="fas fa-suitcase"></i> Comfort</div>
+                    <div class="ai-opt" data-val="luxury"><i class="fas fa-gem"></i> Luxury</div>
+                </div>
+            </div>
+            <div class="ai-field">
+                <label>Primary Interest</label>
+                <div class="ai-select-grid" id="aiInterest" style="grid-template-columns:1fr 1fr;">
+                    <div class="ai-opt active" data-val="all"><i class="fas fa-globe-asia"></i> All-Rounder</div>
+                    <div class="ai-opt" data-val="cultural"><i class="fas fa-vihara"></i> Culture</div>
+                    <div class="ai-opt" data-val="wildlife"><i class="fas fa-elephant"></i> Wildlife</div>
+                    <div class="ai-opt" data-val="beach"><i class="fas fa-umbrella-beach"></i> Beach/Relaxing</div>
+                </div>
+            </div>
+            <div class="modal-actions" style="margin-top: 10px;">
+                <button class="btn-cancel" onclick="closeAIPlanner()">Cancel</button>
+                <button class="btn-ai" style="justify-content:center; width:100%; font-size:1rem;" onclick="generateAIPlan()">
+                    Generate Magic Plan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI LOADING OVERLAY -->
+<div class="ai-overlay" id="aiOverlay">
+    <div class="ai-spinner"></div>
+    <div class="ai-msg" id="aiLoadingMsg">Initializing algorithm...</div>
+</div>
+
+<div class="toast" id="toast"><i id="toastIcon" class="fas fa-check-circle"></i><span id="toastMsg">Done!</span></div>
+
+<footer class="footer"><p>© 2026 <a href="index.html">Ceylon Explorer</a> · Your Sri Lanka Travel Partner</p></footer>
+
+<script>
+    const ACTS=[
+        {id:1,name:"Sigiriya Rock Fortress",location:"Central Province",cost:30,duration:"4 hours",category:"cultural",color:"#0d6e6e",icon:"fas fa-chess-rook", coords: [7.9570, 80.7603]},
+        {id:2,name:"Temple of the Tooth Relic",location:"Kandy",cost:10,duration:"2 hours",category:"cultural",color:"#8e44ad",icon:"fas fa-place-of-worship", coords: [7.2936, 80.6413]},
+        {id:3,name:"Yala National Park Safari",location:"Southern Province",cost:60,duration:"Full day",category:"wildlife",color:"#27ae60",icon:"fas fa-paw", coords: [6.3688, 81.5173]},
+        {id:4,name:"Whale Watching Mirissa",location:"Mirissa",cost:45,duration:"4 hours",category:"wildlife",color:"#2980b9",icon:"fas fa-water", coords: [5.9483, 80.4716]},
+        {id:5,name:"Ella Rock Hike",location:"Ella",cost:5,duration:"5 hours",category:"adventure",color:"#e67e22",icon:"fas fa-mountain", coords: [6.8667, 80.0489]},
+        {id:6,name:"Mirissa Beach Surfing",location:"Mirissa",cost:35,duration:"3 hours",category:"beach",color:"#16a085",icon:"fas fa-umbrella-beach", coords: [5.9483, 80.4716]},
+        {id:7,name:"Sri Lankan Cooking Class",location:"Colombo",cost:40,duration:"3 hours",category:"food",color:"#c0392b",icon:"fas fa-utensils", coords: [6.9271, 79.8612]},
+        {id:8,name:"Galle Fort Walk",location:"Galle",cost:0,duration:"2 hours",category:"cultural",color:"#7f8c8d",icon:"fas fa-archway", coords: [6.0328, 80.2168]},
+        {id:9,name:"Adam's Peak Pilgrimage",location:"Nuwara Eliya",cost:3,duration:"6 hours",category:"adventure",color:"#d35400",icon:"fas fa-hiking", coords: [6.8096, 80.4994]},
+        {id:10,name:"Tea Plantation Tour",location:"Nuwara Eliya",cost:15,duration:"2 hours",category:"cultural",color:"#27ae60",icon:"fas fa-leaf", coords: [6.9497, 80.7828]},
+        {id:11,name:"Udawalawe Elephant Safari",location:"Udawalawe",cost:50,duration:"4 hours",category:"wildlife",color:"#8e6914",icon:"fas fa-horse", coords: [6.4350, 80.8879]},
+        {id:12,name:"Unawatuna Beach Day",location:"Unawatuna",cost:10,duration:"Full day",category:"beach",color:"#2980b9",icon:"fas fa-sun", coords: [6.0125, 80.2458]},
+        {id:13,name:"Minneriya National Park",location:"North Central",cost:40,duration:"4 hours",category:"wildlife",color:"#27ae60",icon:"fas fa-paw", coords: [8.0416, 80.8407]},
+        {id:14,name:"Colombo City Tour",location:"Colombo",cost:25,duration:"4 hours",category:"cultural",color:"#1a2332",icon:"fas fa-city", coords: [6.9271, 79.8612]},
+        {id:15,name:"Street Food Tour",location:"Colombo",cost:20,duration:"3 hours",category:"food",color:"#e74c3c",icon:"fas fa-star", coords: [6.9271, 79.8612]},
+        {id:16,name:"River Boating Bentota",location:"Bentota",cost:25,duration:"2 hours",category:"adventure",color:"#2980b9",icon:"fas fa-ship", coords: [6.4258, 79.9989]},
+    ];
+
+    const LANGS={
+        en:{hero_title:"Plan Your Sri Lanka Adventure",hero_sub:"Drag & drop activities to build your perfect day-by-day itinerary",activities_label:"Activities & Places",my_itinerary:"My Itinerary",trip_name:"Trip Name",start_date:"Start Date",currency:"Currency",cost_estimator:"Trip Cost Estimator",persons:"Persons",select_hotel:"Select Hotel",select_vehicle:"Select Vehicle",save_itinerary:"Save Itinerary",share:"Share Trip Plan"},
+        si:{hero_title:"ශ්‍රී ලංකා සංචාරය සැලසුම් කරන්න",hero_sub:"ක්‍රියාකාරකම් ඇදගෙන ඔබේ ගමන සැලසුම් කරන්න",activities_label:"ක්‍රියාකාරකම් සහ ස්ථාන",my_itinerary:"මගේ සංචාර සැලැස්ම",trip_name:"සංචාර නම",start_date:"ආරම්භ දිනය",currency:"මුදල් ඒකකය",cost_estimator:"සංචාර පිරිවැය ගණකය",persons:"පුද්ගලයින්",select_hotel:"හෝටලය තෝරන්න",select_vehicle:"වාහනය තෝරන්න",save_itinerary:"සැලැස්ම සුරකින්න",share:"සංචාර සැලැස්ම බෙදාගන්න"},
+        ta:{hero_title:"இலங்கை பயணத்தை திட்டமிடுங்கள்",hero_sub:"நடவடிக்கைகளை இழுத்து விட்டு உங்கள் பயணத்தை உருவாக்குங்கள்",activities_label:"நடவடிக்கைகள் மற்றும் இடங்கள்",my_itinerary:"என் பயண திட்டம்",trip_name:"பயணத்தின் பெயர்",start_date:"தொடக்க தேதி",currency:"நாணயம்",cost_estimator:"பயண செலவு மதிப்பீடு",persons:"நபர்கள்",select_hotel:"ஹோட்டல் தேர்ந்தெடுக்கவும்",select_vehicle:"வாகனம் தேர்ந்தெடுக்கவும்",save_itinerary:"திட்டத்தை சேமிக்கவும்",share:"பயண திட்டம் பகிரவும்"},
+        zh:{hero_title:"规划您的斯里兰卡之旅",hero_sub:"拖放活动，创建完美的日程安排",activities_label:"活动与地点",my_itinerary:"我的行程",trip_name:"旅行名称",start_date:"开始日期",currency:"货币",cost_estimator:"旅行费用估算",persons:"人数",select_hotel:"选择酒店",select_vehicle:"选择交通工具",save_itinerary:"保存行程",share:"分享旅行计划"},
+        fr:{hero_title:"Planifiez votre aventure au Sri Lanka",hero_sub:"Glissez-déposez des activités pour créer votre itinéraire",activities_label:"Activités et lieux",my_itinerary:"Mon itinéraire",trip_name:"Nom du voyage",start_date:"Date de début",currency:"Devise",cost_estimator:"Estimateur de coût",persons:"Personnes",select_hotel:"Choisir hôtel",select_vehicle:"Choisir véhicule",save_itinerary:"Sauvegarder",share:"Partager"},
+        de:{hero_title:"Planen Sie Ihr Sri Lanka Abenteuer",hero_sub:"Ziehen und ablegen für Ihre Reise",activities_label:"Aktivitäten und Orte",my_itinerary:"Mein Reiseplan",trip_name:"Reisename",start_date:"Startdatum",currency:"Währung",cost_estimator:"Reisekostenrechner",persons:"Personen",select_hotel:"Hotel wählen",select_vehicle:"Fahrzeug wählen",save_itinerary:"Speichern",share:"Teilen"},
+    };
+    const RATES={USD:1,LKR:300,EUR:0.92,GBP:0.79,AUD:1.55,CNY:7.24};
+    const SYMS={USD:'$',LKR:'Rs ',EUR:'€',GBP:'£',AUD:'A$',CNY:'¥'};
+
+    let days=[],dayCounter=0,persons=2,curLang='en',curCat='all',dragData=null,customDayId=null,cid=1000;
+    
+    // Map variables
+    let map = null;
+    let mapMarkers = [];
+    let mapPolyline = null;
+
+    // INIT
+    document.addEventListener('DOMContentLoaded',()=>{
+        const td=new Date().toISOString().split('T')[0];
+        document.getElementById('startDate').value=td;
+        renderActivities();
+        addDay('Arrival & Colombo');
+        addDay('Cultural Exploration');
+        addDay('Nature & Wildlife');
+        
+        // Initialize Map
+        map = L.map('leafletMap').setView([7.8731, 80.7718], 7); // Center of Sri Lanka
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
+            subdomains: 'abcd',
+            maxZoom: 19
+        }).addTo(map);
+
+        updateCosts();
+    });
+
+    // LANG
+    function setLang(l){
+        curLang=l;
+        const t=LANGS[l]||LANGS.en;
+        document.querySelectorAll('[data-i18n]').forEach(el=>{
+            const k=el.getAttribute('data-i18n');
+            if(t[k]) el.textContent=t[k];
+        });
+        const lb={en:'EN',si:'සිං',ta:'தமி',zh:'中文',fr:'FR',de:'DE'};
+        document.getElementById('langBtn').textContent='🌐 '+(lb[l]||l.toUpperCase())+' ▾';
+        toast('Language changed','info');
+    }
+
+    // ACTIVITIES
+    function renderActivities(){
+        const q=document.getElementById('activitySearch').value.toLowerCase();
+        const list=ACTS.filter(a=>(curCat==='all'||a.category===curCat)&&(a.name.toLowerCase().includes(q)||a.location.toLowerCase().includes(q)));
+        document.getElementById('activitiesList').innerHTML=list.map(a=>`
+    <div class="activity-item" draggable="true" data-id="${a.id}"
+      ondragstart="dragStart(event,'sidebar',{id:${a.id}})"
+      ondragend="dragEnd(event)">
+      <div class="act-header">
+        <div class="act-icon" style="background:${a.color}"><i class="${a.icon}"></i></div>
+        <h4>${a.name}</h4>
+      </div>
+      <p><i class="fas fa-map-pin" style="color:${a.color}"></i> ${a.location}</p>
+      <div class="act-meta">
+        <span class="act-cost">$${a.cost}/person</span>
+        <span class="act-dur"><i class="fas fa-clock"></i> ${a.duration}</span>
+      </div>
+      <div class="drag-hint"><i class="fas fa-grip-vertical"></i> Drag to day</div>
+    </div>`).join('');
+    }
+    function filterCat(c,btn){
+        curCat=c;
+        document.querySelectorAll('.filter-chip').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        renderActivities();
+    }
+
+    // DRAG
+    function dragStart(e,type,data){
+        dragData={type,...data};
+        e.dataTransfer.effectAllowed=type==='sidebar'?'copy':'move';
+        setTimeout(()=>e.target.classList.add('dragging'),0);
+    }
+    function dragEnd(e){
+        document.querySelectorAll('.activity-item,.placed-item').forEach(el=>el.classList.remove('dragging'));
+        document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('drag-over'));
+    }
+    function dzOver(e,dayId){
+        e.preventDefault();
+        document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('drag-over'));
+        document.getElementById('zone-'+dayId)?.classList.add('drag-over');
+    }
+    function dzDrop(e,dayId){
+        e.preventDefault();
+        document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('drag-over'));
+        if(!dragData) return;
+        if(dragData.type==='sidebar'){
+            const act=ACTS.find(a=>a.id===dragData.id);
+            if(!act) return;
+            const day=days.find(d=>d.id===dayId);
+            if(!day) return;
+            if(day.items.find(i=>i.id===act.id)){toast('Already in this day!','info');return;}
+            day.items.push({...act,time:'09:00'});
+            renderDays();updateCosts();
+            toast('Added: '+act.name,'success');
+        } else if(dragData.type==='placed'){
+            const {fromDay,itemId}=dragData;
+            if(fromDay===dayId) return;
+            const fd=days.find(d=>d.id===fromDay),td=days.find(d=>d.id===dayId);
+            if(!fd||!td) return;
+            const idx=fd.items.findIndex(i=>i.id===itemId);
+            if(idx===-1) return;
+            const [item]=fd.items.splice(idx,1);
+            td.items.push(item);
+            renderDays();updateCosts();
+        }
+        dragData=null;
+    }
+
+    // DAYS
+    function addDay(title){
+        dayCounter++;
+        days.push({id:dayCounter,title:title||'Day '+(days.length+1),items:[]});
+        renderDays();updateCosts();
+    }
+    function removeDay(dayId){
+        if(days.length<=1){toast('Need at least 1 day!','info');return;}
+        days=days.filter(d=>d.id!==dayId);
+        renderDays();updateCosts();
+    }
+    function removeItem(dayId,itemId){
+        const d=days.find(d=>d.id===dayId);
+        if(d) d.items=d.items.filter(i=>i.id!==itemId);
+        renderDays();updateCosts();
+    }
+    function updateTitle(dayId,val){const d=days.find(d=>d.id===dayId);if(d)d.title=val;}
+    function updateTime(dayId,itemId,val){const d=days.find(d=>d.id===dayId);if(d){const i=d.items.find(i=>i.id===itemId);if(i)i.time=val;}}
+
+    function getDateStr(start,offset){
+        const d=new Date(start);d.setDate(d.getDate()+offset);
+        return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    }
+
+    function renderDays(){
+        const start=document.getElementById('startDate').value;
+        document.getElementById('daysContainer').innerHTML=days.map((day,idx)=>{
+            const dc=day.items.reduce((s,i)=>s+i.cost*persons,0);
+            return `<div class="day-column" id="day-${day.id}">
+      <div class="day-header">
+        <div class="day-header-left">
+          <div class="day-num">${idx+1}</div>
+          <div>
+            <input class="day-title-in" value="${day.title}" onchange="updateTitle(${day.id},this.value)" placeholder="Day title...">
+            ${start?`<div class="day-date-lbl">${getDateStr(start,idx)}</div>`:''}
+          </div>
+        </div>
+        <div class="day-stats">
+          <span class="day-cost-badge">${fmt(dc)}</span>
+          <button class="day-rm-btn" onclick="removeDay(${day.id})"><i class="fas fa-times"></i></button>
+        </div>
+      </div>
+      <div class="drop-zone" id="zone-${day.id}" ondragover="dzOver(event,${day.id})" ondrop="dzDrop(event,${day.id})" ondragleave="this.classList.remove('drag-over')">
+        ${day.items.length===0?`<div class="empty-drop"><i class="fas fa-hand-point-up"></i><span>Drag activities here</span></div>`:
+                day.items.map(item=>`
+          <div class="placed-item" draggable="true" ondragstart="dragStart(event,'placed',{fromDay:${day.id},itemId:${item.id}})" ondragend="dragEnd(event)">
+            <div class="placed-icon" style="background:${item.color}"><i class="${item.icon}"></i></div>
+            <div class="placed-info">
+              <h4>${item.name}</h4>
+              <p><i class="fas fa-map-pin"></i> ${item.location} · ${item.duration}</p>
+            </div>
+            <input type="time" class="placed-time" value="${item.time}" onchange="updateTime(${day.id},${item.id},this.value)">
+            <span class="placed-cost">${fmt(item.cost*persons)}</span>
+            <button class="placed-rm" onclick="removeItem(${day.id},${item.id})"><i class="fas fa-times"></i></button>
+          </div>`).join('')}
+      </div>
+      <div class="day-footer">
+        <button class="add-custom-btn" onclick="openModal(${day.id})"><i class="fas fa-plus"></i> Add custom</button>
+        <span class="day-total">Total: <span>${fmt(dc)}</span></span>
+      </div>
+    </div>`;
+        }).join('');
+        updateMapPins();
+    }
+
+    // COSTS
+    function fmt(usd){
+        const c=document.getElementById('currencySelect')?.value||'USD';
+        return (SYMS[c]||'$')+Math.round(usd*(RATES[c]||1)).toLocaleString();
+    }
+    function updateCosts(){
+        const n=days.length,h=+(document.getElementById('hotelSelect')?.value)||0,v=+(document.getElementById('vehicleSelect')?.value)||0;
+        const hT=h*n,vT=v*n,aT=days.reduce((s,d)=>s+d.items.reduce((ss,i)=>ss+i.cost*persons,0),0);
+        const fT=persons*n*20,iT=persons*8,total=hT+vT+aT+fT+iT;
+        document.getElementById('hotelPrev').textContent=`${fmt(hT)} for ${n} night${n!==1?'s':''}`;
+        document.getElementById('vehiclePrev').textContent=`${fmt(vT)} for ${n} day${n!==1?'s':''}`;
+        document.getElementById('hotelCost').textContent=fmt(hT);
+        document.getElementById('vehicleCost').textContent=fmt(vT);
+        document.getElementById('activitiesCost').textContent=fmt(aT);
+        document.getElementById('foodCost').textContent=fmt(fT);
+        document.getElementById('insuranceCost').textContent=fmt(iT);
+        document.getElementById('totalCost').textContent=fmt(total);
+        document.getElementById('perPerson').textContent=fmt(total/persons)+' per person';
+        if(total>0){
+            const pc=(v)=>Math.round(v/total*100)+'%';
+            ['hotel','vehicle','activities','food'].forEach((k,i)=>{
+                const vals=[hT,vT,aT,fT+iT];
+                document.getElementById(k+'Bar').style.width=Math.round(vals[i]/total*100)+'%';
+                document.getElementById(k+'Pct').textContent=pc(vals[i]);
+            });
+        }
+        renderDays();
+    }
+    function changePax(d){persons=Math.max(1,persons+d);document.getElementById('personCount').textContent=persons;updateCosts();}
+
+    // CLEAR ALL
+    function clearAll(){
+        if(!confirm('Clear all days and activities?')) return;
+        days=[];dayCounter=0;
+        renderDays();updateCosts();
+        toast('Itinerary cleared','info');
+    }
+
+    // SAVE ITINERARY → API
+    async function saveItinerary(){
+        const currentUserStr = localStorage.getItem('ceylon_current_user');
+        if (!currentUserStr) {
+            toast('Please login to save your itinerary!', 'error');
+            setTimeout(() => { window.location.href = 'login-complete.html'; }, 1500);
+            return;
+        }
+        const currentUser = JSON.parse(currentUserStr);
+
+        const title=document.getElementById('tripName').value.trim()||'My Sri Lanka Trip';
+        const startDate=document.getElementById('startDate').value;
+        if(!startDate){toast('Please select a start date first!','info');return;}
+        // compute end date from number of days
+        const endDateObj=new Date(startDate);
+        endDateObj.setDate(endDateObj.getDate()+Math.max(days.length-1,0));
+        const endDate=endDateObj.toISOString().split('T')[0];
+        const dailyPlan=days.map((d,i)=>'Day '+(i+1)+': '+d.title+(d.items.length?' — '+d.items.map(a=>a.name).join(', '):'')).join('\n');
+        
+        const payload={
+            title, startDate, endDate, dailyPlan, description:dailyPlan, status:'DRAFT',
+            touristName: currentUser.name
+        };
+
+        try{
+            const res=await fetch('http://localhost:8080/api/itineraries',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+            if(res.ok){toast('Itinerary saved successfully! ✓','success');}
+            else{toast('Error saving — please try again','error');}
+        }catch(e){
+            // fallback: save to localStorage
+            const key='itinerary_'+Date.now();
+            localStorage.setItem(key,JSON.stringify({title,startDate,endDate,days,persons}));
+            toast('Saved locally (server offline)','info');
+        }
+    }
+
+    // CUSTOM MODAL
+    function openModal(dayId){customDayId=dayId;document.getElementById('customModal').classList.add('open');}
+    function closeModal(){document.getElementById('customModal').classList.remove('open');}
+    function addCustom(){
+        const name=document.getElementById('cName').value.trim();
+        if(!name){alert('Please enter an activity name');return;}
+        const loc=document.getElementById('cLocation').value.trim()||'Sri Lanka';
+        const cost=+(document.getElementById('cCost').value)||0;
+        const dur=document.getElementById('cDuration').value;
+        const day=days.find(d=>d.id===customDayId);
+        if(!day){closeModal();return;}
+        day.items.push({id:cid++,name,location:loc,cost,duration:dur,color:'#0d6e6e',icon:'fas fa-star',time:'09:00'});
+        closeModal();renderDays();updateCosts();
+        toast('Custom activity added','success');
+    }
+
+    // MAP PINS (LEAFLET INTEGRATION)
+    function updateMapPins(){
+        if(!map) return;
+        
+        // Clear old markers & lines
+        mapMarkers.forEach(m => map.removeLayer(m));
+        if(mapPolyline) map.removeLayer(mapPolyline);
+        mapMarkers = [];
+        
+        // Extract all valid coordinates from placed items
+        const coords = [];
+        days.forEach(day => {
+            day.items.forEach(item => {
+                if(item.coords) {
+                    // Create marker
+                    const marker = L.marker(item.coords).addTo(map)
+                        .bindPopup(`<b>${item.name}</b><br>${item.location}`);
+                    mapMarkers.push(marker);
+                    coords.push(item.coords);
+                }
+            });
+        });
+
+        // Draw path connecting them
+        if(coords.length > 1) {
+            mapPolyline = L.polyline(coords, {color: '#c8a84b', weight: 4, opacity: 0.8, dashArray: '5, 10'}).addTo(map);
+        }
+
+        // Auto zoom map to fit all pins
+        if(coords.length > 0) {
+            map.fitBounds(L.polyline(coords).getBounds(), {padding: [50, 50]});
+        } else {
+            map.setView([7.8731, 80.7718], 7); // Default zoom
+        }
+    }
+
+    // TOAST
+    function toast(msg,type='success'){
+        const t=document.getElementById('toast');
+        const ic=document.getElementById('toastIcon');
+        document.getElementById('toastMsg').textContent=msg;
+        ic.className=type==='success'?'fas fa-check-circle':type==='info'?'fas fa-info-circle':'fas fa-exclamation-circle';
+        t.className='toast '+type+' show';
+        setTimeout(()=>t.classList.remove('show'),2800);
+    }
+
+    // SHARE
+    function shareIt(){
+        const title=document.getElementById('tripName').value||'My Sri Lanka Itinerary';
+        const text=days.map((d,i)=>'Day '+(i+1)+': '+d.title+(d.items.length?' ('+d.items.map(a=>a.name).join(', ')+')':'')).join('\n');
+        if(navigator.share){
+            navigator.share({title,text,url:window.location.href}).catch(()=>{});
+        } else {
+            navigator.clipboard.writeText(title+'\n\n'+text+'\n\n'+window.location.href)
+                .then(()=>toast('Link copied to clipboard!','success'))
+                .catch(()=>toast('Share not supported on this browser','info'));
+        }
+    }
+
+    // ════════════════════════════════════════════════════════
+    // AI SMART PLANNER LOGIC
+    // ════════════════════════════════════════════════════════
+    
+    // Bind selection clicks
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.ai-select-grid').forEach(grid => {
+            grid.querySelectorAll('.ai-opt').forEach(opt => {
+                opt.addEventListener('click', function() {
+                    grid.querySelectorAll('.ai-opt').forEach(o => o.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    });
+
+    function openAIPlanner() { document.getElementById('aiModal').classList.add('open'); }
+    function closeAIPlanner() { document.getElementById('aiModal').classList.remove('open'); }
+
+    async function generateAIPlan() {
+        const daysCount = Math.max(1, Math.min(14, +(document.getElementById('aiDays').value) || 5));
+        const budgetElem = document.querySelector('#aiBudget .active');
+        const budget = budgetElem ? budgetElem.dataset.val : 'comfort';
+        const interestElem = document.querySelector('#aiInterest .active');
+        const interest = interestElem ? interestElem.dataset.val : 'all';
+
+        closeAIPlanner();
+        const overlay = document.getElementById('aiOverlay');
+        const msg = document.getElementById('aiLoadingMsg');
+        overlay.classList.add('active');
+
+        // Simulate AI Processing Steps
+        msg.textContent = "Analyzing destinations and coordinates...";
+        await new Promise(r => setTimeout(r, 800));
+        
+        msg.textContent = `Optimizing routes for ${daysCount} days based on interests...`;
+        await new Promise(r => setTimeout(r, 900));
+
+        msg.textContent = "Selecting hotels and calculating costs...";
+        await new Promise(r => setTimeout(r, 600));
+
+        msg.textContent = "Finalizing your perfect itinerary...";
+        await new Promise(r => setTimeout(r, 500));
+
+        // Actual Generation
+        days = [];
+        dayCounter = 0;
+
+        // Auto-select Hotel & Vehicle based on budget
+        const hotelSel = document.getElementById('hotelSelect');
+        const vehSel = document.getElementById('vehicleSelect');
+        if(budget === 'budget') { hotelSel.value = "45"; vehSel.value = "30"; }
+        if(budget === 'comfort') { hotelSel.value = "120"; vehSel.value = "80"; }
+        if(budget === 'luxury') { hotelSel.value = "350"; vehSel.value = "200"; }
+
+        // Filter activities by interest
+        let pool = [...ACTS];
+        if (interest !== 'all') {
+            pool.sort((a, b) => {
+                if (a.category === interest && b.category !== interest) return -1;
+                if (a.category !== interest && b.category === interest) return 1;
+                return 0.5 - Math.random(); // shuffle rest
+            });
+        } else {
+            pool.sort(() => 0.5 - Math.random()); // simple random for all-round
+        }
+
+        // Create Day columns
+        const regionNames = ["Arrival & City Tour", "Cultural Heritage", "Nature & Wildlife Exploration", "Hill Country Retreat", "Coastal Relaxation"];
+        
+        for (let i = 0; i < daysCount; i++) {
+            dayCounter++;
+            let title = regionNames[i % regionNames.length];
+            if (i === daysCount - 1 && daysCount > 1) title = "Departure";
+            
+            let dayActs = [];
+            // Assign 2 to 3 activities per day
+            let actsPerDay = (budget === 'luxury') ? 2 : 3; 
+            if (i === 0 || i === daysCount - 1) actsPerDay = 1; // less on first/last day
+
+            for(let j = 0; j < actsPerDay; j++) {
+                if(pool.length > 0) {
+                    let act = {...pool.shift(), time: (9 + (j * 4)) + ":00" };
+                    dayActs.push(act);
+                }
+            }
+
+            days.push({ id: dayCounter, title: title, items: dayActs });
+        }
+
+        renderDays();
+        updateCosts();
+
+        overlay.classList.remove('active');
+        document.getElementById('tripName').value = `My ${budget.charAt(0).toUpperCase() + budget.slice(1)} Sri Lanka Trip`;
+        toast('Smart Itinerary Generated! ✨', 'success');
+    }
+</script>
+<script src="script.js"></script>
+<script src="navbar-fix.js"></script>
+</body>
+</html>

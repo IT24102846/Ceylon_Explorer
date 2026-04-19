@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Culture & Festivals - Ceylon Explorer</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+    :root {
+      --primary-color:#FF6B35;--secondary-color:#004E89;--accent-color:#1A936F;
+      --text-dark:#2C3E50;--text-light:#7F8C8D;--bg-light:#F8F9FA;--white:#FFFFFF;
+      --gold: #FF6B35; --gold-light: #FFCDB5; --deep: #004E89; --warm: #1A936F;
+      --sand: #F8F9FA; --cream: #F8F9FA; --rust: #E74C3C; --teal: #004E89;
+      --purple: #1A936F; --text: #2C3E50; --muted: #7F8C8D; --border: #E0E0E0;
+      --shadow: 0 8px 40px rgba(0,0,0,0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Outfit', sans-serif; background: var(--bg-light); color: var(--text-dark); }
+
+    /* NAVBAR — overridden entirely by navbar-fix.js */
+    .navbar {
+      background: #FFFFFF;
+      padding: 0;
+      position: sticky; top: 0; z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .nav-inner { max-width: 1300px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { color: #FF6B35; font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .logo i { color: #FF6B35; }
+    .nav-links { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+    .nav-links a { color: #2C3E50; text-decoration: none; font-size: 13px; padding: 6px 12px; border-radius: 16px; transition: all 0.2s; }
+    .nav-links a:hover { background: rgba(255,107,53,0.08); color: #FF6B35; }
+    .nav-links a.active { background: #FF6B35; color: #FFFFFF; font-weight: 700; }
+
+    /* HERO */
+    .page-hero {
+      background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+      padding: 80px 24px 70px;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .page-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 50% at 50% 50%, rgba(255,255,255,0.1), transparent);
+    }
+    .mandala-bg {
+      position: absolute; inset: 0; opacity: 0.06;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='80' fill='none' stroke='%23c9933d' stroke-width='1'/%3E%3Ccircle cx='100' cy='100' r='60' fill='none' stroke='%23c9933d' stroke-width='1'/%3E%3Ccircle cx='100' cy='100' r='40' fill='none' stroke='%23c9933d' stroke-width='1'/%3E%3Ccircle cx='100' cy='100' r='20' fill='none' stroke='%23c9933d' stroke-width='1'/%3E%3Cline x1='100' y1='20' x2='100' y2='180' stroke='%23c9933d' stroke-width='0.5'/%3E%3Cline x1='20' y1='100' x2='180' y2='100' stroke='%23c9933d' stroke-width='0.5'/%3E%3Cline x1='43' y1='43' x2='157' y2='157' stroke='%23c9933d' stroke-width='0.5'/%3E%3Cline x1='157' y1='43' x2='43' y2='157' stroke='%23c9933d' stroke-width='0.5'/%3E%3C/svg%3E");
+      background-size: 150px;
+    }
+    .page-hero .subtitle { color: var(--gold-light); font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 16px; position: relative; font-weight: 600; }
+    .page-hero h1 { font-family: 'Cormorant Garamond', serif; color: #fff; font-size: clamp(32px,6vw,64px); font-weight: 700; margin-bottom: 14px; position: relative; }
+    .page-hero h1 em { color: var(--gold-light); font-style: italic; }
+    .page-hero p { color: rgba(255,255,255,0.65); font-size: 16px; position: relative; max-width: 560px; margin: 0 auto; }
+
+    /* NAV PILLS */
+    .nav-pills { background: #FFFFFF; border-bottom: 2px solid #F0F0F0; padding: 0; display: flex; justify-content: center; gap: 0; overflow-x: auto; }
+    .pill { padding: 14px 24px; color: #7F8C8D; cursor: pointer; font-size: 13px; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; background: none; border-left: none; border-right: none; border-top: none; font-family: 'Outfit', sans-serif; display: flex; align-items: center; gap: 6px; }
+    .pill:hover { color: #2C3E50; }
+    .pill.active { color: #FF6B35; border-bottom-color: #FF6B35; }
+
+    /* SECTIONS */
+    .section { display: none; padding: 60px 24px; max-width: 1300px; margin: 0 auto; }
+    .section.active { display: block; }
+    .section-header { text-align: center; margin-bottom: 48px; }
+    .section-header .eyebrow { color: var(--gold); font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; display: block; }
+    .section-header h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px,4vw,48px); font-weight: 700; }
+    .section-header p { color: var(--muted); font-size: 15px; margin-top: 10px; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+    /* ETIQUETTE CARDS */
+    .etiquette-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 24px; }
+    .etiquette-card { background: var(--cream); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; transition: all 0.3s; }
+    .etiquette-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: var(--gold); }
+    .eti-header { padding: 22px 22px 14px; display: flex; align-items: flex-start; gap: 14px; }
+    .eti-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .eti-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .eti-subtitle { font-size: 12px; color: var(--muted); }
+    .eti-body { padding: 0 22px 22px; }
+    .eti-rule { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; font-size: 13px; }
+    .eti-rule .badge { flex-shrink: 0; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; margin-top: 1px; }
+    .badge-do { background: #dcfce7; color: #15803d; }
+    .badge-dont { background: #fee2e2; color: #dc2626; }
+    .badge-note { background: #fef3c7; color: #d97706; }
+
+    /* FESTIVAL CALENDAR */
+    .months-nav { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 28px; }
+    .month-btn { flex-shrink: 0; padding: 8px 18px; border-radius: 20px; border: 2px solid var(--border); background: transparent; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--muted); transition: all 0.2s; font-family: 'Outfit', sans-serif; }
+    .month-btn.active, .month-btn:hover { background: var(--gold); border-color: var(--gold); color: var(--deep); }
+
+    .festivals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 20px; }
+    .festival-card { background: #fff; border-radius: 20px; overflow: hidden; border: 1px solid var(--border); transition: all 0.3s; }
+    .festival-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+    .festival-banner { height: 100px; display: flex; align-items: center; justify-content: center; font-size: 48px; position: relative; overflow: hidden; }
+    .festival-details { padding: 18px; }
+    .festival-name { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .festival-date { font-size: 12px; color: var(--gold); font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+    .festival-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+    .festival-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .ftag { padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; background: var(--sand); color: var(--muted); }
+    .festival-highlight { border: 2px solid var(--gold); }
+    .festival-highlight .festival-date { color: var(--rust); }
+
+    /* SEASONS */
+    .seasons-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 24px; margin-bottom: 40px; }
+    .season-card { border-radius: 20px; padding: 24px; position: relative; overflow: hidden; }
+    .season-card::before { content: attr(data-emoji); position: absolute; right: -10px; top: -10px; font-size: 80px; opacity: 0.15; }
+    .season-name { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    .season-months { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; opacity: 0.7; margin-bottom: 12px; }
+    .season-desc { font-size: 13px; line-height: 1.7; opacity: 0.85; margin-bottom: 14px; }
+    .season-best { font-size: 12px; }
+    .season-best strong { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; margin-bottom: 5px; }
+    .region-tag { display: inline-block; background: rgba(255,255,255,0.3); padding: 3px 9px; border-radius: 8px; font-size: 11px; font-weight: 600; margin: 2px 3px 2px 0; }
+
+    /* LOCAL TIPS */
+    .tips-categories { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
+    .tip-cat-btn { padding: 8px 18px; border-radius: 20px; border: 2px solid var(--border); background: #fff; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--muted); transition: all 0.2s; font-family: 'Outfit', sans-serif; display: flex; align-items: center; gap: 6px; }
+    .tip-cat-btn.active { background: var(--deep); border-color: var(--deep); color: #fff; }
+
+    .tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 20px; }
+    .tip-card { background: #fff; border-radius: 16px; padding: 20px; border: 1px solid var(--border); transition: all 0.25s; }
+    .tip-card:hover { border-color: var(--gold); box-shadow: 0 4px 20px rgba(201,147,61,0.12); }
+    .tip-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .tip-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .tip-title { font-weight: 700; font-size: 14px; }
+    .tip-cat-label { font-size: 11px; color: var(--muted); }
+    .tip-body { font-size: 13px; color: var(--muted); line-height: 1.7; }
+    .tip-important { margin-top: 10px; padding: 8px 12px; background: #fffbeb; border-radius: 8px; border-left: 3px solid var(--gold); font-size: 12px; color: var(--warm); }
+
+    /* PHRASES */
+    .phrases-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 16px; }
+    .phrase-card { background: #fff; border-radius: 14px; padding: 16px; border: 1px solid var(--border); }
+    .phrase-english { font-size: 14px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .phrase-row { display: flex; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid #f5f0ea; }
+    .phrase-row:last-child { border: none; }
+    .phrase-lang { font-size: 11px; font-weight: 700; color: var(--muted); width: 50px; flex-shrink: 0; }
+    .phrase-text { font-size: 14px; font-weight: 600; color: var(--text); }
+    .phrase-roman { font-size: 11px; color: var(--muted); font-style: italic; }
+
+    /* DIVIDER */
+    .ornament-divider { text-align: center; margin: 48px 0 40px; color: var(--gold); font-size: 20px; letter-spacing: 12px; opacity: 0.5; }
+
+    /* FOOTER */
+    footer { background: #2C3E50; color: rgba(255,255,255,0.6); text-align: center; padding: 24px; font-size: 13px; }
+    footer a { color: #FFCDB5; text-decoration: none; }
+
+    /* Scroll smooth */
+    html { scroll-behavior: smooth; }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="logo"><i class="fas fa-umbrella-beach"></i> CEYLON EXPLORER</a>
+        
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="hotel-complete.html" class="nav-link">Hotels</a></li>
+            <li><a href="vehicle-complete.html" class="nav-link">Vehicles</a></li>
+            <li><a href="tourguide-complete.html" class="nav-link">Guides</a></li>
+            <li><a href="activity-complete.html" class="nav-link">Activities</a></li>
+            <li><a href="itinerary.html" class="nav-link">Itinerary</a></li>
+            <li id="navLoginLi"><a href="login-complete.html" class="nav-link nav-login-btn">Login</a></li>
+            <li id="navSignupLi"><a href="signup-complete.html" class="nav-link nav-signup-btn">Sign Up</a></li>
+            <li id="navUserLi" style="display:none; position:relative;">
+                <button class="nav-user-btn" id="userMenuBtn" onclick="toggleUserMenu()">
+                    <div class="nav-avatar" id="navUserAvatar">U</div>
+                    <span id="navUserName">User</span>
+                    <i class="fas fa-chevron-down" style="font-size:10px; margin-left:3px;"></i>
+                </button>
+                <div class="nav-dropdown" id="userDropdown">
+                    <a href="user-dashboard.html" id="dashboardLink"><i class="fas fa-th-large"></i> Dashboard</a>
+                    <a href="#" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </li>
+        </ul>
+        <div class="hamburger" id="hamburger">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO -->
+<div class="page-hero">
+  <div class="mandala-bg"></div>
+  <div class="subtitle">🌺 Discover the Soul of the Island</div>
+  <h1>Culture & <em>Traditions</em></h1>
+  <p>Immerse yourself in 2,500 years of rich culture, vibrant festivals, spiritual traditions, and warm Lankan hospitality</p>
+</div>
+
+<!-- NAV PILLS -->
+<div class="nav-pills">
+  <button class="pill active" onclick="showSection('etiquette',this)"><i class="fas fa-hands-praying"></i> Etiquette</button>
+  <button class="pill" onclick="showSection('festivals',this)"><i class="fas fa-star-and-crescent"></i> Festival Calendar</button>
+  <button class="pill" onclick="showSection('seasons',this)"><i class="fas fa-sun"></i> Best Season to Visit</button>
+  <button class="pill" onclick="showSection('tips',this)"><i class="fas fa-lightbulb"></i> Local Tips</button>
+  <button class="pill" onclick="showSection('phrases',this)"><i class="fas fa-language"></i> Useful Phrases</button>
+</div>
+
+<!-- =================== ETIQUETTE SECTION =================== -->
+<div class="section active" id="sec-etiquette">
+  <div class="section-header">
+    <span class="eyebrow">🙏 Respect & Understand</span>
+    <h2>Cultural Etiquette Guide</h2>
+    <p>Sri Lanka is a deeply spiritual country. Understanding local customs ensures respectful and meaningful interactions.</p>
+  </div>
+  <div class="etiquette-grid">
+    <div class="etiquette-card">
+      <div class="eti-header">
+        <div class="eti-icon" style="background:#fef3c7">🛕</div>
+        <div><div class="eti-title">Temples & Religious Sites</div><div class="eti-subtitle">Buddhist, Hindu & Sacred Spaces</div></div>
+      </div>
+      <div class="eti-body">
+        <div class="eti-rule"><span class="badge badge-do">DO</span> Remove shoes before entering any temple or shrine</div>
+        <div class="eti-rule"><span class="badge badge-do">DO</span> Dress modestly — shoulders and knees covered (sarongs often provided)</div>
+        <div class="eti-rule"><span class="badge badge-do">DO</span> Walk clockwise around stupas and sacred trees</div>
+        <div class="eti-rule"><span class="badge badge-dont">DON'T</span> Turn your back to a Buddha statue for photos</div>
+        <div class="eti-rule"><span class="badge badge-dont">DON'T</span> Pose with Buddha statues — it's considered disrespectful</div>
+        <div class="eti-rule"><span class="badge badge-dont">DON'T</span> Enter temples during prayer times uninvited</div>
+        <div class="eti-rule"><span class="badge badge-note">NOTE</span> Menstruating women may be restricted from some Hindu temples</div>
+      </div>
+    </div>
+    <div class="etiquette-card">
+      <div class="eti-header">
+        <div class="eti-icon" style="background:#dbeafe">🤝</div>
+        <div><div class="eti-title">Greetings & Social Customs</div><div class="eti-subtitle">Connecting with Locals</div></div>
+      </div>
+      <div class="eti-body">
+        <div class="eti-rule"><span class="badge badge-do">DO</span> Greet with "Āyubōvan" (Sinhala) or "Vanakkam" (Tamil) with hands pressed together</div>
+        <div class="eti-rule"><span class="badge badge-do">DO</span> Use your right hand for handshakes and passing items</div>
+        <div class="eti-rule"><span class="badge badge-do">DO</span> Respect elders — address them with titles</div>
+        <div class="eti-rule"><span class="badge badge-dont">DON'T</span> Shake hands with monks — press palms together instead</div>
+        <div class="eti-rule"><span class="badge badge-dont">DON'T</span> Touch anyone on the head — it's considered sacred</div>
+        <div class="eti-rule"><span class="badge badge-note">NOTE</span> Public displays of affection are frowned upon</div>
+      </div>
+    </div>
+    <div class="etiquette-card">
+      <div class="eti-header">
+        <div class="eti-icon" style="background:#dcfce7">🍛</div>
+        <div><div class="eti-title">Dining Etiquette</div><div class="eti-subtitle">Eating the Lankan Way</div></div>
+      </div>
+      <div class="eti-body">
+        <div class="eti-rule"><span class="badge badge-do">DO</span> Eat with your right hand — a sign of respect and tradition</div>
+        <div class="eti-rule"><span class="badge badge-do">DO</span> Finish what's on your plate — leaving food can seem wasteful</div>
+        <div class="eti-rule"><span class="badge badge-do">DO</span> Wait for the eldest or host to start eating first</div>
+        <div class="eti-rule"><span class="badge badge-dont">DON'T</span> Use your left hand to eat or pass food — considered unclean</div>
+        <div class="eti-rule"><span class="badge badge-dont">DON'T</span> Refuse an invitation to share food — very rude</div>
+        <div class="eti-rule"><span class="badge badge-note">NOTE</span> Many Sri Lankans are vegetarian on Poya (full moon) days</div>
+      </div>
+    </div>
+    <div class="etiquette-card">
+      <div class="eti-header">
+        <div class="eti-icon" style="background:#ede9fe">👗</div>
+        <div><div class="eti-title">Dress Code</div><div class="eti-subtitle">Dressing Respectfully</div></div>
+      </div>
+      <div class="eti-body">
+        <div class="eti-rule"><span class="badge badge-do">DO</span> Dress conservatively in villages and religious areas</div>
+        <div class="eti-rule"><span class="badge badge-do">DO</span> Swimwear is fine at beaches — change before leaving</div>
+        <div class="eti-rule"><span class="badge badge-do">DO</span> Cover tattoos of Buddha or Hindu deities in public</div>
+        <div class="eti-rule"><span class="badge badge-dont">DON'T</span> Wear revealing clothing in cities or sacred places</div>
+        <div class="eti-rule"><span class="badge badge-dont">DON'T</span> Enter government buildings in shorts</div>
+        <div class="eti-rule"><span class="badge badge-note">NOTE</span> Light, breathable fabrics recommended in humid climate</div>
+      </div>
+    </div>
+    <div class="etiquette-card">
+      <div class="eti-header">
+        <div class="eti-icon" style="background:#fce7f3">📷</div>
+        <div><div class="eti-title">Photography</div><div class="eti-subtitle">Capturing Memories Respectfully</div></div>
+      </div>
+      <div class="eti-body">
+        <div class="eti-rule"><span class="badge badge-do">DO</span> Ask permission before photographing locals, especially in villages</div>
+        <div class="eti-rule"><span class="badge badge-do">DO</span> Smile and show the photo — it creates connection!</div>
+        <div class="eti-rule"><span class="badge badge-dont">DON'T</span> Photograph military installations or checkpoints</div>
+        <div class="eti-rule"><span class="badge badge-dont">DON'T</span> Take photos inside temples without permission</div>
+        <div class="eti-rule"><span class="badge badge-dont">DON'T</span> Use flash near sacred artifacts</div>
+        <div class="eti-rule"><span class="badge badge-note">NOTE</span> Some sites charge a photography fee — check in advance</div>
+      </div>
+    </div>
+    <div class="etiquette-card">
+      <div class="eti-header">
+        <div class="eti-icon" style="background:#d1fae5">🐘</div>
+        <div><div class="eti-title">Wildlife & Nature</div><div class="eti-subtitle">Responsible Tourism</div></div>
+      </div>
+      <div class="eti-body">
+        <div class="eti-rule"><span class="badge badge-do">DO</span> Stay in vehicles during safari and follow guide instructions</div>
+        <div class="eti-rule"><span class="badge badge-do">DO</span> Use responsible operators certified by the Wildlife Dept.</div>
+        <div class="eti-rule"><span class="badge badge-dont">DON'T</span> Ride elephants — many are kept in harmful conditions</div>
+        <div class="eti-rule"><span class="badge badge-dont">DON'T</span> Feed wild animals in parks</div>
+        <div class="eti-rule"><span class="badge badge-dont">DON'T</span> Remove coral, shells, or natural materials from beaches</div>
+        <div class="eti-rule"><span class="badge badge-note">NOTE</span> National park entry requires valid permits booked in advance</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== FESTIVALS SECTION =================== -->
+<div class="section" id="sec-festivals">
+  <div class="section-header">
+    <span class="eyebrow">🎊 Celebrate with Sri Lanka</span>
+    <h2>Festival Calendar 2026</h2>
+    <p>Plan your visit around Sri Lanka's spectacular festivals, religious observances, and cultural celebrations</p>
+  </div>
+  <div class="months-nav">
+    <button class="month-btn active" onclick="filterMonth('all',this)">All Year</button>
+    <button class="month-btn" onclick="filterMonth('Jan',this)">Jan</button>
+    <button class="month-btn" onclick="filterMonth('Feb',this)">Feb</button>
+    <button class="month-btn" onclick="filterMonth('Mar',this)">Mar</button>
+    <button class="month-btn" onclick="filterMonth('Apr',this)">Apr</button>
+    <button class="month-btn" onclick="filterMonth('May',this)">May</button>
+    <button class="month-btn" onclick="filterMonth('Jun',this)">Jun</button>
+    <button class="month-btn" onclick="filterMonth('Jul',this)">Jul</button>
+    <button class="month-btn" onclick="filterMonth('Aug',this)">Aug</button>
+    <button class="month-btn" onclick="filterMonth('Sep',this)">Sep</button>
+    <button class="month-btn" onclick="filterMonth('Oct',this)">Oct</button>
+    <button class="month-btn" onclick="filterMonth('Nov',this)">Nov</button>
+    <button class="month-btn" onclick="filterMonth('Dec',this)">Dec</button>
+  </div>
+  <div class="festivals-grid" id="festivalsGrid"></div>
+</div>
+
+<!-- =================== SEASONS SECTION =================== -->
+<div class="section" id="sec-seasons">
+  <div class="section-header">
+    <span class="eyebrow">🌤️ When to Visit</span>
+    <h2>Best Season to Visit Sri Lanka</h2>
+    <p>Sri Lanka's climate varies by region and time of year. Here's your complete seasonal guide.</p>
+  </div>
+  <div class="seasons-grid">
+    <div class="season-card" data-emoji="☀️" style="background:linear-gradient(135deg,#fef9c3,#fde68a);color:#713f12">
+      <div class="season-name">☀️ Dry Season West</div>
+      <div class="season-months">December – March</div>
+      <div class="season-desc">Peak season for the southwest coast, cultural triangle, and hill country. Clear skies, minimal rain, perfect beach weather. Busiest and most expensive period.</div>
+      <div class="season-best"><strong>Best For</strong><span class="region-tag">Galle</span><span class="region-tag">Colombo</span><span class="region-tag">Kandy</span><span class="region-tag">Sigiriya</span><span class="region-tag">Ella</span></div>
+    </div>
+    <div class="season-card" data-emoji="🌺" style="background:linear-gradient(135deg,#fce7f3,#fbcfe8);color:#831843">
+      <div class="season-name">🌺 Shoulder Season</div>
+      <div class="season-months">April – May</div>
+      <div class="season-desc">Transitional period with warm weather and occasional showers. Prices drop slightly. April hosts New Year celebrations — a wonderful cultural experience.</div>
+      <div class="season-best"><strong>Best For</strong><span class="region-tag">Cultural Triangle</span><span class="region-tag">East Coast</span><span class="region-tag">Festivals</span></div>
+    </div>
+    <div class="season-card" data-emoji="🌊" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe);color:#1e3a5f">
+      <div class="season-name">🌊 Dry Season East</div>
+      <div class="season-months">May – September</div>
+      <div class="season-desc">The east coast comes alive — Trincomalee, Arugam Bay, Batticaloa. Perfect for surfing (Arugam Bay peak: July–Sep), diving, and whale watching in Trinco.</div>
+      <div class="season-best"><strong>Best For</strong><span class="region-tag">Arugam Bay</span><span class="region-tag">Trincomalee</span><span class="region-tag">Surfing</span><span class="region-tag">Diving</span></div>
+    </div>
+    <div class="season-card" data-emoji="🍃" style="background:linear-gradient(135deg,#dcfce7,#bbf7d0);color:#14532d">
+      <div class="season-name">🍃 Monsoon Season</div>
+      <div class="season-months">June – Nov (SW), Oct–Jan (NE)</div>
+      <div class="season-desc">Lush green landscapes, fewer tourists, lower prices. Rain is usually short afternoon bursts. Not suitable for west/south coast beaches during SW monsoon.</div>
+      <div class="season-best"><strong>Best For</strong><span class="region-tag">Budget Travel</span><span class="region-tag">Photography</span><span class="region-tag">Ayurveda Retreats</span></div>
+    </div>
+  </div>
+
+  <div class="ornament-divider">— ✦ —</div>
+
+  <div class="section-header">
+    <h2 style="font-size:28px">Month-by-Month Highlights</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px" id="monthHighlights"></div>
+</div>
+
+<!-- =================== TIPS SECTION =================== -->
+<div class="section" id="sec-tips">
+  <div class="section-header">
+    <span class="eyebrow">💡 Insider Knowledge</span>
+    <h2>Local Tips for Sri Lanka</h2>
+    <p>Practical advice from seasoned travelers and locals to make your trip smooth, safe, and unforgettable</p>
+  </div>
+  <div class="tips-categories">
+    <button class="tip-cat-btn active" onclick="filterTips('all',this)">All Tips</button>
+    <button class="tip-cat-btn" onclick="filterTips('money',this)">💰 Money</button>
+    <button class="tip-cat-btn" onclick="filterTips('transport',this)">🚗 Transport</button>
+    <button class="tip-cat-btn" onclick="filterTips('food',this)">🍛 Food</button>
+    <button class="tip-cat-btn" onclick="filterTips('safety',this)">🛡️ Safety</button>
+    <button class="tip-cat-btn" onclick="filterTips('health',this)">💊 Health</button>
+    <button class="tip-cat-btn" onclick="filterTips('culture',this)">🙏 Culture</button>
+  </div>
+  <div class="tips-grid" id="tipsGrid"></div>
+</div>
+
+<!-- =================== PHRASES SECTION =================== -->
+<div class="section" id="sec-phrases">
+  <div class="section-header">
+    <span class="eyebrow">🗣️ Connect with Locals</span>
+    <h2>Useful Phrases</h2>
+    <p>A few words in Sinhala or Tamil will delight locals and enrich your experience immensely</p>
+  </div>
+  <div class="phrases-grid" id="phrasesGrid"></div>
+</div>
+
+<footer>
+  <p>© 2026 <a href="index.html">Ceylon Explorer</a> · Your guide to Sri Lanka</p>
+</footer>
+
+<script>
+  // =================== FESTIVALS DATA ===================
+  const festivals = [
+    { name: "Thai Pongal", month: "Jan", date: "January 15", emoji: "🌾", color: "#fef3c7", desc: "Tamil harvest festival giving thanks to the Sun God. Colorful kolam drawings, sugarcane, and sweet pongal rice.", tags: ["Hindu", "Tamil", "Cultural"], highlight: false, location: "North, East, Nationwide" },
+    { name: "Independence Day", month: "Feb", date: "February 4", emoji: "🇱🇰", color: "#dbeafe", desc: "National holiday celebrating independence from British rule in 1948. Grand military parade in Colombo with cultural performances.", tags: ["National", "Public Holiday"], highlight: true, location: "Colombo" },
+    { name: "Maha Sivarathri", month: "Feb", date: "February (varies)", emoji: "🕉️", color: "#ede9fe", desc: "Hindu festival dedicated to Lord Shiva. All-night vigils, fasting, and prayers at Shiva temples across the island.", tags: ["Hindu", "Religious"], highlight: false, location: "North, East" },
+    { name: "Vesak Poya", month: "May", date: "May 12 (Full Moon)", emoji: "🪔", color: "#dcfce7", desc: "Most sacred Buddhist festival celebrating Buddha's birth, enlightenment, and death. Stunning lantern displays and free food stalls (dansalas) nationwide.", tags: ["Buddhist", "Public Holiday", "★ Top Festival"], highlight: true, location: "Nationwide" },
+    { name: "Sinhala & Tamil New Year", month: "Apr", date: "April 13–14", emoji: "🎊", color: "#fce7f3", desc: "The most widely celebrated festival. Traditional rituals, oil baths, games, sweets, and auspicious times observed strictly. Streets come alive!", tags: ["Cultural", "Public Holiday", "★ Top Festival"], highlight: true, location: "Nationwide" },
+    { name: "Poson Poya", month: "Jun", date: "June Full Moon", emoji: "🏔️", color: "#d1fae5", desc: "Celebrates the introduction of Buddhism to Sri Lanka. Mihintale, the sacred hill where it happened, draws huge pilgrimages.", tags: ["Buddhist", "Pilgrimage"], highlight: false, location: "Mihintale, Anuradhapura" },
+    { name: "Esala Perahera", month: "Jul", date: "July–August (10 days)", emoji: "🐘", color: "#fef9c3", desc: "The grandest procession in Asia — 100 adorned elephants, fire dancers, drummers, and whip crackers parade through Kandy for 10 nights.", tags: ["Buddhist", "★ Top Festival", "Cultural"], highlight: true, location: "Kandy" },
+    { name: "Kataragama Festival", month: "Jul", date: "July–August", emoji: "🔥", color: "#fee2e2", desc: "Multi-religious festival at the sacred Kataragama shrine. Kavadi dancers, fire-walking, and body piercings as acts of devotion.", tags: ["Hindu", "Buddhist", "Religious"], highlight: false, location: "Kataragama" },
+    { name: "Navam Perahera", month: "Feb", date: "February Full Moon", emoji: "🎺", color: "#fce7f3", desc: "Vibrant Colombo procession featuring 50+ elephants, dancers, and drummers from Gangaramaya Temple around Beira Lake.", tags: ["Buddhist", "Cultural"], highlight: false, location: "Colombo" },
+    { name: "Deepavali", month: "Oct", date: "October/November (varies)", emoji: "💡", color: "#fef3c7", desc: "Festival of Lights. Tamil Hindus celebrate with oil lamps, fireworks, sweets, and prayers to Lakshmi. Beautiful in Jaffna.", tags: ["Hindu", "Cultural", "Public Holiday"], highlight: true, location: "Jaffna, Colombo, Nationwide" },
+    { name: "Eid al-Fitr", month: "Apr", date: "End of Ramadan (varies)", emoji: "🌙", color: "#dbeafe", desc: "Muslim community celebrates end of Ramadan with prayers, feasting, and family gatherings. Special biryani and sweets.", tags: ["Islamic", "Public Holiday"], highlight: false, location: "Beruwala, Colombo, East" },
+    { name: "Christmas", month: "Dec", date: "December 25", emoji: "🎄", color: "#dcfce7", desc: "Celebrated by Sri Lanka's Christian community and beyond. Midnight masses, carol singing, and festive decorations in Negombo and Colombo.", tags: ["Christian", "Public Holiday"], highlight: false, location: "Negombo, Colombo" },
+    { name: "Duruthu Perahera", month: "Jan", date: "January Full Moon", emoji: "🥁", color: "#fef9c3", desc: "One of Sri Lanka's oldest Buddhist processions at Kelaniya Raja Maha Vihara. Marks Buddha's legendary visit to Sri Lanka.", tags: ["Buddhist", "Cultural"], highlight: false, location: "Kelaniya" },
+    { name: "Unduwap Poya", month: "Dec", date: "December Full Moon", emoji: "🌿", color: "#d1fae5", desc: "Celebrates the arrival of the sacred Bodhi tree cutting to Sri Lanka by Sangamitta Thero. Pilgrims visit Anuradhapura.", tags: ["Buddhist", "Pilgrimage"], highlight: false, location: "Anuradhapura" },
+  ];
+
+  function renderFestivals(monthFilter) {
+    const filtered = monthFilter === 'all' ? festivals : festivals.filter(f => f.month === monthFilter);
+    const grid = document.getElementById('festivalsGrid');
+    grid.innerHTML = filtered.map(f => `
+        <div class="festival-card ${f.highlight?'festival-highlight':''}">
+            <div class="festival-banner" style="background:${f.color}">${f.emoji}</div>
+            <div class="festival-details">
+                ${f.highlight ? '<div style="font-size:11px;font-weight:700;color:#d97706;margin-bottom:4px">⭐ MUST EXPERIENCE</div>' : ''}
+                <div class="festival-name">${f.name}</div>
+                <div class="festival-date"><i class="fas fa-calendar"></i> ${f.date} · 📍 ${f.location}</div>
+                <div class="festival-desc">${f.desc}</div>
+                <div class="festival-tags">${f.tags.map(t=>`<span class="ftag">${t}</span>`).join('')}</div>
+            </div>
+        </div>
+    `).join('');
+    if (filtered.length === 0) grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">No festivals this month.</div>';
+  }
+
+  function filterMonth(m, btn) {
+    document.querySelectorAll('.month-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderFestivals(m);
+  }
+
+  // =================== MONTH HIGHLIGHTS ===================
+  const monthHighlights = [
+    { m:'Jan', icon:'🐘', note:'Duruthu Perahera, dry weather, great for surfing at Arugam' },
+    { m:'Feb', icon:'🎺', note:'Independence Day, Navam Perahera, Colombo buzz' },
+    { m:'Mar', icon:'🏖️', note:'Last of the dry season on west coast, prime beaches' },
+    { m:'Apr', icon:'🎊', note:'★ Sinhala & Tamil New Year — do not miss!' },
+    { m:'May', icon:'🪔', note:'★ Vesak — most magical time, lanterns everywhere' },
+    { m:'Jun', icon:'🏔️', note:'Poson Poya, east coast opens up for the season' },
+    { m:'Jul', icon:'🐘', note:'★ Esala Perahera begins — book Kandy hotels early!' },
+    { m:'Aug', icon:'🔥', note:'Perahera peak, Kataragama festival, east coast best' },
+    { m:'Sep', icon:'🏄', note:'Arugam Bay surf peak, fewer crowds in central SL' },
+    { m:'Oct', icon:'💡', note:'Deepavali, transitional rains, good wildlife sightings' },
+    { m:'Nov', icon:'🌿', note:'Northeast coast opening, Colombo literary festival' },
+    { m:'Dec', icon:'🎄', note:'Christmas, peak season begins, Unduwap Poya, New Year crowd' },
+  ];
+
+  function renderMonthHighlights() {
+    document.getElementById('monthHighlights').innerHTML = monthHighlights.map(m => `
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:28px;margin-bottom:8px">${m.icon}</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;margin-bottom:6px">${m.m}</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">${m.note}</div>
+        </div>
+    `).join('');
+  }
+
+  // =================== TIPS DATA ===================
+  const tips = [
+    { cat:'money', icon:'💵', bg:'#dcfce7', title:'Currency & Exchange', sub:'Money Matters', body:"Always exchange at licensed banks or official exchange counters. Licensed money changers in Colombo offer competitive rates. ATMs widespread in cities. Credit cards accepted at most tourist establishments.", important:"Notify your bank before traveling to avoid card blocks" },
+    { cat:'money', icon:'🛒', bg:'#fef3c7', title:'Bargaining Tips', sub:'Shopping Smart', body:"Bargaining is expected at markets and tuk-tuk rides but not in shops with fixed prices. Start at 50–60% of asking price. Always smile and be friendly — it's part of the fun!", important:"Never bargain aggressively or walk away rudely" },
+    { cat:'transport', icon:'🛺', bg:'#fce7f3', title:'Tuk-Tuk Wisdom', sub:'Getting Around', body:"Always agree on the fare before getting in, or insist on using the meter. App-based tuk-tuks (PickMe, Uber) are safest and most transparent. Great for short distances in cities.", important:"Use PickMe app for reliable pricing in Colombo" },
+    { cat:'transport', icon:'🚂', bg:'#dbeafe', title:'Scenic Train Rides', sub:'Must-Do Experience', body:"The Ella to Kandy train through tea country is one of the world's most beautiful rail journeys. Book 2nd class (observation) seats in advance — they sell out fast!", important:"Book at Fort Station Colombo 2–3 weeks in advance for peak season" },
+    { cat:'food', icon:'🌶️', bg:'#fee2e2', title:'Spice Warning!', sub:'Food & Dining', body:"Sri Lankan food is genuinely spicy! Always specify 'little spicy' (tikka kama) when ordering. String hoppers, kottu roti, and rice & curry are must-tries. Avoid raw salads at budget places.", important:"Carry basic stomach medication as a precaution" },
+    { cat:'food', icon:'💧', bg:'#dbeafe', title:'Water Safety', sub:'Health & Hydration', body:"Drink only bottled or purified water. Ice in budget restaurants may not be safe. Coconut water (fresh king coconuts) is safe, cheap, and delicious — drink it fresh from the vendor.", important:"Hydrate well — Sri Lanka is very hot and humid" },
+    { cat:'safety', icon:'🏊', bg:'#bfdbfe', title:'Beach Safety', sub:'Swim Smart', body:"Never swim at beaches without lifeguards present. Many beaches have dangerous currents. Swim between the flags if present. Unawatuna, Mirissa, Bentota beaches are generally safer.", important:"27+ tourists drown in Sri Lanka annually — take currents seriously" },
+    { cat:'safety', icon:'📱', bg:'#d1fae5', title:'Emergency Contacts', sub:'Stay Safe', body:"Save key numbers: Police 119, Ambulance 1990, Fire 110, Tourist Police +94 11 242 1052. Share your itinerary with someone at home. Keep copies of passport and insurance.", important:"Tourist Police are very helpful — don't hesitate to call them" },
+    { cat:'health', icon:'🦟', bg:'#fef3c7', title:'Mosquito Protection', sub:'Health Precautions', body:"Use DEET-based repellent, especially in low-lying areas and after sunset. Dengue fever is present year-round. Long sleeves at dawn/dusk help. Check if malaria prophylaxis is needed for your itinerary.", important:"Seek medical attention immediately for any fever within 2 weeks of travel" },
+    { cat:'health', icon:'☀️', bg:'#fee2e2', title:'Sun Protection', sub:'Beat the Heat', body:"The Sri Lankan sun is intense — SPF 50+ sunscreen essential. Heat exhaustion is common for visitors. Take midday breaks, stay hydrated, and wear a hat. UV is strongest 11am–3pm.", important:"A light scarf is also useful for temple visits and sun protection" },
+    { cat:'culture', icon:'🤫', bg:'#ede9fe', title:'Poya Days', sub:'Religious Observance', body:"On Poya (full moon) days, alcohol sales are prohibited nationwide and many restaurants won't serve it. Most locals fast or eat vegetarian. Many shops close. Plan around Poya days.", important:"Check Poya dates before planning beach days requiring alcohol" },
+    { cat:'culture', icon:'🐕', bg:'#fce7f3', title:'Stray Dogs', sub:'Animal Awareness', body:"Stray dogs are very common everywhere. Most are harmless but don't provoke them. Avoid feeding strays. If bitten, seek immediate medical attention — rabies vaccination may be needed.", important:"Consider rabies pre-exposure vaccination if you'll be in rural areas" },
+    { cat:'money', icon:'🏷️', bg:'#fef3c7', title:'Tipping Culture', sub:'Gratuities', body:"Tipping is appreciated but not mandatory. Hotel staff: Rs 50–100/bag. Restaurant: 10% if not already included. Tour guides: $5–10/day. Tuk-tuks: round up to nearest 50.", important:"Check if a service charge is already included in the bill" },
+    { cat:'transport', icon:'🛣️', bg:'#dcfce7', title:'Road Safety', sub:'Driving Tips', body:"Traffic is chaotic by Western standards. Lanes are often suggestions. Driving on the left. Hiring a driver is far safer and relatively affordable (~$60–75/day for van + driver).", important:"International driving permit required if self-driving" },
+  ];
+
+  function renderTips(cat) {
+    const filtered = cat === 'all' ? tips : tips.filter(t=>t.cat===cat);
+    document.getElementById('tipsGrid').innerHTML = filtered.map(t=>`
+        <div class="tip-card">
+            <div class="tip-card-header">
+                <div class="tip-icon" style="background:${t.bg}">${t.icon}</div>
+                <div><div class="tip-title">${t.title}</div><div class="tip-cat-label">${t.sub}</div></div>
+            </div>
+            <div class="tip-body">${t.body}</div>
+            ${t.important ? `<div class="tip-important">⚠️ ${t.important}</div>` : ''}
+        </div>
+    `).join('');
+  }
+
+  function filterTips(cat, btn) {
+    document.querySelectorAll('.tip-cat-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTips(cat);
+  }
+
+  // =================== PHRASES DATA ===================
+  const phrases = [
+    { english: "Hello / Welcome", emoji: "👋", translations: [ { lang:"Sinhala", text:"ආයුබෝවන්", roman:"Āyubōvan" }, { lang:"Tamil", text:"வணக்கம்", roman:"Vanakkam" } ] },
+    { english: "Thank You", emoji: "🙏", translations: [ { lang:"Sinhala", text:"ස්තුතියි", roman:"Sthutiyi" }, { lang:"Tamil", text:"நன்றி", roman:"Nandri" } ] },
+    { english: "How much?", emoji: "💰", translations: [ { lang:"Sinhala", text:"කීයද?", roman:"Kīyada?" }, { lang:"Tamil", text:"எவ்வளவு?", roman:"Evvalavu?" } ] },
+    { english: "Very tasty!", emoji: "😋", translations: [ { lang:"Sinhala", text:"ගොඩක් රසයි!", roman:"Godak rasayi!" }, { lang:"Tamil", text:"மிகவும் சுவையாக!", roman:"Migavum suvaiyāga!" } ] },
+    { english: "Where is...?", emoji: "📍", translations: [ { lang:"Sinhala", text:"...කොහෙද?", roman:"...kohedha?" }, { lang:"Tamil", text:"...எங்கே?", roman:"...enge?" } ] },
+    { english: "Beautiful!", emoji: "✨", translations: [ { lang:"Sinhala", text:"ලස්සනයි!", roman:"Lassanayi!" }, { lang:"Tamil", text:"அழகு!", roman:"Azagu!" } ] },
+    { english: "Help me!", emoji: "🆘", translations: [ { lang:"Sinhala", text:"මට උදව් කරන්න!", roman:"Mata udav karanna!" }, { lang:"Tamil", text:"உதவுங்கள்!", roman:"Udhavungal!" } ] },
+    { english: "Good morning", emoji: "🌅", translations: [ { lang:"Sinhala", text:"සුභ උදෑසනක්", roman:"Subha udaesanak" }, { lang:"Tamil", text:"காலை வணக்கம்", roman:"Kālai vanakkam" } ] },
+    { english: "Spicy / Not spicy", emoji: "🌶️", translations: [ { lang:"Sinhala", text:"ඒය / ඒ නෑ", roman:"Tikkama / tikka nǣ" }, { lang:"Tamil", text:"கார / கார இல்லை", roman:"Kāram / kāram illai" } ] },
+    { english: "Goodbye", emoji: "👋", translations: [ { lang:"Sinhala", text:"ගිහිල්ල එනවා", roman:"Gihilla enawā" }, { lang:"Tamil", text:"போய் வருகிறேன்", roman:"Pōy varugirēn" } ] },
+    { english: "I love Sri Lanka!", emoji: "❤️", translations: [ { lang:"Sinhala", text:"මට ශ්‍රී ලංකාව ආදරෙයි!", roman:"Mata Shrī Lankāwa ādareyi!" }, { lang:"Tamil", text:"இலங்கையை நேசிக்கிறேன்!", roman:"Ilangaiyai nēcikkirēn!" } ] },
+    { english: "Police / Hospital", emoji: "🚨", translations: [ { lang:"Sinhala", text:"පොලිසිය / රෝහල", roman:"Polisiya / Rōhala" }, { lang:"Tamil", text:"காவல்துறை / மருத்துவமனை", roman:"Kāvalturai / Maruththuvam" } ] },
+  ];
+
+  function renderPhrases() {
+    document.getElementById('phrasesGrid').innerHTML = phrases.map(p=>`
+        <div class="phrase-card">
+            <div class="phrase-english">${p.emoji} ${p.english}</div>
+            ${p.translations.map(t=>`
+                <div class="phrase-row">
+                    <div class="phrase-lang">${t.lang}</div>
+                    <div style="flex:1">
+                        <div class="phrase-text">${t.text}</div>
+                        <div class="phrase-roman">${t.roman}</div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `).join('');
+  }
+
+  // =================== SECTION SWITCHER ===================
+  function showSection(id, btn) {
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+    document.getElementById('sec-'+id).classList.add('active');
+    btn.classList.add('active');
+    window.scrollTo({top:document.querySelector('.nav-pills').offsetTop - 10, behavior:'smooth'});
+  }
+
+  // =================== INIT ===================
+  renderFestivals('all');
+  renderMonthHighlights();
+  renderTips('all');
+  renderPhrases();
+</script>
+
+<script src="ceylon-data.js"></script>
+<script src="ceylon-loader.js"></script>
+<script src="script.js"></script>
+<script src="navbar-fix.js"></script>
+</body>
+</html>

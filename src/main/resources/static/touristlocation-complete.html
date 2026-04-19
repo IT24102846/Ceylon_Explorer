@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tourist Locations - CEYLON EXPLORER</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ===================== CSS STYLES ===================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #FF6B35;
+            --secondary-color: #004E89;
+            --accent-color: #1A936F;
+            --text-dark: #2C3E50;
+            --text-light: #7F8C8D;
+            --bg-light: #F8F9FA;
+            --white: #FFFFFF;
+            --success: #27AE60;
+            --warning: #F39C12;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo i {
+            margin-right: 10px;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: var(--white);
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: var(--bg-light);
+            padding: 2rem 0;
+        }
+
+        .filter-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 0.75rem 1.5rem;
+            background: var(--white);
+            border: 2px solid var(--secondary-color);
+            color: var(--secondary-color);
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .filter-tab:hover,
+        .filter-tab.active {
+            background: var(--secondary-color);
+            color: var(--white);
+        }
+
+        /* Locations Section */
+        .locations-section {
+            padding: 3rem 0;
+        }
+
+        .results-header {
+            margin-bottom: 2rem;
+        }
+
+        .results-header h2 {
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .locations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .location-card {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .location-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .location-image {
+            height: 250px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .location-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--accent-color);
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+
+        .location-content {
+            padding: 1.5rem;
+        }
+
+        .location-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        .location-province {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .location-info {
+            display: flex;
+            gap: 1.5rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 5px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .info-value {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .btn-view-details {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-view-details:hover {
+            background: #E55A2A;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 24px 16px 40px;
+        }
+
+        .modal.active {
+            display: block;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 10px;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text-light);
+            z-index: 10;
+        }
+
+        .close:hover {
+            color: var(--text-dark);
+        }
+
+        .location-details {
+            padding: 3rem;
+        }
+
+        .location-details h2 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .location-details img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .detail-item {
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 5px;
+        }
+
+        .detail-item h4 {
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .facilities-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .facility-tag {
+            background: var(--accent-color);
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .btn-directions {
+            width: 100%;
+            padding: 1rem;
+            background: var(--secondary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 1.5rem;
+        }
+
+        .btn-directions:hover {
+            background: #003A6B;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--text-dark);
+            color: var(--white);
+            padding: 3rem 0 1rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3,
+        .footer-section h4 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .locations-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-menu {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="logo"><i class="fas fa-umbrella-beach"></i> CEYLON EXPLORER</a>
+        
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="hotel-complete.html" class="nav-link">Hotels</a></li>
+            <li><a href="vehicle-complete.html" class="nav-link">Vehicles</a></li>
+            <li><a href="tourguide-complete.html" class="nav-link">Guides</a></li>
+            <li><a href="activity-complete.html" class="nav-link">Activities</a></li>
+            <li><a href="itinerary.html" class="nav-link">Itinerary</a></li>
+            <li id="navLoginLi"><a href="login-complete.html" class="nav-link nav-login-btn">Login</a></li>
+            <li id="navSignupLi"><a href="signup-complete.html" class="nav-link nav-signup-btn">Sign Up</a></li>
+            <li id="navUserLi" style="display:none; position:relative;">
+                <button class="nav-user-btn" id="userMenuBtn" onclick="toggleUserMenu()">
+                    <div class="nav-avatar" id="navUserAvatar">U</div>
+                    <span id="navUserName">User</span>
+                    <i class="fas fa-chevron-down" style="font-size:10px; margin-left:3px;"></i>
+                </button>
+                <div class="nav-dropdown" id="userDropdown">
+                    <a href="user-dashboard.html" id="dashboardLink"><i class="fas fa-th-large"></i> Dashboard</a>
+                    <a href="#" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </li>
+        </ul>
+        <div class="hamburger" id="hamburger">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+</nav>
+
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-map-marked-alt"></i> Tourist Locations</h1>
+        <p>Discover Sri Lanka's most beautiful and historic destinations</p>
+    </div>
+</section>
+
+<!-- Filter Section -->
+<section class="filter-section">
+    <div class="container">
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-type="all" onclick="filterLocations('all', this)">
+                <i class="fas fa-th"></i> All Locations
+            </button>
+            <button class="filter-tab" data-type="HISTORICAL" onclick="filterLocations('HISTORICAL', this)">
+                <i class="fas fa-landmark"></i> Historical Sites
+            </button>
+            <button class="filter-tab" data-type="NATURE" onclick="filterLocations('NATURE', this)">
+                <i class="fas fa-tree"></i> Nature & Parks
+            </button>
+            <button class="filter-tab" data-type="BEACH" onclick="filterLocations('BEACH', this)">
+                <i class="fas fa-umbrella-beach"></i> Beaches
+            </button>
+            <button class="filter-tab" data-type="RELIGIOUS" onclick="filterLocations('RELIGIOUS', this)">
+                <i class="fas fa-place-of-worship"></i> Religious Sites
+            </button>
+            <button class="filter-tab" data-type="WILDLIFE" onclick="filterLocations('WILDLIFE', this)">
+                <i class="fas fa-paw"></i> Wildlife Parks
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Locations Grid -->
+<section class="locations-section">
+    <div class="container">
+        <div class="results-header">
+            <h2>Popular Destinations</h2>
+            <p id="resultsCount">Loading locations...</p>
+        </div>
+        <div class="locations-grid" id="locationsGrid">
+            <!-- Locations will be loaded dynamically -->
+        </div>
+    </div>
+</section>
+
+<!-- Details Modal -->
+<div id="detailsModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div class="location-details">
+            <h2 id="modalLocationName">Location Name</h2>
+            <img id="modalLocationImage" src="" alt="Location">
+
+            <p id="modalDescription" style="line-height: 1.8; margin-bottom: 1.5rem;"></p>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <h4><i class="fas fa-map-marker-alt"></i> Location</h4>
+                    <p id="modalProvince"></p>
+                </div>
+                <div class="detail-item">
+                    <h4><i class="fas fa-layer-group"></i> Type</h4>
+                    <p id="modalType"></p>
+                </div>
+                <div class="detail-item">
+                    <h4><i class="fas fa-clock"></i> Opening Hours</h4>
+                    <p id="modalOpeningHours"></p>
+                </div>
+                <div class="detail-item">
+                    <h4><i class="fas fa-dollar-sign"></i> Entry Fee</h4>
+                    <p id="modalEntryFee"></p>
+                </div>
+            </div>
+
+            <div>
+                <h4 style="color: var(--secondary-color); margin: 1.5rem 0 0.75rem;">Facilities</h4>
+                <div class="facilities-list" id="modalFacilities">
+                    <!-- Facilities will be loaded -->
+                </div>
+            </div>
+
+            <button class="btn-directions" onclick="openGoogleMaps()">
+                <i class="fas fa-directions"></i> Get Directions (Google Maps)
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CEYLON EXPLORER</h3>
+                <p>Your trusted partner for exploring Sri Lanka</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="hotel-complete.html">Hotels</a></li>
+                    <li><a href="vehicle-complete.html">Vehicles</a></li>
+                    <li><a href="tourguide-complete.html">Tour Guides</a></li>
+                    <li><a href="activity-complete.html">Activities</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Ceylon Explorer. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    /* ===================== JAVASCRIPT CODE ===================== */
+
+    const API_BASE_URL = 'http://localhost:8080/api';
+    let currentLocation = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadLocations();
+    });
+
+    function filterLocations(type, element) {
+        // Update active tab
+        document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+        element.classList.add('active');
+
+        loadLocations(type);
+    }
+
+    function loadLocations(type = 'all') {
+        let url = `${API_BASE_URL}/locations`;
+
+        if (type !== 'all') {
+            url += `?type=${type}`;
+        }
+
+        fetch(url)
+            .then(response => response.json())
+            .then(locations => {
+                displayLocations(locations);
+            })
+            .catch(error => {
+                console.error('Error loading locations:', error);
+                displaySampleLocations(type);
+            });
+    }
+
+    function displayLocations(locations) {
+        const grid = document.getElementById('locationsGrid');
+        const resultsCount = document.getElementById('resultsCount');
+
+        resultsCount.textContent = `${locations.length} locations found`;
+        grid.innerHTML = '';
+
+        locations.forEach(location => {
+            const card = createLocationCard(location);
+            grid.appendChild(card);
+        });
+    }
+
+    function createLocationCard(location) {
+        const card = document.createElement('div');
+        card.className = 'location-card';
+        card.onclick = function() { openDetailsModal(location); };
+
+        card.innerHTML = `
+                <div class="location-image" style="background-image: url('${location.imageUrl || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400'}')">
+                    <span class="location-badge">${formatType(location.type)}</span>
+                </div>
+                <div class="location-content">
+                    <h3>${location.name}</h3>
+                    <p class="location-province"><i class="fas fa-map-marker-alt"></i> ${location.province}</p>
+                    <div class="location-info">
+                        <div class="info-item">
+                            <span class="info-label">Opening Hours</span>
+                            <span class="info-value">${location.openingHours || 'Daily'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Entry Fee</span>
+                            <span class="info-value">${location.entryFee}</span>
+                        </div>
+                    </div>
+                    <button class="btn-view-details" onclick="event.stopPropagation(); openDetailsModal(${JSON.stringify(location).replace(/"/g, '&quot;')})">
+                        <i class="fas fa-info-circle"></i> View Details
+                    </button>
+                </div>
+            `;
+        return card;
+    }
+
+    function formatType(type) {
+        return type.replace(/_/g, ' ');
+    }
+
+    function openDetailsModal(location) {
+        currentLocation = location;
+        const modal = document.getElementById('detailsModal');
+
+        document.getElementById('modalLocationName').textContent = location.name;
+        document.getElementById('modalLocationImage').src = location.imageUrl || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600';
+        document.getElementById('modalDescription').textContent = location.description || 'Experience the beauty and wonder of this amazing destination in Sri Lanka.';
+        document.getElementById('modalProvince').textContent = location.province + ', ' + (location.district || 'Sri Lanka');
+        document.getElementById('modalType').textContent = formatType(location.type);
+        document.getElementById('modalOpeningHours').textContent = location.openingHours || 'Open Daily';
+        document.getElementById('modalEntryFee').textContent = location.entryFee;
+
+        // Set facilities
+        const facilitiesDiv = document.getElementById('modalFacilities');
+        if (location.facilities) {
+            facilitiesDiv.innerHTML = location.facilities.split(',').map(f =>
+                `<span class="facility-tag"><i class="fas fa-check"></i> ${f.trim()}</span>`
+            ).join('');
+        }
+
+        modal.scrollTop = 0;
+        modal.classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('detailsModal').classList.remove('active');
+    }
+
+    function openGoogleMaps() {
+        if (currentLocation) {
+            const query = encodeURIComponent(currentLocation.name + ' Sri Lanka');
+            window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
+        }
+    }
+
+    function displaySampleLocations(type = 'all') {
+        const sampleLocations = [
+            {
+                id: 1,
+                name: 'Sigiriya Rock Fortress',
+                type: 'HISTORICAL',
+                province: 'Central Province',
+                district: 'Matale',
+                openingHours: '7:00 AM - 5:30 PM',
+                entryFee: '$30',
+                imageUrl: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400',
+                facilities: 'Parking,Restrooms,Guide Services,Museum',
+                description: 'Ancient rock fortress and palace ruins, a UNESCO World Heritage Site with breathtaking frescoes and gardens.'
+            },
+            {
+                id: 2,
+                name: 'Temple of the Sacred Tooth Relic',
+                type: 'RELIGIOUS',
+                province: 'Central Province',
+                district: 'Kandy',
+                openingHours: '5:30 AM - 8:00 PM',
+                entryFee: '$10',
+                imageUrl: 'https://images.unsplash.com/photo-1580837119756-563d608dd119?w=400',
+                facilities: 'Parking,Shoe Storage,Photography Allowed,Gift Shop',
+                description: 'Sacred Buddhist temple housing the relic of the tooth of Buddha, located in the royal palace complex.'
+            },
+            {
+                id: 3,
+                name: 'Yala National Park',
+                type: 'WILDLIFE',
+                province: 'Southern Province',
+                district: 'Hambantota',
+                openingHours: '6:00 AM - 6:00 PM',
+                entryFee: '$25',
+                imageUrl: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?w=400',
+                facilities: 'Safari Jeeps,Camping,Restaurant,Wildlife Viewing',
+                description: 'Most visited national park in Sri Lanka, famous for leopards, elephants, and diverse wildlife.'
+            },
+            {
+                id: 4,
+                name: 'Galle Fort',
+                type: 'HISTORICAL',
+                province: 'Southern Province',
+                district: 'Galle',
+                openingHours: 'Open 24 hours',
+                entryFee: 'Free',
+                imageUrl: 'https://images.unsplash.com/photo-1580836719058-a4fee33c0e5a?w=400',
+                facilities: 'Cafes,Shopping,Hotels,Museum',
+                description: 'Historic fortification built by Portuguese and later fortified by Dutch, a UNESCO World Heritage Site.'
+            },
+            {
+                id: 5,
+                name: 'Horton Plains National Park',
+                type: 'NATURE',
+                province: 'Central Province',
+                district: 'Nuwara Eliya',
+                openingHours: '6:00 AM - 6:00 PM',
+                entryFee: '$20',
+                imageUrl: 'https://images.unsplash.com/photo-1587974928442-77dc3e0dba72?w=400',
+                facilities: 'Hiking Trails,Restrooms,Parking,Viewing Points',
+                description: 'Protected area with stunning World\'s End cliff and Baker\'s Falls, home to unique highland wildlife.'
+            },
+            {
+                id: 6,
+                name: 'Mirissa Beach',
+                type: 'BEACH',
+                province: 'Southern Province',
+                district: 'Matara',
+                openingHours: 'Open 24 hours',
+                entryFee: 'Free',
+                imageUrl: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400',
+                facilities: 'Beach Bars,Water Sports,Restaurants,Whale Watching',
+                description: 'Beautiful crescent-shaped sandy beach, perfect for surfing, swimming, and whale watching.'
+            },
+            {
+                id: 7,
+                name: 'Dambulla Cave Temple',
+                type: 'RELIGIOUS',
+                province: 'Central Province',
+                district: 'Matale',
+                openingHours: '7:00 AM - 7:00 PM',
+                entryFee: '$10',
+                imageUrl: 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400',
+                facilities: 'Parking,Guide Services,Museum,Gift Shop',
+                description: 'Cave temple complex with over 150 Buddha statues and ancient murals, a UNESCO World Heritage Site.'
+            },
+            {
+                id: 8,
+                name: 'Nine Arch Bridge',
+                type: 'HISTORICAL',
+                province: 'Uva Province',
+                district: 'Badulla',
+                openingHours: 'Open 24 hours',
+                entryFee: 'Free',
+                imageUrl: 'https://images.unsplash.com/photo-1587974928442-77dc3e0dba72?w=400',
+                facilities: 'Viewing Points,Photography,Nearby Cafes',
+                description: 'Iconic railway bridge in Ella, surrounded by lush tea plantations and beautiful scenery.'
+            }
+        ];
+
+        let filteredLocations = sampleLocations;
+        if (type !== 'all') {
+            filteredLocations = sampleLocations.filter(l => l.type === type);
+        }
+
+        displayLocations(filteredLocations);
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('detailsModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+</script>
+
+<script src="navbar-fix.js"></script>
+<script src="ceylon-data.js"></script>
+<script src="ceylon-loader.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

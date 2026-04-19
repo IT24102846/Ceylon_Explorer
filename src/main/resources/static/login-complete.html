@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Ceylon Explorer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --gold: #C9A84C;
+            --gold-light: #E8C97A;
+            --dark: #0D1117;
+            --dark-2: #161B24;
+            --dark-3: #1E2535;
+            --text: #E8E8E8;
+            --text-muted: #8A9BB0;
+            --green: #2ECC71;
+            --red: #E74C3C;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Left Panel */
+        .left-panel {
+            width: 55%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                    linear-gradient(135deg, rgba(201,168,76,0.15) 0%, transparent 50%),
+                    linear-gradient(to bottom, rgba(13,17,23,0.3) 0%, rgba(13,17,23,0.85) 100%);
+            z-index: 1;
+        }
+
+        .left-bg {
+            position: absolute;
+            inset: 0;
+            background-image: url('https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=900&q=80');
+            background-size: cover;
+            background-position: center;
+            transform: scale(1.05);
+            animation: subtleZoom 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes subtleZoom {
+            from { transform: scale(1.05); }
+            to { transform: scale(1.12); }
+        }
+
+        .left-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 50px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--gold);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--dark);
+        }
+
+        .brand-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        .left-tagline {
+            padding-bottom: 60px;
+        }
+
+        .left-tagline h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            color: #fff;
+            line-height: 1.2;
+            margin-bottom: 16px;
+        }
+
+        .left-tagline h1 span {
+            color: var(--gold);
+        }
+
+        .left-tagline p {
+            color: rgba(255,255,255,0.75);
+            font-size: 16px;
+            line-height: 1.6;
+            max-width: 380px;
+        }
+
+        .floating-cards {
+            position: absolute;
+            bottom: 120px;
+            left: 50px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .mini-card {
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            font-size: 13px;
+            animation: floatUp 3s ease-in-out infinite;
+        }
+
+        .mini-card:nth-child(2) { animation-delay: 1s; }
+        .mini-card:nth-child(3) { animation-delay: 2s; }
+
+        @keyframes floatUp {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .mini-card i { color: var(--gold); font-size: 16px; }
+
+        /* Right Panel */
+        .right-panel {
+            width: 45%;
+            background: var(--dark-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .right-panel::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-header {
+            margin-bottom: 36px;
+        }
+
+        .form-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .form-header p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .form-header p a {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .form-header p a:hover { text-decoration: underline; }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .divider span {
+            color: var(--text-muted);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .social-login {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            background: var(--dark-3);
+            color: var(--text);
+            font-size: 13px;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .social-btn:hover {
+            border-color: var(--gold);
+            background: rgba(201,168,76,0.08);
+        }
+
+        .social-btn i { font-size: 16px; }
+        .social-btn .fa-google { color: #EA4335; }
+        .social-btn .fa-facebook { color: #1877F2; }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-wrap i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 15px;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+
+        .input-wrap input {
+            width: 100%;
+            padding: 13px 14px 13px 42px;
+            background: var(--dark-3);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .input-wrap input::placeholder { color: rgba(138,155,176,0.5); }
+
+        .input-wrap input:focus {
+            border-color: var(--gold);
+            background: rgba(201,168,76,0.04);
+        }
+
+        .input-wrap input:focus + i,
+        .input-wrap i:has(+ input:focus) { color: var(--gold); }
+        .input-wrap:focus-within i { color: var(--gold); }
+
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 15px;
+            padding: 0;
+            pointer-events: all;
+            transition: color 0.2s;
+        }
+
+        .toggle-password:hover { color: var(--gold); }
+
+        .form-options {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--gold);
+            cursor: pointer;
+        }
+
+        .remember-me span {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .forgot-link {
+            font-size: 13px;
+            color: var(--gold);
+            text-decoration: none;
+        }
+
+        .forgot-link:hover { text-decoration: underline; }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            border: none;
+            border-radius: 10px;
+            color: var(--dark);
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-login:hover::before { left: 100%; }
+        .btn-login:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(201,168,76,0.35); }
+        .btn-login:active { transform: translateY(0); }
+
+        .toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            z-index: 9999;
+            max-width: 320px;
+        }
+
+        .toast.show { transform: translateX(0); }
+        .toast.success { background: #1a3a2a; color: var(--green); border: 1px solid rgba(46,204,113,0.3); }
+        .toast.error { background: #3a1a1a; color: var(--red); border: 1px solid rgba(231,76,60,0.3); }
+
+        .back-home {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.2s;
+        }
+
+        .back-home:hover { color: var(--gold); }
+
+        @media (max-width: 768px) {
+            .left-panel { display: none; }
+            .right-panel { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="toast" id="toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMsg"></span>
+</div>
+
+<!-- Left Visual Panel -->
+<div class="left-panel">
+    <div class="left-bg"></div>
+    <div class="left-content">
+        <a href="index.html" class="brand">
+            <div class="brand-icon"><i class="fas fa-umbrella-beach"></i></div>
+            <span class="brand-name">CEYLON EXPLORER</span>
+        </a>
+
+        <div class="floating-cards">
+            <div class="mini-card"><i class="fas fa-hotel"></i> 500+ Hotels</div>
+            <div class="mini-card"><i class="fas fa-map-marker-alt"></i> 80+ Locations</div>
+            <div class="mini-card"><i class="fas fa-star"></i> 4.9 Rated</div>
+        </div>
+
+        <div class="left-tagline">
+            <h1>Welcome<br>Back to<br><span>Paradise</span></h1>
+            <p>Sign in to access your personalized Sri Lanka travel dashboard and continue your journey.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Right Form Panel -->
+<div class="right-panel">
+    <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+
+    <div class="form-container">
+        <div class="form-header">
+            <h2>Sign In</h2>
+            <p>New to Ceylon Explorer? <a href="signup-complete.html">Create an account</a></p>
+        </div>
+
+        <div class="social-login">
+            <button class="social-btn" onclick="socialLogin('Google')">
+                <i class="fab fa-google"></i> Google
+            </button>
+            <button class="social-btn" onclick="socialLogin('Facebook')">
+                <i class="fab fa-facebook"></i> Facebook
+            </button>
+        </div>
+
+        <div class="divider"><span>or sign in with email</span></div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label>Email Address</label>
+                <div class="input-wrap">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" placeholder="you@example.com" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <div class="input-wrap">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                    <button type="button" class="toggle-password" onclick="togglePwd('password', this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-options">
+                <label class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <span>Remember me</span>
+                </label>
+                <a href="#" class="forgot-link">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn-login">Sign In to Ceylon Explorer</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function togglePwd(id, btn) {
+        const input = document.getElementById(id);
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
+
+    function showToast(msg, type = 'success') {
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+        toastMsg.textContent = msg;
+        toast.className = `toast ${type} show`;
+        toast.querySelector('i').className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-times-circle';
+        setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    function handleLogin(e) {
+        e.preventDefault();
+        const email = document.getElementById('email').value.trim().toLowerCase();
+        const password = document.getElementById('password').value;
+
+        if (!email || !password) {
+            showToast('Please fill in all fields.', 'error');
+            return;
+        }
+
+        // Find user in localStorage
+        let users = [];
+        try { users = JSON.parse(localStorage.getItem('ceylon_users') || '[]'); } catch {}
+
+        const user = users.find(u => u.email.toLowerCase() === email && u.password === password);
+
+        if (!user) {
+            showToast('Invalid email or password.', 'error');
+            return;
+        }
+
+        const btn = document.querySelector('.btn-login');
+        btn.textContent = 'Signing in...';
+        btn.disabled = true;
+
+        // Save current session
+        localStorage.setItem('ceylon_current_user', JSON.stringify(user));
+
+        setTimeout(() => {
+            showToast('Welcome back, ' + user.name + '!', 'success');
+            setTimeout(() => {
+                if (user.role === 'admin') {
+                    window.location.href = 'admin-dashboard.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            }, 1200);
+        }, 900);
+    }
+
+    function socialLogin(provider) {
+        showToast(`Connecting with ${provider}...`, 'success');
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tour Guides - CEYLON EXPLORER</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ===================== CSS STYLES ===================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #FF6B35;
+            --secondary-color: #004E89;
+            --accent-color: #1A936F;
+            --text-dark: #2C3E50;
+            --text-light: #7F8C8D;
+            --bg-light: #F8F9FA;
+            --white: #FFFFFF;
+            --success: #27AE60;
+            --warning: #F39C12;
+            --danger: #E74C3C;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo i {
+            margin-right: 10px;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: var(--white);
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Search Section */
+        .search-section {
+            background: var(--bg-light);
+            padding: 2rem 0;
+        }
+
+        .search-box {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .search-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .search-input label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .search-input label i {
+            color: var(--primary-color);
+            margin-right: 5px;
+        }
+
+        .search-input select,
+        .search-input input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #E0E0E0;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .btn-search {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--secondary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-search:hover {
+            background: #003A6B;
+        }
+
+        /* Guides Section */
+        .guides-section {
+            padding: 3rem 0;
+        }
+
+        .results-header {
+            margin-bottom: 2rem;
+        }
+
+        .results-header h2 {
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .guides-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .guide-card {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .guide-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .guide-image {
+            height: 280px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .guide-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--warning);
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+
+        .verified-badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: var(--success);
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+        }
+
+        .guide-content {
+            padding: 1.5rem;
+        }
+
+        .guide-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        .guide-specialty {
+            color: var(--accent-color);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .guide-languages {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .guide-experience {
+            display: flex;
+            gap: 1.5rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 5px;
+        }
+
+        .experience-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .experience-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .experience-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .guide-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid #E0E0E0;
+        }
+
+        .guide-price {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .price-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .price-unit {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .btn-hire-now {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-hire-now:hover {
+            background: #E55A2A;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 24px 16px 40px;
+        }
+
+        .modal.active {
+            display: block;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 10px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text-light);
+            z-index: 10;
+        }
+
+        .close:hover {
+            color: var(--text-dark);
+        }
+
+        .booking-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            padding: 3rem;
+        }
+
+        .booking-left {
+            border-right: 1px solid #E0E0E0;
+            padding-right: 2rem;
+        }
+
+        .booking-left h2 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .booking-left img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .guide-details p {
+            margin-bottom: 0.75rem;
+            color: var(--text-dark);
+        }
+
+        .price-tag {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 1rem 0;
+        }
+
+        .certifications {
+            background: var(--bg-light);
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+        }
+
+        .certifications h4 {
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        .cert-tag {
+            display: inline-block;
+            background: var(--white);
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .cert-tag i {
+            color: var(--success);
+            margin-right: 5px;
+        }
+
+        .guide-bio {
+            margin-top: 1.5rem;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        .booking-right h3 {
+            color: var(--secondary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #E0E0E0;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .price-summary {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+        }
+
+        .price-summary h4 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            color: var(--text-dark);
+        }
+
+        .price-row.total {
+            border-top: 2px solid #D0D0D0;
+            padding-top: 0.75rem;
+            margin-top: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .payment-title {
+            color: var(--secondary-color);
+            margin: 1.5rem 0 1rem;
+        }
+
+        .payment-methods {
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-option {
+            display: block;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border: 2px solid #E0E0E0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .payment-option:hover {
+            border-color: var(--primary-color);
+        }
+
+        .payment-option input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .btn-book {
+            width: 100%;
+            padding: 1rem;
+            background: var(--success);
+            color: var(--white);
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-book:hover {
+            background: #229954;
+        }
+
+        .btn-book:disabled {
+            background: #95A5A6;
+            cursor: not-allowed;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--text-dark);
+            color: var(--white);
+            padding: 3rem 0 1rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3,
+        .footer-section h4 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .booking-container {
+                grid-template-columns: 1fr;
+            }
+
+            .booking-left {
+                border-right: none;
+                border-bottom: 1px solid #E0E0E0;
+                padding-right: 0;
+                padding-bottom: 2rem;
+            }
+
+            .search-row {
+                grid-template-columns: 1fr;
+            }
+
+            .guides-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-menu {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="logo">
+            <i class="fas fa-umbrella-beach"></i>
+            <span>CEYLON EXPLORER</span>
+        </a>
+        <ul class="nav-menu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="hotel-complete.html" class="nav-link">Hotels</a></li>
+            <li><a href="vehicle-complete.html" class="nav-link">Vehicles</a></li>
+            <li><a href="tourguide-complete.html" class="nav-link">Tour Guides</a></li>
+            <li><a href="activity-complete.html" class="nav-link">Activities</a></li>
+            <li><a href="touristlocation-complete.html" class="nav-link">Locations</a></li>
+            <li><a href="itinerary.html" class="nav-link">Itinerary</a></li>
+            <li><a href="culture.html" class="nav-link">Culture&Calender</a></li>
+            <li><a href="emergency-healthcare.html" class="nav-link">Emergency</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-user-tie"></i> Professional Tour Guides</h1>
+        <p>Explore Sri Lanka with experienced, licensed tour guides</p>
+    </div>
+</section>
+
+<!-- Search Section -->
+<section class="search-section">
+    <div class="container">
+        <div class="search-box">
+            <div class="search-row">
+                <div class="search-input">
+                    <label><i class="fas fa-language"></i> Language</label>
+                    <select id="filterLanguage">
+                        <option value="">All Languages</option>
+                        <option value="English">English</option>
+                        <option value="Chinese">Chinese</option>
+                        <option value="French">French</option>
+                        <option value="German">German</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="Japanese">Japanese</option>
+                    </select>
+                </div>
+                <div class="search-input">
+                    <label><i class="fas fa-star"></i> Specialty</label>
+                    <select id="filterSpecialty">
+                        <option value="">All Specialties</option>
+                        <option value="CULTURAL_TOURS">Cultural Tours</option>
+                        <option value="WILDLIFE_SAFARI">Wildlife Safari</option>
+                        <option value="ADVENTURE">Adventure</option>
+                        <option value="PHOTOGRAPHY">Photography</option>
+                        <option value="FOOD_TOURS">Food Tours</option>
+                        <option value="HISTORICAL">Historical</option>
+                    </select>
+                </div>
+                <div class="search-input">
+                    <label><i class="fas fa-calendar"></i> Tour Start Date</label>
+                    <input type="date" id="tourStartDate">
+                </div>
+                <div class="search-input">
+                    <button class="btn-search" onclick="searchGuides()">
+                        <i class="fas fa-search"></i> Find Guides
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Guides Grid -->
+<section class="guides-section">
+    <div class="container">
+        <div class="results-header">
+            <h2>Available Tour Guides</h2>
+            <p id="resultsCount">Loading guides...</p>
+        </div>
+        <div class="guides-grid" id="guidesGrid">
+            <!-- Guides will be loaded dynamically -->
+        </div>
+    </div>
+</section>
+
+<!-- Booking Modal -->
+<div id="bookingModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div class="booking-container">
+            <!-- Guide Details -->
+            <div class="booking-left">
+                <h2 id="modalGuideName">Guide Name</h2>
+                <img id="modalGuideImage" src="" alt="Guide">
+                <div class="guide-details">
+                    <p><i class="fas fa-star"></i> Specialty: <span id="modalSpecialty"></span></p>
+                    <p><i class="fas fa-language"></i> Languages: <span id="modalLanguages"></span></p>
+                    <p><i class="fas fa-briefcase"></i> Experience: <span id="modalExperience"></span> years</p>
+                    <p class="price-tag">$<span id="modalPrice"></span> / day</p>
+                </div>
+                <div class="certifications" id="modalCertifications">
+                    <!-- Certifications will be loaded -->
+                </div>
+                <div class="guide-bio" id="modalBio"></div>
+            </div>
+
+            <!-- Booking Form -->
+            <div class="booking-right">
+                <h3>Book Tour Guide</h3>
+                <form id="guideBookingForm" onsubmit="handleBooking(event)">
+                    <input type="hidden" id="selectedGuideId">
+
+                    <div class="form-group">
+                        <label>Tour Start Date</label>
+                        <input type="date" id="bookingStartDate" required onchange="calculatePrice()">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tour End Date</label>
+                        <input type="date" id="bookingEndDate" required onchange="calculatePrice()">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Number of People</label>
+                        <input type="number" id="numberOfPeople" min="1" value="2" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tour Type</label>
+                        <select id="tourType" required>
+                            <option value="Half Day">Half Day (4 hours)</option>
+                            <option value="Full Day">Full Day (8 hours)</option>
+                            <option value="Multi Day">Multi Day Tour</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pickup Location</label>
+                        <input type="text" id="pickupLocation" placeholder="Hotel name or address" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tour Preferences / Custom Requests</label>
+                        <textarea id="tourPreferences" rows="4" placeholder="Tell us about your interests, specific locations you'd like to visit, or any special requirements..."></textarea>
+                    </div>
+
+                    <div class="price-summary">
+                        <h4>Tour Summary</h4>
+                        <div class="price-row">
+                            <span>Guide fee per day:</span>
+                            <span>$<span id="summaryPricePerDay">0</span></span>
+                        </div>
+                        <div class="price-row">
+                            <span>Number of days:</span>
+                            <span id="summaryDays">0</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Service charge (10%):</span>
+                            <span>$<span id="summaryServiceCharge">0</span></span>
+                        </div>
+                        <div class="price-row total">
+                            <span><strong>Total Amount:</strong></span>
+                            <span><strong>$<span id="summaryTotal">0</span></strong></span>
+                        </div>
+                    </div>
+
+                    <h4 class="payment-title"><i class="fas fa-credit-card"></i> Payment Method</h4>
+
+                    <div class="payment-methods">
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="card" checked onchange="togglePaymentSection()">
+                            <span><i class="fas fa-credit-card"></i> Credit/Debit Card</span>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="paypal" onchange="togglePaymentSection()">
+                            <span><i class="fab fa-paypal"></i> PayPal</span>
+                        </label>
+                    </div>
+
+                    <div id="cardPaymentSection">
+                        <div class="form-group">
+                            <label>Card Number</label>
+                            <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCardNumber(this)">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Expiry Date</label>
+                                <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)">
+                            </div>
+                            <div class="form-group">
+                                <label>CVV</label>
+                                <input type="text" id="cardCVV" placeholder="123" maxlength="3">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Cardholder Name</label>
+                            <input type="text" id="cardName" placeholder="Name on card">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-book">
+                        <i class="fas fa-lock"></i> Confirm & Pay $<span id="finalTotal">0</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CEYLON EXPLORER</h3>
+                <p>Your trusted partner for exploring Sri Lanka</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="hotel.html">Hotels</a></li>
+                    <li><a href="vehicle.html">Vehicles</a></li>
+                    <li><a href="tourguide.html">Tour Guides</a></li>
+                    <li><a href="activity.html">Activities</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Ceylon Explorer. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    /* ===================== JAVASCRIPT CODE ===================== */
+
+    const API_BASE_URL = 'http://localhost:8080/api';
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadGuides();
+        setupDateLimits();
+    });
+
+    function setupDateLimits() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('tourStartDate').setAttribute('min', today);
+        document.getElementById('bookingStartDate').setAttribute('min', today);
+        document.getElementById('bookingEndDate').setAttribute('min', today);
+    }
+
+    function formatCardNumber(input) {
+        let value = input.value.replace(/\s/g, '');
+        let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+        input.value = formattedValue;
+    }
+
+    function formatExpiry(input) {
+        let value = input.value.replace(/\D/g, '');
+        if (value.length >= 2) {
+            value = value.slice(0, 2) + '/' + value.slice(2, 4);
+        }
+        input.value = value;
+    }
+
+    function togglePaymentSection() {
+        const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+        const cardSection = document.getElementById('cardPaymentSection');
+        cardSection.style.display = paymentMethod === 'card' ? 'block' : 'none';
+    }
+
+    function searchGuides() {
+        const language = document.getElementById('filterLanguage').value;
+        const specialty = document.getElementById('filterSpecialty').value;
+        loadGuides(language, specialty);
+    }
+
+    function loadGuides(language = '', specialty = '') {
+        // Correct endpoint: /tour-guides
+        let url = `${API_BASE_URL}/tour-guides`;
+        const params = [];
+        if (language) params.push(`language=${language}`);
+        if (specialty) params.push(`specialty=${specialty}`);
+        if (params.length) url += '?' + params.join('&');
+
+
+        fetch(url)
+            .then(response => response.json())
+            .then(guides => {
+                // Normalize DB field names for frontend compatibility
+                const normalized = guides.map(g => ({
+                    ...g,
+                    pricePerDay: g.pricePerDay || g.rate || 0,
+                    experienceYears: g.experienceYears || g.experience || 0,
+                    bio: g.bio || g.description || '',
+                    certifications: g.certifications || '',
+                    specialty: g.specialty || 'Cultural Tours',
+                    imageUrl: g.imageUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
+                    rating: g.rating || 5,
+                    verified: g.verified !== undefined ? g.verified : true
+                }));
+                displayGuides(normalized);
+            })
+            .catch(error => {
+                console.error('Error loading guides:', error);
+                displaySampleGuides();
+            });
+    }
+
+    function displayGuides(guides) {
+        const grid = document.getElementById('guidesGrid');
+        const resultsCount = document.getElementById('resultsCount');
+
+        resultsCount.textContent = `${guides.length} guides found`;
+        grid.innerHTML = '';
+
+        if (guides.length === 0) {
+            grid.innerHTML = '<p class="no-results">No guides found matching your criteria.</p>';
+            return;
+        }
+
+        guides.forEach(guide => {
+            const card = createGuideCard(guide);
+            grid.appendChild(card);
+        });
+    }
+
+    function createGuideCard(guide) {
+        const card = document.createElement('div');
+        card.className = 'guide-card';
+        card.onclick = function() { openBookingModal(guide); };
+
+        card.innerHTML = `
+                <div class="guide-image" style="background-image: url('${guide.imageUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400'}')">
+                    ${guide.verified ? '<span class="verified-badge"><i class="fas fa-check-circle"></i> Verified</span>' : ''}
+                    <span class="guide-badge">${guide.rating} <i class="fas fa-star"></i></span>
+                </div>
+                <div class="guide-content">
+                    <h3>${guide.name}</h3>
+                    <p class="guide-specialty"><i class="fas fa-certificate"></i> ${formatSpecialty(guide.specialty)}</p>
+                    <p class="guide-languages"><i class="fas fa-language"></i> ${guide.languages}</p>
+                    <div class="guide-experience">
+                        <div class="experience-item">
+                            <span class="experience-value">${guide.experienceYears}</span>
+                            <span class="experience-label">Years Exp.</span>
+                        </div>
+                        <div class="experience-item">
+                            <span class="experience-value">${guide.rating}</span>
+                            <span class="experience-label">Rating</span>
+                        </div>
+                    </div>
+                    <div class="guide-footer">
+                        <div class="guide-price">
+                            <span class="price-value">$${guide.pricePerDay}</span>
+                            <span class="price-unit">/ day</span>
+                        </div>
+                        <button class="btn-hire-now" onclick="event.stopPropagation(); openBookingModal(${JSON.stringify(guide).replace(/"/g, '&quot;')})">
+                            <i class="fas fa-user-plus"></i> Hire Guide
+                        </button>
+                    </div>
+                </div>
+            `;
+        return card;
+    }
+
+    function formatSpecialty(specialty) {
+        return specialty.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
+
+    function openBookingModal(guide) {
+        const modal = document.getElementById('bookingModal');
+
+        document.getElementById('selectedGuideId').value = guide.id;
+        document.getElementById('modalGuideName').textContent = guide.name;
+        document.getElementById('modalGuideImage').src = guide.imageUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600';
+        document.getElementById('modalSpecialty').textContent = formatSpecialty(guide.specialty);
+        document.getElementById('modalLanguages').textContent = guide.languages;
+        document.getElementById('modalExperience').textContent = guide.experienceYears;
+        document.getElementById('modalPrice').textContent = guide.pricePerDay;
+        document.getElementById('modalBio').textContent = guide.bio || 'Experienced tour guide with deep knowledge of Sri Lankan culture, history, and natural beauty. Passionate about sharing the wonders of Sri Lanka with visitors from around the world.';
+
+        // Set certifications
+        const certificationsDiv = document.getElementById('modalCertifications');
+        if (guide.certifications) {
+            certificationsDiv.innerHTML = '<h4>Certifications & Qualifications</h4>' +
+                guide.certifications.split(',').map(c => `<span class="cert-tag"><i class="fas fa-certificate"></i> ${c.trim()}</span>`).join('');
+        } else {
+            certificationsDiv.innerHTML = '<h4>Certifications & Qualifications</h4><span class="cert-tag"><i class="fas fa-certificate"></i> SLTDA Licensed</span><span class="cert-tag"><i class="fas fa-certificate"></i> First Aid Certified</span>';
+        }
+
+        document.getElementById('summaryPricePerDay').textContent = guide.pricePerDay;
+
+        calculatePrice();
+        modal.scrollTop = 0;
+        modal.classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('bookingModal').classList.remove('active');
+    }
+
+    function calculatePrice() {
+        const pricePerDay = parseFloat(document.getElementById('modalPrice').textContent);
+        const startDate = document.getElementById('bookingStartDate').value;
+        const endDate = document.getElementById('bookingEndDate').value;
+
+        if (!startDate || !endDate) return;
+
+        const days = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)) + 1;
+
+        if (days <= 0) {
+            alert('End date must be after or equal to start date');
+            return;
+        }
+
+        const subtotal = pricePerDay * days;
+        const serviceCharge = subtotal * 0.10;
+        const total = subtotal + serviceCharge;
+
+        document.getElementById('summaryDays').textContent = days;
+        document.getElementById('summaryServiceCharge').textContent = serviceCharge.toFixed(2);
+        document.getElementById('summaryTotal').textContent = total.toFixed(2);
+        document.getElementById('finalTotal').textContent = total.toFixed(2);
+    }
+
+    function handleBooking(event) {
+        event.preventDefault();
+
+        const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+        if (paymentMethod === 'card') {
+            const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+            const cardExpiry = document.getElementById('cardExpiry').value;
+            const cardCVV = document.getElementById('cardCVV').value;
+            const cardName = document.getElementById('cardName').value;
+
+            if (!cardNumber || cardNumber.length < 13) {
+                alert('Please enter a valid card number');
+                return;
+            }
+            if (!cardExpiry || cardExpiry.length !== 5) {
+                alert('Please enter a valid expiry date (MM/YY)');
+                return;
+            }
+            if (!cardCVV || cardCVV.length < 3) {
+                alert('Please enter a valid CVV');
+                return;
+            }
+            if (!cardName) {
+                alert('Please enter cardholder name');
+                return;
+            }
+        }
+
+        const currentUser = JSON.parse(localStorage.getItem('ceylon_current_user') || '{}');
+        const bookingData = {
+            guideId: parseInt(document.getElementById('selectedGuideId').value) || null,
+            touristName: currentUser.name || 'Guest',
+            startDate: document.getElementById('bookingStartDate').value,
+            endDate: document.getElementById('bookingEndDate').value,
+            numberOfPeople: parseInt(document.getElementById('numberOfPeople').value) || 1,
+            tourType: document.getElementById('tourType').value,
+            pickupLocation: document.getElementById('pickupLocation').value,
+            specialRequests: document.getElementById('tourPreferences').value,
+            totalPrice: parseFloat(document.getElementById('summaryTotal').textContent) || 0,
+            paymentMethod: paymentMethod,
+            bookingType: 'TOURGUIDE'
+        };
+
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        submitBtn.disabled = true;
+
+        fetch(`${API_BASE_URL}/bookings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bookingData)
+        })
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Booking failed');
+            return data;
+        })
+        .then(data => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            closeModal();
+            showToast('🎉 Guide booked! Booking ID: ' + data.id, 'success');
+            setTimeout(() => { window.location.href = 'user-dashboard.html'; }, 1800);
+        })
+        .catch(err => {
+            console.error('Booking Error:', err);
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            if (err.message && err.message.includes('fetch')) {
+                showToast('Booking submitted! (Demo mode)', 'info');
+                setTimeout(() => { closeModal(); window.location.href = 'user-dashboard.html'; }, 1800);
+            } else {
+                showToast(err.message || 'Booking failed. Please try again.', 'error');
+            }
+        });
+    }
+
+    function displaySampleGuides() {
+        const sampleGuides = [
+            {
+                id: 1,
+                name: 'Nimal Perera',
+                specialty: 'CULTURAL_TOURS',
+                languages: 'English, French, German',
+                experienceYears: 10,
+                pricePerDay: 60,
+                rating: 5,
+                imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
+                verified: true,
+                certifications: 'SLTDA Licensed,First Aid Certified,Cultural Heritage Expert',
+                bio: 'Passionate about Sri Lankan history and culture with over 10 years of experience guiding international tourists.'
+            },
+            {
+                id: 2,
+                name: 'Sandun Silva',
+                specialty: 'WILDLIFE_SAFARI',
+                languages: 'English, German, Spanish',
+                experienceYears: 8,
+                pricePerDay: 70,
+                rating: 5,
+                imageUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
+                verified: true,
+                certifications: 'SLTDA Licensed,Wildlife Training,Naturalist Guide',
+                bio: 'Wildlife expert with extensive knowledge of Sri Lankan fauna and national parks.'
+            },
+            {
+                id: 3,
+                name: 'Kasun Fernando',
+                specialty: 'ADVENTURE',
+                languages: 'English, Spanish, Italian',
+                experienceYears: 6,
+                pricePerDay: 55,
+                rating: 4,
+                imageUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400',
+                verified: true,
+                certifications: 'SLTDA Licensed,Mountain Guide,Adventure Sports Certified',
+                bio: 'Adventure tour specialist for hiking, trekking, and outdoor activities across Sri Lanka.'
+            },
+            {
+                id: 4,
+                name: 'Priya Mendis',
+                specialty: 'PHOTOGRAPHY',
+                languages: 'English, Japanese, Chinese',
+                experienceYears: 7,
+                pricePerDay: 65,
+                rating: 5,
+                imageUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
+                verified: true,
+                certifications: 'SLTDA Licensed,Professional Photographer,Landscape Photography Expert',
+                bio: 'Professional photographer guiding photography tours to capture Sri Lanka\'s stunning landscapes.'
+            },
+            {
+                id: 5,
+                name: 'Ravi Jayasinghe',
+                specialty: 'FOOD_TOURS',
+                languages: 'English, French',
+                experienceYears: 5,
+                pricePerDay: 50,
+                rating: 5,
+                imageUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
+                verified: true,
+                certifications: 'SLTDA Licensed,Culinary Expert,Food Safety Certified',
+                bio: 'Culinary expert specializing in Sri Lankan cuisine and authentic food experiences.'
+            },
+            {
+                id: 6,
+                name: 'Anjali Wickramasinghe',
+                specialty: 'HISTORICAL',
+                languages: 'English, German, Dutch',
+                experienceYears: 12,
+                pricePerDay: 75,
+                rating: 5,
+                imageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400',
+                verified: true,
+                certifications: 'SLTDA Licensed,Archaeology Degree,UNESCO Heritage Expert',
+                bio: 'Historian and archaeologist with deep knowledge of Sri Lanka\'s UNESCO heritage sites.'
+            }
+        ];
+
+        displayGuides(sampleGuides);
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('bookingModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+
+    function showToast(message, type = 'info') {
+        const existing = document.querySelector('.guide-toast');
+        if (existing) existing.remove();
+        const colors = { success:'#27AE60', error:'#E74C3C', info:'#004E89' };
+        const icons  = { success:'fa-check-circle', error:'fa-times-circle', info:'fa-info-circle' };
+        const toast = document.createElement('div');
+        toast.className = 'guide-toast';
+        toast.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:99999;background:${colors[type]||colors.info};color:#fff;padding:14px 20px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.2);display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500;max-width:380px;min-width:260px;animation:slideInT .3s ease;`;
+        toast.innerHTML = `<i class="fas ${icons[type]||icons.info}" style="font-size:18px;flex-shrink:0"></i><span>${message}</span>`;
+        if (!document.querySelector('#toastKf')) { const s=document.createElement('style');s.id='toastKf';s.textContent='@keyframes slideInT{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}';document.head.appendChild(s); }
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.style.animation='slideInT .3s ease reverse'; setTimeout(()=>toast.remove(),300); }, type==='error'?4000:3000);
+    }
+</script>
+
+<script src="navbar-fix.js"></script>
+<script src="ceylon-data.js"></script>
+<script src="ceylon-loader.js"></script>
+</body>
+</html>

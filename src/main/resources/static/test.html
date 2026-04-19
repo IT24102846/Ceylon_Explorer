@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<body>
+<div id="output"></div>
+<script>
+    fetch('http://localhost:8080/api/hotels?location=Colombo&rating=5')
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('output').innerHTML += "Data length from API: " + data.length + "<br>";
+            document.getElementById('output').innerHTML += "Raw data: " + JSON.stringify(data).substring(0, 100) + "...<br>";
+             
+            let filtered = data.filter(h => h.pricePerNight >= 200);
+            document.getElementById('output').innerHTML += "After filter length: " + filtered.length + "<br>";
+        })
+        .catch(err => document.getElementById('output').innerHTML += "Error: " + err.message);
+</script>
+</body>
+</html>
