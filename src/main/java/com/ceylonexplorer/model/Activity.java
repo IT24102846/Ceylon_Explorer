@@ -43,6 +43,46 @@ public class Activity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    // 1. AI & Filtering
+    private String tags; // e.g., "Adventure,Water"
+    private String difficultyLevel; // e.g., "Beginner", "Expert"
+
+    // 2. Weather & Crowd
+    private boolean weatherDependent;
+    private String currentCrowdLevel; // e.g., "Low", "Moderate", "High"
+
+    // 3. Dynamic Pricing & Yield Management
+    @Column(name = "high_season_multiplier")
+    private double highSeasonMultiplier = 1.0;
+    
+    @Column(name = "discount_percentage")
+    private double discountPercentage = 0.0;
+    
+    private int availableSlots;
+
+    // 4. VR / Media
+    private String vrVideoUrl;
+
+    // 5. Social / Buddy
+    private boolean isGroupActivity;
+
+    // 6. Guides / Maps
+    private String gpsCoordinates;
+    private String audioGuideUrl;
+
+    // 7. Gamification
+    private int rewardPoints;
+
+    // 8. Ticketing
+    private boolean requiresTicket;
+
+    // 9. Eco-Friendly
+    private double carbonFootprint;
+    private double communityContributionPercentage;
+
+    // 10. Add-ons
+    private String availableAddons;
+
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private Status status = Status.ACTIVE;

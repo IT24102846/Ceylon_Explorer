@@ -39,6 +39,16 @@ public class BookingController {
         return service.findByTouristName(name);
     }
 
+    // ── Find bookings for a specific vehicle (Real-time availability) ──
+    @GetMapping("/vehicle/{vehicleId}")
+    public ResponseEntity<List<Booking>> getByVehicleId(@PathVariable Long vehicleId) {
+        // We'll just filter all bookings by vehicleId for simplicity, or use a custom repository method
+        List<Booking> vehicleBookings = service.findAll().stream()
+            .filter(b -> vehicleId.equals(b.getVehicleId()) && b.getStatus() != Booking.Status.CANCELLED)
+            .toList();
+        return ResponseEntity.ok(vehicleBookings);
+    }
+
     @PostMapping
     public ResponseEntity<?> create(@RequestBody Booking entity) {
         try {

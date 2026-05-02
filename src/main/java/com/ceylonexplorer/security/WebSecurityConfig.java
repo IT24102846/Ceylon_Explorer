@@ -58,7 +58,7 @@ public class WebSecurityConfig {
                 auth.requestMatchers("/api/auth/**").permitAll()
                     .requestMatchers("/error").permitAll()
                     .requestMatchers("/", "/*.html", "/*.css", "/*.js", "/css/**", "/js/**", "/images/**", "/assets/**").permitAll()
-                    .requestMatchers("/api/hotels/**", "/api/activities/**", "/api/tour-packages/**", "/api/tour-guides/**", "/api/locations/**", "/api/vehicles/**", "/api/cultural-events/**", "/api/emergency-services/**", "/api/reviews/**", "/api/itineraries/**", "/api/users/**", "/api/bookings/**", "/api/upload/**", "/uploads/**").permitAll()
+                    .requestMatchers("/api/hotels/**", "/api/activities/**", "/api/tour-packages/**", "/api/tour-guides/**", "/api/locations/**", "/api/vehicles/**", "/api/cultural-events/**", "/api/emergency-services/**", "/api/reviews/**", "/api/itineraries/**", "/api/users/**", "/api/bookings/**", "/api/upload/**", "/uploads/**", "/api/drivers/**").permitAll()
                     .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                     .anyRequest().authenticated()
             );
