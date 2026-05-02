@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activities - CEYLON EXPLORER</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ===================== CSS STYLES ===================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #FF6B35;
+            --secondary-color: #004E89;
+            --accent-color: #1A936F;
+            --text-dark: #2C3E50;
+            --text-light: #7F8C8D;
+            --bg-light: #F8F9FA;
+            --white: #FFFFFF;
+            --success: #27AE60;
+            --warning: #F39C12;
+            --danger: #E74C3C;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo i {
+            margin-right: 10px;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: var(--white);
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Categories Section */
+        .categories-section {
+            background: var(--bg-light);
+            padding: 3rem 0;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .category-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .category-card i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .category-card h3 {
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .category-card.active {
+            background: var(--secondary-color);
+            color: var(--white);
+        }
+
+        .category-card.active i,
+        .category-card.active h3,
+        .category-card.active p {
+            color: var(--white);
+        }
+
+        /* Activities Section */
+        .activities-section {
+            padding: 3rem 0;
+        }
+
+        .results-header {
+            margin-bottom: 2rem;
+        }
+
+        .results-header h2 {
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .activities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .activity-card {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .activity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .activity-image {
+            height: 250px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .activity-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--accent-color);
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+
+        .activity-content {
+            padding: 1.5rem;
+        }
+
+        .activity-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        .activity-location {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .activity-details {
+            display: flex;
+            gap: 1.5rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 5px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .activity-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid #E0E0E0;
+        }
+
+        .activity-price {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .price-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .price-unit {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .btn-book-activity {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-book-activity:hover {
+            background: #E55A2A;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 24px 16px 40px;
+        }
+
+        .modal.active {
+            display: block;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 10px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text-light);
+            z-index: 10;
+        }
+
+        .close:hover {
+            color: var(--text-dark);
+        }
+
+        .booking-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            padding: 3rem;
+        }
+
+        .booking-left {
+            border-right: 1px solid #E0E0E0;
+            padding-right: 2rem;
+        }
+
+        .booking-left h2 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .booking-left img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .activity-info p {
+            margin-bottom: 0.75rem;
+            color: var(--text-dark);
+        }
+
+        .price-tag {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 1rem 0;
+        }
+
+        .included-list {
+            background: var(--bg-light);
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+        }
+
+        .included-list h4 {
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        .included-item {
+            display: block;
+            padding: 0.5rem 0;
+            color: var(--text-dark);
+        }
+
+        .included-item i {
+            color: var(--success);
+            margin-right: 10px;
+        }
+
+        .booking-right h3 {
+            color: var(--secondary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #E0E0E0;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .price-summary {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+        }
+
+        .price-summary h4 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            color: var(--text-dark);
+        }
+
+        .price-row.total {
+            border-top: 2px solid #D0D0D0;
+            padding-top: 0.75rem;
+            margin-top: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .payment-title {
+            color: var(--secondary-color);
+            margin: 1.5rem 0 1rem;
+        }
+
+        .payment-methods {
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-option {
+            display: block;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border: 2px solid #E0E0E0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .payment-option:hover {
+            border-color: var(--primary-color);
+        }
+
+        .payment-option input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .btn-book {
+            width: 100%;
+            padding: 1rem;
+            background: var(--success);
+            color: var(--white);
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-book:hover {
+            background: #229954;
+        }
+
+        .btn-book:disabled {
+            background: #95A5A6;
+            cursor: not-allowed;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--text-dark);
+            color: var(--white);
+            padding: 3rem 0 1rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3,
+        .footer-section h4 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+            font-size: 1.2rem;
+        }
+
+        /* Weather Calendar */
+        .weather-calendar-section {
+            background: #fff;
+            padding: 4rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .calendar-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .calendar-header h2 {
+            color: var(--secondary-color);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .month-card {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #eee;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .month-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow);
+        }
+
+        .month-card.is-current {
+            border: 2px solid var(--primary-color);
+            background: #fff;
+        }
+
+        .current-label {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--primary-color);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-bottom-left-radius: 8px;
+            font-weight: bold;
+        }
+
+        .month-name {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .coast-weather {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .coast-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .coast-label {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .weather-status {
+            font-size: 1.1rem;
+        }
+
+        .best-activity {
+            border-top: 1px dashed #ccc;
+            padding-top: 0.8rem;
+            font-size: 0.85rem;
+        }
+
+        .best-activity span {
+            display: block;
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .best-activity p {
+            color: var(--text-dark);
+            line-height: 1.3;
+        }
+
+        .weather-legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .booking-container {
+                grid-template-columns: 1fr;
+            }
+
+            .booking-left {
+                border-right: none;
+                border-bottom: 1px solid #E0E0E0;
+                padding-right: 0;
+                padding-bottom: 2rem;
+            }
+
+            .activities-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-menu {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-umbrella-beach"></i>
+                <span>CEYLON EXPLORER</span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="hotel-complete.html" class="nav-link">Hotels</a></li>
+                <li><a href="vehicle-complete.html" class="nav-link">Vehicles</a></li>
+                <li><a href="tourguide-complete.html" class="nav-link">Tour Guides</a></li>
+                <li><a href="activity-complete.html" class="nav-link">Activities</a></li>
+                <li><a href="touristlocation-complete.html" class="nav-link">Locations</a></li>
+                <li><a href="itinerary.html" class="nav-link">Itinerary</a></li>
+                <li><a href="culture.html" class="nav-link">Culture&Calendar</a></li>
+                <li><a href="emergency-healthcare.html" class="nav-link">Emergency</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1><i class="fas fa-hiking"></i> Popular Activities</h1>
+            <p>Experience the best adventures and activities in Sri Lanka</p>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="categories-section">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 2rem; color: var(--secondary-color);">Activity Categories</h2>
+            <div class="categories-grid">
+                <div class="category-card active" data-category="all" onclick="filterByCategory('all', this)">
+                    <i class="fas fa-th"></i>
+                    <h3>All Activities</h3>
+                    <p>Browse everything</p>
+                </div>
+                <div class="category-card" data-category="SAFARI" onclick="filterByCategory('SAFARI', this)">
+                    <i class="fas fa-paw"></i>
+                    <h3>Wildlife Safari</h3>
+                    <p>Explore national parks</p>
+                </div>
+                <div class="category-card" data-category="WATER_SPORTS"
+                    onclick="filterByCategory('WATER_SPORTS', this)">
+                    <i class="fas fa-swimmer"></i>
+                    <h3>Water Sports</h3>
+                    <p>Diving, surfing & more</p>
+                </div>
+                <div class="category-card" data-category="HIKING" onclick="filterByCategory('HIKING', this)">
+                    <i class="fas fa-mountain"></i>
+                    <h3>Hiking & Trekking</h3>
+                    <p>Mountain adventures</p>
+                </div>
+                <div class="category-card" data-category="CULTURAL" onclick="filterByCategory('CULTURAL', this)">
+                    <i class="fas fa-landmark"></i>
+                    <h3>Cultural Tours</h3>
+                    <p>Heritage & temples</p>
+                </div>
+                <div class="category-card" data-category="ADVENTURE" onclick="filterByCategory('ADVENTURE', this)">
+                    <i class="fas fa-parachute-box"></i>
+                    <h3>Adventure Sports</h3>
+                    <p>Thrilling experiences</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Weather Calendar Section -->
+    <section class="weather-calendar-section">
+        <div class="container">
+            <div class="calendar-header">
+                <h2><i class="fas fa-calendar-alt"></i> Weather & Activity Planner</h2>
+                <p>Find the perfect month for your Sri Lankan adventure based on monsoon cycles.</p>
+            </div>
+
+            <div class="calendar-grid" id="weatherCalendarGrid">
+                <!-- Calendar months will be generated here -->
+            </div>
+
+            <div class="weather-legend">
+                <div class="legend-item"><span class="weather-status">🥹</span> Best Weather (Dry)</div>
+                <div class="legend-item"><span class="weather-status">⛅</span> Mixed Weather</div>
+                <div class="legend-item"><span class="weather-status">🌧️</span> Monsoon (Rain)</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Activities Grid -->
+    <section class="activities-section">
+        <div class="container">
+            <div class="results-header">
+                <h2>Available Activities</h2>
+                <p id="resultsCount">Loading activities...</p>
+            </div>
+            <div class="activities-grid" id="activitiesGrid">
+                <!-- Activities will be loaded dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="booking-container">
+                <!-- Activity Details -->
+                <div class="booking-left">
+                    <h2 id="modalActivityName">Activity Name</h2>
+                    <img id="modalActivityImage" src="" alt="Activity">
+                    <div class="activity-info">
+                        <p><i class="fas fa-map-marker-alt"></i> Location: <span id="modalLocation"></span></p>
+                        <p><i class="fas fa-clock"></i> Duration: <span id="modalDuration"></span></p>
+                        <p><i class="fas fa-users"></i> Max Participants: <span id="modalMaxParticipants"></span></p>
+                        <p class="price-tag">$<span id="modalPrice"></span> / person</p>
+                    </div>
+                    <div class="included-list" id="modalIncluded">
+                        <!-- Included items will be loaded -->
+                    </div>
+                    <div style="margin-top: 1.5rem; line-height: 1.6; color: var(--text-dark);" id="modalDescription">
+                    </div>
+                </div>
+
+                <!-- Booking Form -->
+                <div class="booking-right">
+                    <h3>Book Activity</h3>
+                    <form id="activityBookingForm" onsubmit="handleBooking(event)">
+                        <input type="hidden" id="selectedActivityId">
+
+                        <div class="form-group">
+                            <label>Activity Date</label>
+                            <input type="date" id="bookingDate" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Number of Participants</label>
+                            <input type="number" id="numberOfParticipants" min="1" value="2" required
+                                onchange="calculatePrice()">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Pickup Location</label>
+                            <input type="text" id="pickupLocation" placeholder="Hotel name or address" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Special Requirements (Optional)</label>
+                            <textarea id="specialRequirements" rows="3"
+                                placeholder="Dietary restrictions, medical conditions, special requests..."></textarea>
+                        </div>
+
+                        <div class="price-summary">
+                            <h4>Booking Summary</h4>
+                            <div class="price-row">
+                                <span>Price per person:</span>
+                                <span>$<span id="summaryPricePerPerson">0</span></span>
+                            </div>
+                            <div class="price-row">
+                                <span>Number of participants:</span>
+                                <span id="summaryParticipants">0</span>
+                            </div>
+                            <div class="price-row">
+                                <span>Service charge (10%):</span>
+                                <span>$<span id="summaryServiceCharge">0</span></span>
+                            </div>
+                            <div class="price-row total">
+                                <span><strong>Total Amount:</strong></span>
+                                <span><strong>$<span id="summaryTotal">0</span></strong></span>
+                            </div>
+                        </div>
+
+                        <h4 class="payment-title"><i class="fas fa-credit-card"></i> Payment Method</h4>
+
+                        <div class="payment-methods">
+                            <label class="payment-option">
+                                <input type="radio" name="paymentMethod" value="card" checked
+                                    onchange="togglePaymentSection()">
+                                <span><i class="fas fa-credit-card"></i> Credit/Debit Card</span>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="paymentMethod" value="paypal"
+                                    onchange="togglePaymentSection()">
+                                <span><i class="fab fa-paypal"></i> PayPal</span>
+                            </label>
+                        </div>
+
+                        <div id="cardPaymentSection">
+                            <div class="form-group">
+                                <label>Card Number</label>
+                                <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19"
+                                    oninput="formatCardNumber(this)">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Expiry Date</label>
+                                    <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5"
+                                        oninput="formatExpiry(this)">
+                                </div>
+                                <div class="form-group">
+                                    <label>CVV</label>
+                                    <input type="text" id="cardCVV" placeholder="123" maxlength="3">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Cardholder Name</label>
+                                <input type="text" id="cardName" placeholder="Name on card">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-book">
+                            <i class="fas fa-lock"></i> Confirm & Pay $<span id="finalTotal">0</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>CEYLON EXPLORER</h3>
+                    <p>Your trusted partner for exploring Sri Lanka</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="hotel-complete.html">Hotels</a></li>
+                        <li><a href="vehicle-complete.html">Vehicles</a></li>
+                        <li><a href="tourguide-complete.html">Tour Guides</a></li>
+                        <li><a href="activity-complete.html">Activities</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Ceylon Explorer. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        /* ===================== JAVASCRIPT CODE ===================== */
+
+        const API_BASE_URL = 'http://localhost:8080/api';
+        let currentCategory = 'all';
+
+        const WEATHER_DATA = [
+            { month: "January", west: "☀️", east: "🌧️", activity: "Whale Watching", desc: "Prime time for Mirissa whales and South Coast beaches." },
+            { month: "February", west: "☀️", east: "🌧️", activity: "Adam's Peak", desc: "Best conditions for the sacred mountain pilgrimage." },
+            { month: "March", west: "☀️", east: "⛅", activity: "Wildlife Safari", desc: "Excellent leopard sightings in Yala and Wilpattu." },
+            { month: "April", west: "☀️", east: "☀️", activity: "New Year Festival", desc: "Warmest month, great for cultural celebrations island-wide." },
+            { month: "May", west: "🌧️", east: "☀️", activity: "East Coast Diving", desc: "Crystal clear waters begin in Trincomalee." },
+            { month: "June", west: "🌧️", east: "☀️", activity: "Arugam Bay Surf", desc: "World-class surfing waves hit the East Coast." },
+            { month: "July", west: "🌧️", east: "☀️", activity: "Esala Perahera", desc: "Grand cultural processions in Kandy." },
+            { month: "August", west: "🌧️", east: "☀️", activity: "Cultural Triangle", desc: "Dry and sunny in Sigiriya and Anuradhapura." },
+            { month: "September", west: "🌧️", east: "☀️", activity: "The Gathering", desc: "Witness hundreds of elephants in Minneriya." },
+            { month: "October", west: "🌧️", icon: "🌧️", east: "🌧️", activity: "Museum Tours", desc: "Rainy month; perfect for exploring Colombo's indoor charm." },
+            { month: "November", west: "⛅", east: "🌧️", activity: "Tea Country", desc: "Lush green tea plantations after the rains." },
+            { month: "December", west: "☀️", east: "🌧️", activity: "Peak Season", desc: "Beach parties and festive vibes in the South." }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function () {
+            renderWeatherCalendar();
+            loadActivities();
+            setupDateLimits();
+        });
+
+        function renderWeatherCalendar() {
+            const grid = document.getElementById('weatherCalendarGrid');
+            const currentMonthIdx = new Date().getMonth();
+
+            grid.innerHTML = WEATHER_DATA.map((data, index) => {
+                const isCurrent = index === currentMonthIdx;
+                return `
+                <div class="month-card ${isCurrent ? 'is-current' : ''}">
+                    ${isCurrent ? '<span class="current-label">CURRENT</span>' : ''}
+                    <span class="month-name">${data.month}</span>
+                    <div class="coast-weather">
+                        <div class="coast-item">
+                            <span class="coast-label">West & South</span>
+                            <span class="weather-status">${data.west}</span>
+                        </div>
+                        <div class="coast-item">
+                            <span class="coast-label">East & North</span>
+                            <span class="weather-status">${data.east}</span>
+                        </div>
+                    </div>
+                    <div class="best-activity">
+                        <span>TOP PICK:</span>
+                        <p><strong>${data.activity}</strong></p>
+                        <p style="font-size: 0.75rem; margin-top: 5px;">${data.desc}</p>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        function setupDateLimits() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('bookingDate').setAttribute('min', today);
+        }
+
+        function formatCardNumber(input) {
+            let value = input.value.replace(/\s/g, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            input.value = formattedValue;
+        }
+
+        function formatExpiry(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.slice(0, 2) + '/' + value.slice(2, 4);
+            }
+            input.value = value;
+        }
+
+        function togglePaymentSection() {
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            const cardSection = document.getElementById('cardPaymentSection');
+            cardSection.style.display = paymentMethod === 'card' ? 'block' : 'none';
+        }
+
+        function filterByCategory(category, element) {
+            currentCategory = category;
+
+            // Update active category
+            document.querySelectorAll('.category-card').forEach(card => card.classList.remove('active'));
+            element.classList.add('active');
+
+            loadActivities(category);
+        }
+
+        function loadActivities(category = 'all') {
+            let url = `${API_BASE_URL}/activities`;
+
+            if (category !== 'all') {
+                url += `?type=${category}`;
+            }
+
+            fetch(url)
+                .then(response => response.json())
+                .then(activities => {
+                    displayActivities(activities);
+                })
+                .catch(error => {
+                    console.error('Error loading activities:', error);
+                    displaySampleActivities(category);
+                });
+        }
+
+        function displayActivities(activities) {
+            const grid = document.getElementById('activitiesGrid');
+            const resultsCount = document.getElementById('resultsCount');
+
+            resultsCount.textContent = `${activities.length} activities found`;
+            grid.innerHTML = '';
+
+            if (activities.length === 0) {
+                grid.innerHTML = '<p class="no-results">No activities found.</p>';
+                return;
+            }
+
+            activities.forEach(activity => {
+                const card = createActivityCard(activity);
+                grid.appendChild(card);
+            });
+        }
+
+        function createActivityCard(activity) {
+            const card = document.createElement('div');
+            card.className = 'activity-card';
+            card.onclick = function () { openBookingModal(activity); };
+
+            card.innerHTML = `
+                <div class="activity-image" style="background-image: url('${activity.imageUrl || 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=400'}')">
+                    <span class="activity-badge">${formatCategory(activity.type)}</span>
+                </div>
+                <div class="activity-content">
+                    <h3>${activity.name}</h3>
+                    <p class="activity-location"><i class="fas fa-map-marker-alt"></i> ${activity.location}</p>
+                    <div class="activity-details">
+                        <div class="detail-item">
+                            <i class="fas fa-clock"></i>
+                            <span>${activity.duration}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-users"></i>
+                            <span>Max ${activity.maxParticipants}</span>
+                        </div>
+                    </div>
+                    <div class="activity-footer">
+                        <div class="activity-price">
+                            <span class="price-value">$${activity.pricePerPerson}</span>
+                            <span class="price-unit">/ person</span>
+                        </div>
+                        <button class="btn-book-activity" onclick="event.stopPropagation(); openBookingModal(${JSON.stringify(activity).replace(/"/g, '&quot;')})">
+                            <i class="fas fa-ticket-alt"></i> Book Now
+                        </button>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        function formatCategory(type) {
+            return type.replace(/_/g, ' ');
+        }
+
+        function openBookingModal(activity) {
+            const modal = document.getElementById('bookingModal');
+
+            document.getElementById('selectedActivityId').value = activity.id;
+            document.getElementById('modalActivityName').textContent = activity.name;
+            document.getElementById('modalActivityImage').src = activity.imageUrl || 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=600';
+            document.getElementById('modalLocation').textContent = activity.location;
+            document.getElementById('modalDuration').textContent = activity.duration;
+            document.getElementById('modalMaxParticipants').textContent = activity.maxParticipants;
+            document.getElementById('numberOfParticipants').setAttribute('max', activity.maxParticipants);
+            document.getElementById('modalPrice').textContent = activity.pricePerPerson;
+            document.getElementById('modalDescription').textContent = activity.description || 'Join us for an unforgettable experience exploring the beauty and adventure of Sri Lanka.';
+
+            // Set included items
+            const includedDiv = document.getElementById('modalIncluded');
+            if (activity.included) {
+                includedDiv.innerHTML = '<h4>What\'s Included</h4>' +
+                    activity.included.split(',').map(item => `<span class="included-item"><i class="fas fa-check-circle"></i> ${item.trim()}</span>`).join('');
+            } else {
+                includedDiv.innerHTML = '<h4>What\'s Included</h4><span class="included-item"><i class="fas fa-check-circle"></i> Professional Guide</span><span class="included-item"><i class="fas fa-check-circle"></i> Equipment</span><span class="included-item"><i class="fas fa-check-circle"></i> Transportation</span>';
+            }
+
+            document.getElementById('summaryPricePerPerson').textContent = activity.pricePerPerson;
+
+            calculatePrice();
+            modal.scrollTop = 0;
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('bookingModal').classList.remove('active');
+        }
+
+        function calculatePrice() {
+            const pricePerPerson = parseFloat(document.getElementById('modalPrice').textContent);
+            const participants = parseInt(document.getElementById('numberOfParticipants').value);
+
+            const subtotal = pricePerPerson * participants;
+            const serviceCharge = subtotal * 0.10;
+            const total = subtotal + serviceCharge;
+
+            document.getElementById('summaryParticipants').textContent = participants;
+            document.getElementById('summaryServiceCharge').textContent = serviceCharge.toFixed(2);
+            document.getElementById('summaryTotal').textContent = total.toFixed(2);
+            document.getElementById('finalTotal').textContent = total.toFixed(2);
+        }
+
+        function handleBooking(event) {
+            event.preventDefault();
+
+            const activityId = document.getElementById('selectedActivityId').value;
+            const bookingDate = document.getElementById('bookingDate').value;
+            const participants = parseInt(document.getElementById('numberOfParticipants').value);
+            const maxParticipants = parseInt(document.getElementById('numberOfParticipants').getAttribute('max'));
+            const pickupLocation = document.getElementById('pickupLocation').value.trim();
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+            // Basic Validations
+            if (!bookingDate) {
+                showToast('Please select a date for the activity.', 'error');
+                return;
+            }
+
+            const selectedDate = new Date(bookingDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (selectedDate < today) {
+                showToast('Activity date cannot be in the past.', 'error');
+                return;
+            }
+
+            if (isNaN(participants) || participants < 1) {
+                showToast('Please enter a valid number of participants (min 1).', 'error');
+                return;
+            }
+
+            if (participants > maxParticipants) {
+                showToast(`This activity only allows up to ${maxParticipants} participants.`, 'error');
+                return;
+            }
+
+            if (!pickupLocation) {
+                showToast('Please provide a pickup location.', 'error');
+                return;
+            }
+
+            if (paymentMethod === 'card') {
+                const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+                const cardExpiry = document.getElementById('cardExpiry').value;
+                const cardCVV = document.getElementById('cardCVV').value;
+                const cardName = document.getElementById('cardName').value.trim();
+
+                if (!/^\d{13,19}$/.test(cardNumber)) {
+                    showToast('Please enter a valid 13-19 digit card number.', 'error');
+                    return;
+                }
+                if (!/^\d{2}\/\d{2}$/.test(cardExpiry)) {
+                    showToast('Please enter expiry date in MM/YY format.', 'error');
+                    return;
+                }
+                
+                const [month, year] = cardExpiry.split('/').map(Number);
+                const expiryDate = new Date(2000 + year, month - 1);
+                const now = new Date();
+                if (month < 1 || month > 12 || expiryDate < new Date(now.getFullYear(), now.getMonth())) {
+                    showToast('Card has expired or invalid expiry date.', 'error');
+                    return;
+                }
+
+                if (!/^\d{3,4}$/.test(cardCVV)) {
+                    showToast('Please enter a valid 3 or 4 digit CVV.', 'error');
+                    return;
+                }
+                if (!cardName) {
+                    showToast('Please enter the cardholder name.', 'error');
+                    return;
+                }
+            }
+
+            const currentUser = JSON.parse(localStorage.getItem('ceylon_current_user') || '{}');
+            const bookingData = {
+                activityId: parseInt(document.getElementById('selectedActivityId').value) || null,
+                touristName: currentUser.name || 'Guest',
+                date: document.getElementById('bookingDate').value,
+                numberOfParticipants: parseInt(document.getElementById('numberOfParticipants').value) || 1,
+                pickupLocation: document.getElementById('pickupLocation').value,
+                specialRequirements: document.getElementById('specialRequirements').value,
+                totalPrice: parseFloat(document.getElementById('summaryTotal').textContent) || 0,
+                paymentMethod: paymentMethod,
+                bookingType: 'ACTIVITY'
+            };
+
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            submitBtn.disabled = true;
+
+            fetch(`${API_BASE_URL}/bookings`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bookingData)
+            })
+                .then(async res => {
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error || 'Booking failed');
+                    return data;
+                })
+                .then(data => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    closeModal();
+                    showToast('🎉 Activity booked! Booking ID: ' + data.id, 'success');
+                    setTimeout(() => { window.location.href = 'user-dashboard.html'; }, 1800);
+                })
+                .catch(err => {
+                    console.error('Booking Error:', err);
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    if (err.message && err.message.includes('fetch')) {
+                        showToast('Booking submitted! (Demo mode)', 'info');
+                        setTimeout(() => { closeModal(); window.location.href = 'user-dashboard.html'; }, 1800);
+                    } else {
+                        showToast(err.message || 'Booking failed. Please try again.', 'error');
+                    }
+                });
+        }
+
+        function displaySampleActivities(category = 'all') {
+            const sampleActivities = [
+                {
+                    id: 1,
+                    name: 'Yala National Park Safari',
+                    type: 'SAFARI',
+                    location: 'Yala, Southern Province',
+                    duration: '4-5 hours',
+                    maxParticipants: 6,
+                    pricePerPerson: 65,
+                    imageUrl: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?w=400',
+                    included: 'Safari Jeep,Professional Guide,Park Entry Fees,Breakfast',
+                    description: 'Experience wildlife in one of Asia\'s premier national parks. Spot leopards, elephants, sloth bears, and more.'
+                },
+                {
+                    id: 2,
+                    name: 'Scuba Diving in Hikkaduwa',
+                    type: 'WATER_SPORTS',
+                    location: 'Hikkaduwa, Southern Coast',
+                    duration: '3 hours',
+                    maxParticipants: 8,
+                    pricePerPerson: 80,
+                    imageUrl: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400',
+                    included: 'Equipment,Instructor,Boat Trip,Refreshments',
+                    description: 'Explore vibrant coral reefs and marine life in crystal clear waters.'
+                },
+                {
+                    id: 3,
+                    name: 'Adam\'s Peak Sunrise Trek',
+                    type: 'HIKING',
+                    location: 'Central Highlands',
+                    duration: '6-7 hours',
+                    maxParticipants: 12,
+                    pricePerPerson: 45,
+                    imageUrl: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400',
+                    included: 'Guide,Flashlight,Light Breakfast,Certificate',
+                    description: 'Climb Sri Lanka\'s sacred mountain and witness a breathtaking sunrise from the summit.'
+                },
+                {
+                    id: 4,
+                    name: 'Sigiriya & Dambulla Cultural Tour',
+                    type: 'CULTURAL',
+                    location: 'Central Province',
+                    duration: 'Full Day',
+                    maxParticipants: 15,
+                    pricePerPerson: 70,
+                    imageUrl: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400',
+                    included: 'Transport,Guide,Entrance Fees,Lunch',
+                    description: 'Visit UNESCO World Heritage sites including the ancient rock fortress and cave temples.'
+                },
+                {
+                    id: 5,
+                    name: 'White Water Rafting - Kelani River',
+                    type: 'ADVENTURE',
+                    location: 'Kitulgala',
+                    duration: '3-4 hours',
+                    maxParticipants: 10,
+                    pricePerPerson: 55,
+                    imageUrl: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=400',
+                    included: 'Safety Gear,Professional Guide,Transport,Lunch',
+                    description: 'Navigate exciting rapids through lush rainforest scenery on this thrilling adventure.'
+                },
+                {
+                    id: 6,
+                    name: 'Whale Watching in Mirissa',
+                    type: 'WATER_SPORTS',
+                    location: 'Mirissa, South Coast',
+                    duration: '4-5 hours',
+                    maxParticipants: 20,
+                    pricePerPerson: 60,
+                    imageUrl: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400',
+                    included: 'Boat Trip,Guide,Breakfast,Life Jackets',
+                    description: 'Spot blue whales, dolphins, and other marine life in their natural habitat.'
+                }
+            ];
+
+            let filteredActivities = sampleActivities;
+            if (category !== 'all') {
+                filteredActivities = sampleActivities.filter(a => a.type === category);
+            }
+
+            displayActivities(filteredActivities);
+        }
+
+        window.onclick = function (event) {
+            const modal = document.getElementById('bookingModal');
+            if (event.target === modal) { closeModal(); }
+        }
+
+        function showToast(message, type = 'info') {
+            const existing = document.querySelector('.act-toast');
+            if (existing) existing.remove();
+            const colors = { success: '#27AE60', error: '#E74C3C', info: '#004E89' };
+            const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle' };
+            const toast = document.createElement('div');
+            toast.className = 'act-toast';
+            toast.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:99999;background:${colors[type] || colors.info};color:#fff;padding:14px 20px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.2);display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500;max-width:380px;min-width:260px;animation:slideInA .3s ease;`;
+            toast.innerHTML = `<i class="fas ${icons[type] || icons.info}" style="font-size:18px;flex-shrink:0"></i><span>${message}</span>`;
+            if (!document.querySelector('#toastKfA')) { const s = document.createElement('style'); s.id = 'toastKfA'; s.textContent = '@keyframes slideInA{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}'; document.head.appendChild(s); }
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.style.animation = 'slideInA .3s ease reverse'; setTimeout(() => toast.remove(), 300); }, type === 'error' ? 4000 : 3000);
+        }
+    </script>
+
+    <script src="navbar-fix.js"></script>
+    <script src="ceylon-data.js"></script>
+    <script src="ceylon-loader.js"></script>
+</body>
+
+</html>
