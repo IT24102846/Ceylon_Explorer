@@ -545,6 +545,127 @@
             font-size: 1.2rem;
         }
 
+        /* Weather Calendar */
+        .weather-calendar-section {
+            background: #fff;
+            padding: 4rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .calendar-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .calendar-header h2 {
+            color: var(--secondary-color);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .month-card {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #eee;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .month-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow);
+        }
+
+        .month-card.is-current {
+            border: 2px solid var(--primary-color);
+            background: #fff;
+        }
+
+        .current-label {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--primary-color);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-bottom-left-radius: 8px;
+            font-weight: bold;
+        }
+
+        .month-name {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .coast-weather {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .coast-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .coast-label {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .weather-status {
+            font-size: 1.1rem;
+        }
+
+        .best-activity {
+            border-top: 1px dashed #ccc;
+            padding-top: 0.8rem;
+            font-size: 0.85rem;
+        }
+
+        .best-activity span {
+            display: block;
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .best-activity p {
+            color: var(--text-dark);
+            line-height: 1.3;
+        }
+
+        .weather-legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .booking-container {
@@ -638,6 +759,26 @@
                 <h3>Adventure Sports</h3>
                 <p>Thrilling experiences</p>
             </div>
+        </div>
+    </div>
+</section>
+
+<!-- Weather Calendar Section -->
+<section class="weather-calendar-section">
+    <div class="container">
+        <div class="calendar-header">
+            <h2><i class="fas fa-calendar-alt"></i> Weather & Activity Planner</h2>
+            <p>Find the perfect month for your Sri Lankan adventure based on monsoon cycles.</p>
+        </div>
+        
+        <div class="calendar-grid" id="weatherCalendarGrid">
+            <!-- Calendar months will be generated here -->
+        </div>
+
+        <div class="weather-legend">
+            <div class="legend-item"><span class="weather-status">☀️</span> Best Weather (Dry)</div>
+            <div class="legend-item"><span class="weather-status">⛅</span> Mixed Weather</div>
+            <div class="legend-item"><span class="weather-status">🌧️</span> Monsoon (Rain)</div>
         </div>
     </div>
 </section>
@@ -795,10 +936,56 @@
     const API_BASE_URL = 'http://localhost:8080/api';
     let currentCategory = 'all';
 
+    const WEATHER_DATA = [
+        { month: "January", west: "☀️", east: "🌧️", activity: "Whale Watching", desc: "Prime time for Mirissa whales and South Coast beaches." },
+        { month: "February", west: "☀️", east: "🌧️", activity: "Adam's Peak", desc: "Best conditions for the sacred mountain pilgrimage." },
+        { month: "March", west: "☀️", east: "⛅", activity: "Wildlife Safari", desc: "Excellent leopard sightings in Yala and Wilpattu." },
+        { month: "April", west: "☀️", east: "☀️", activity: "New Year Festival", desc: "Warmest month, great for cultural celebrations island-wide." },
+        { month: "May", west: "🌧️", east: "☀️", activity: "East Coast Diving", desc: "Crystal clear waters begin in Trincomalee." },
+        { month: "June", west: "🌧️", east: "☀️", activity: "Arugam Bay Surf", desc: "World-class surfing waves hit the East Coast." },
+        { month: "July", west: "🌧️", east: "☀️", activity: "Esala Perahera", desc: "Grand cultural processions in Kandy." },
+        { month: "August", west: "🌧️", east: "☀️", activity: "Cultural Triangle", desc: "Dry and sunny in Sigiriya and Anuradhapura." },
+        { month: "September", west: "🌧️", east: "☀️", activity: "The Gathering", desc: "Witness hundreds of elephants in Minneriya." },
+        { month: "October", west: "🌧️", icon: "🌧️", east: "🌧️", activity: "Museum Tours", desc: "Rainy month; perfect for exploring Colombo's indoor charm." },
+        { month: "November", west: "⛅", east: "🌧️", activity: "Tea Country", desc: "Lush green tea plantations after the rains." },
+        { month: "December", west: "☀️", east: "🌧️", activity: "Peak Season", desc: "Beach parties and festive vibes in the South." }
+    ];
+
     document.addEventListener('DOMContentLoaded', function() {
+        renderWeatherCalendar();
         loadActivities();
         setupDateLimits();
     });
+
+    function renderWeatherCalendar() {
+        const grid = document.getElementById('weatherCalendarGrid');
+        const currentMonthIdx = new Date().getMonth();
+
+        grid.innerHTML = WEATHER_DATA.map((data, index) => {
+            const isCurrent = index === currentMonthIdx;
+            return `
+                <div class="month-card ${isCurrent ? 'is-current' : ''}">
+                    ${isCurrent ? '<span class="current-label">CURRENT</span>' : ''}
+                    <span class="month-name">${data.month}</span>
+                    <div class="coast-weather">
+                        <div class="coast-item">
+                            <span class="coast-label">West & South</span>
+                            <span class="weather-status">${data.west}</span>
+                        </div>
+                        <div class="coast-item">
+                            <span class="coast-label">East & North</span>
+                            <span class="weather-status">${data.east}</span>
+                        </div>
+                    </div>
+                    <div class="best-activity">
+                        <span>TOP PICK:</span>
+                        <p><strong>${data.activity}</strong></p>
+                        <p style="font-size: 0.75rem; margin-top: 5px;">${data.desc}</p>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
 
     function setupDateLimits() {
         const today = new Date().toISOString().split('T')[0];
