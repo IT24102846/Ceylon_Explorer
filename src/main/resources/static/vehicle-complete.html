@@ -137,17 +137,37 @@
         .driver-info{background:linear-gradient(135deg,var(--accent-color),#16A068);color:var(--white);padding:.85rem 1rem;border-radius:8px;margin:.7rem 0}
         .driver-info h4{margin-bottom:.3rem;font-size:.9rem}
         .driver-info p{font-size:.85rem}
-
+        
         /* ══ RATING SYSTEM ══ */
         .rating-section{margin-top:1.2rem;padding-top:1.2rem;border-top:2px solid #F0F0F0}
-        .rating-section-title{font-size:1rem;font-weight:700;color:var(--secondary-color);margin-bottom:1rem;display:flex;align-items:center;gap:6px}
-
-        /* Average score box */
-        .avg-box{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#fff8f0,#fff3e6);border:1.5px solid #FFD4B8;border-radius:12px;padding:12px 16px;margin-bottom:1rem}
-        .avg-score{font-size:2.6rem;font-weight:800;color:var(--primary-color);line-height:1}
-        .avg-right{}
-        .avg-stars-row{color:#F39C12;font-size:1.15rem;letter-spacing:2px}
+        .rating-section-title{font-size:1.1rem;font-weight:700;color:var(--text-dark);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+        .avg-box{background:var(--bg-light);border-radius:10px;padding:15px;display:flex;align-items:center;gap:15px;margin-bottom:1rem}
+        .avg-score{font-size:2rem;font-weight:800;color:#F39C12;line-height:1}
+        .avg-right{display:flex;flex-direction:column}
+        .avg-stars-row{color:#F39C12;font-size:1.1rem;letter-spacing:2px}
         .avg-label{font-size:.8rem;color:var(--text-light);margin-top:2px}
+
+        /* ── Driver Profile ── */
+        .driver-profile-card { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 15px; margin-top: 15px; display: none; }
+        .driver-profile-header { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; }
+        .driver-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-color); }
+        .driver-info h4 { margin: 0; color: var(--secondary-color); font-size: 1.1rem; }
+        .driver-info p { margin: 2px 0 0; font-size: 0.9rem; color: var(--text-light); }
+        .driver-stats { display: flex; gap: 15px; margin-bottom: 10px; }
+        .driver-stat-item { background: white; padding: 5px 10px; border-radius: 5px; border: 1px solid #e9ecef; font-size: 0.85rem; }
+        .driver-stat-item i { color: #F39C12; margin-right: 5px; }
+
+        /* ── Vehicle Compare ── */
+        .compare-checkbox-container { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.95); padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5; transition: all 0.2s; }
+        .compare-checkbox-container:hover { background: white; transform: translateY(-1px); }
+        .compare-checkbox-container input { cursor: pointer; }
+        .floating-compare-bar { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: var(--secondary-color); color: white; padding: 15px 25px; border-radius: 30px 30px 0 0; display: flex; align-items: center; gap: 20px; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); z-index: 1000; transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .floating-compare-bar.visible { bottom: 0; }
+        .floating-compare-bar button { padding: 8px 16px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-compare-action { background: #F39C12; color: white; }
+        .btn-compare-action:hover { background: #e67e22; transform: scale(1.05); }
+        .btn-compare-clear { background: rgba(255,255,255,0.2); color: white; }
+        .btn-compare-clear:hover { background: rgba(255,255,255,0.3); }
 
         /* Reviews scroll list */
         .reviews-scroll{max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;padding-right:4px}
@@ -230,6 +250,38 @@
 <!-- Toast -->
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
 
+<!-- Floating Compare Bar -->
+<div id="compareBar" class="floating-compare-bar">
+    <span><i class="fas fa-balance-scale"></i> <span id="compareCount">0</span> Vehicles Selected</span>
+    <button class="btn-compare-action" onclick="openCompareModal()">Compare Now</button>
+    <button class="btn-compare-clear" onclick="clearComparison()">Clear</button>
+</div>
+
+<!-- Comparison Modal -->
+<div id="compareModal" class="modal" onclick="if(event.target===this) this.classList.remove('active')">
+    <div class="modal-content" style="max-width:900px;">
+        <span class="close" onclick="document.getElementById('compareModal').classList.remove('active')" title="Close">&times;</span>
+        <div style="padding:2rem;">
+            <h2 style="color:var(--secondary-color); margin-bottom:1.5rem;"><i class="fas fa-balance-scale"></i> Vehicle Comparison</h2>
+            <div id="compareTableContainer" style="overflow-x:auto;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Virtual Tour Modal -->
+<div id="videoModal" class="modal" onclick="if(event.target===this) closeVideoModal()">
+    <div class="modal-content" style="max-width:820px; padding:0; background:#0a0a0a; border-radius:12px; overflow:hidden;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:#111;">
+            <span style="color:#fff; font-weight:600; font-size:1rem;"><i class="fas fa-vr-cardboard" style="color:var(--primary-color); margin-right:8px;"></i>Virtual Tour</span>
+            <span onclick="closeVideoModal()" style="color:#aaa; cursor:pointer; font-size:1.5rem; line-height:1;">&times;</span>
+        </div>
+        <div style="padding:10px;">
+            <video id="tourVideo" controls style="width:100%; display:none; border-radius:6px; background:#000;" preload="metadata"></video>
+            <iframe id="tourIframe" width="100%" height="460" src="" frameborder="0" allowfullscreen style="display:none; border-radius:6px;"></iframe>
+        </div>
+    </div>
+</div>
+
 <!-- NAVBAR -->
 <nav class="navbar">
     <div class="nav-container">
@@ -274,6 +326,8 @@
                         <option value="CAR">Cars</option>
                         <option value="VAN">Vans</option>
                         <option value="LUXURY">Luxury</option>
+                        <option value="SUV">SUV</option>
+                        <option value="4WD">4WD</option>
                         <option value="BUS">Bus</option>
                         <option value="BIKE">Bikes</option>
                     </select>
@@ -300,12 +354,146 @@
     </div>
 </section>
 
+<!-- AI-Powered Vehicle Recommendation (Creative UI) -->
+<style>
+@keyframes aiGradientAnim { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+@keyframes aiPulseGlow { 0% { box-shadow: 0 0 0 0 rgba(243, 156, 18, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(243, 156, 18, 0); } 100% { box-shadow: 0 0 0 0 rgba(243, 156, 18, 0); } }
+@keyframes aiFadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+.ai-recommender-section {
+    background: linear-gradient(-45deg, #091219, #1b303d, #244154, #12283a);
+    background-size: 400% 400%;
+    animation: aiGradientAnim 15s ease infinite;
+    padding: 4rem 0;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    border-top: 2px solid rgba(255,255,255,0.05);
+    border-bottom: 2px solid rgba(255,255,255,0.05);
+}
+.ai-shape { position:absolute; border-radius:50%; background:rgba(255,255,255,0.02); }
+.ai-shape-1 { width:400px; height:400px; top:-150px; left:-100px; box-shadow: inset 0 0 50px rgba(243,156,18,0.1); }
+.ai-shape-2 { width:250px; height:250px; bottom:-80px; right:-50px; box-shadow: inset 0 0 50px rgba(46,204,113,0.1); }
+
+.ai-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 3rem;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+}
+.ai-header { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1rem; }
+.ai-icon-wrap {
+    width: 70px; height: 70px;
+    background: linear-gradient(135deg, #F39C12, #D35400);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; color: #fff;
+    box-shadow: 0 0 20px rgba(243, 156, 18, 0.6);
+    animation: aiPulseGlow 2s infinite;
+}
+.ai-header h2 {
+    font-size: 2.2rem; font-weight: 800; margin: 0;
+    background: linear-gradient(to right, #ffffff, #b0bec5);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: 0.5px;
+}
+.ai-subtitle { font-size: 1.05rem; color: #cfd8dc; margin-left: 94px; max-width: 600px; line-height: 1.5; }
+
+.ai-input-group { display: flex; gap: 15px; margin-top: 2.5rem; }
+.ai-input-wrap { position: relative; flex: 1; }
+.ai-input-wrap i { position: absolute; left: 22px; top: 50%; transform: translateY(-50%); color: #90a4ae; font-size: 1.3rem; }
+.ai-input {
+    width: 100%; padding: 20px 20px 20px 60px;
+    border-radius: 14px; border: 2px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.25); color: #fff; font-size: 1.15rem;
+    outline: none; transition: all 0.3s ease;
+}
+.ai-input:focus {
+    background: rgba(0,0,0,0.4); border-color: #F39C12;
+    box-shadow: 0 0 20px rgba(243, 156, 18, 0.25);
+}
+.ai-input::placeholder { color: #78909c; }
+
+.ai-btn {
+    padding: 0 40px; border-radius: 14px;
+    background: linear-gradient(135deg, #F39C12, #E67E22);
+    color: #fff; font-weight: 700; font-size: 1.15rem;
+    border: none; cursor: pointer; transition: all 0.3s ease;
+    display: flex; align-items: center; gap: 12px;
+}
+.ai-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(243, 156, 18, 0.5); }
+.ai-btn i { font-size: 1.3rem; }
+
+.ai-result-box {
+    margin-top: 2.5rem; background: rgba(0,0,0,0.35);
+    border-left: 5px solid #F39C12; padding: 1.8rem 2.5rem;
+    border-radius: 0 16px 16px 0; display: none;
+    animation: aiFadeInUp 0.6s ease forwards;
+}
+.ai-result-title { color: #F39C12; font-size: 1.2rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+.ai-result-text { font-size: 1.2rem; line-height: 1.6; color: #eceff1; margin-bottom: 20px; }
+.ai-filter-btn {
+    background: #fff; color: #1e3c72; border: none;
+    padding: 12px 24px; border-radius: 10px; font-weight: 800; cursor: pointer;
+    transition: 0.3s; font-size: 1rem; display: inline-flex; align-items: center; gap: 10px;
+}
+.ai-filter-btn:hover { background: #f5f5f5; transform: translateX(8px); box-shadow: 0 5px 15px rgba(255,255,255,0.2); }
+
+@media (max-width: 768px) {
+    .ai-input-group { flex-direction: column; }
+    .ai-btn { padding: 20px; justify-content: center; }
+    .ai-card { padding: 1.5rem; }
+    .ai-header h2 { font-size: 1.6rem; }
+    .ai-subtitle { margin-left: 0; margin-top: 10px; }
+    .ai-header { flex-direction: column; text-align: center; gap: 1rem; }
+}
+</style>
+
+<section class="ai-recommender-section">
+    <div class="ai-shape ai-shape-1"></div>
+    <div class="ai-shape ai-shape-2"></div>
+    <div class="container">
+        <div class="ai-card">
+            <div class="ai-header">
+                <div class="ai-icon-wrap"><i class="fas fa-robot"></i></div>
+                <h2>AI Itinerary-Based Recommender</h2>
+            </div>
+            <p class="ai-subtitle">Not sure which vehicle suits your journey? Simply enter your planned destinations, and our AI will analyze the terrain, distance, and road conditions to recommend the perfect ride for Sri Lanka!</p>
+            
+            <div class="ai-input-group">
+                <div class="ai-input-wrap">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <input type="text" class="ai-input" id="aiItineraryInput" placeholder="e.g., Nuwara Eliya, Ella, Yala National Park, Mirissa">
+                </div>
+                <button class="ai-btn" onclick="generateAIRecommendation()">
+                    <i class="fas fa-sparkles"></i> Get Suggestion
+                </button>
+            </div>
+            
+            <div class="ai-result-box" id="aiRecommendationResult">
+                <div class="ai-result-title"><i class="fas fa-check-circle"></i> AI Analysis Complete:</div>
+                <p class="ai-result-text" id="aiSuggestionText"></p>
+                <button class="ai-filter-btn" id="aiApplyFilterBtn" onclick="">
+                    View Recommended Vehicles <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Type tabs -->
 <section class="vehicle-types-section">
     <div class="container">
         <div class="vehicle-type-tabs">
             <button class="type-tab active" onclick="filterByType('all',this)"><i class="fas fa-th"></i> All Vehicles</button>
             <button class="type-tab" onclick="filterByType('CAR',this)"><i class="fas fa-car"></i> Cars</button>
+            <button class="type-tab" onclick="filterByType('SUV',this)"><i class="fas fa-truck-monster"></i> SUV</button>
+            <button class="type-tab" onclick="filterByType('4WD',this)"><i class="fas fa-mountain"></i> 4WD</button>
             <button class="type-tab" onclick="filterByType('VAN',this)"><i class="fas fa-van-shuttle"></i> Vans</button>
             <button class="type-tab" onclick="filterByType('LUXURY',this)"><i class="fas fa-car-side"></i> Luxury</button>
             <button class="type-tab" onclick="filterByType('BUS',this)"><i class="fas fa-bus"></i> Bus</button>
@@ -352,8 +540,23 @@
                 <div class="vehicle-features-list" id="modalFeatures"></div>
 
                 <div class="driver-info">
-                    <h4><i class="fas fa-user-tie"></i> Professional Driver Included</h4>
-                    <p>Experienced, licensed driver for your entire journey</p>
+                    <h4><i class="fas fa-user-tie"></i> Professional Driver</h4>
+                    <p>Driver profile will appear when you select "Yes" for driver.</p>
+                </div>
+                
+                <!-- Driver Profile Card (Hidden by default) -->
+                <div id="driverProfileCard" class="driver-profile-card">
+                    <div class="driver-profile-header">
+                        <div id="driverAvatarContainer"></div>
+                        <div class="driver-info">
+                            <h4 id="driverName">Kamal Perera</h4>
+                            <p id="driverLanguages">Speaks: English, Sinhala</p>
+                        </div>
+                    </div>
+                    <div class="driver-stats">
+                        <div class="driver-stat-item"><i class="fas fa-star"></i> <span id="driverRating">4.9</span>/5</div>
+                        <div class="driver-stat-item"><i class="fas fa-briefcase"></i> <span id="driverExp">10 Years</span></div>
+                    </div>
                 </div>
 
                 <!-- ══ RATING SECTION ══ -->
@@ -424,9 +627,9 @@
                     <div class="form-row" id="driverOptionRow" style="display:none;">
                         <div class="form-group">
                             <label>Include Professional Driver?</label>
-                            <select id="rentalIncludeDriver" onchange="calculateRentalPrice()">
-                                <option value="yes">Yes (Recommended)</option>
+                            <select id="rentalIncludeDriver" onchange="toggleDriverProfile(); calculateRentalPrice()">
                                 <option value="no">No (Self-Drive)</option>
+                                <option value="yes">Yes (Assign Driver)</option>
                             </select>
                         </div>
                     </div>
@@ -439,11 +642,37 @@
                         <textarea id="specialRequirements" rows="2"></textarea>
                     </div>
 
+                    <!-- ── Add-on Services ── -->
+                    <div id="addonsContainer" style="display:none; margin-bottom: 1.1rem; background: var(--bg-light); padding: 10px; border-radius: 8px;">
+                        <h4 style="font-size:0.9rem; color:var(--secondary-color); margin-bottom: 8px;"><i class="fas fa-plus-circle"></i> Smart Add-ons</h4>
+                        <div id="addonsList" style="display:flex; flex-direction:column; gap:6px;"></div>
+                    </div>
+
+                    <!-- ── Fuel Estimator ── -->
+                    <div id="fuelEstimatorContainer" style="margin-bottom: 1.1rem; background: #eef2f5; padding: 10px; border-radius: 8px; border: 1px solid #dce4e8;">
+                        <h4 style="font-size:0.9rem; color:#2c3e50; margin-bottom: 8px;"><i class="fas fa-gas-pump"></i> Itinerary Fuel Estimator</h4>
+                        <select id="routeSelect" onchange="calculateFuel()" style="width:100%; padding:8px; border-radius:5px; border:1px solid #ccc; margin-bottom:8px;">
+                            <option value="0">Select a common route to estimate fuel...</option>
+                            <option value="115">Colombo -> Galle (115 km)</option>
+                            <option value="116">Colombo -> Kandy (116 km)</option>
+                            <option value="200">Colombo -> Nuwara Eliya (200 km)</option>
+                            <option value="320">Colombo -> Kandy -> Ella (320 km)</option>
+                            <option value="260">Colombo -> Yala (260 km)</option>
+                            <option value="400">Round Trip: Colombo -> Kandy -> Galle -> Colombo (400 km)</option>
+                        </select>
+                        <div style="font-size:0.85rem; color:#555;">
+                            Estimated Fuel Cost: <strong style="color:var(--primary-color)">$<span id="fuelEstimate">0.00</span></strong>
+                            <small style="display:block; margin-top:2px; color:#888;">(Based on <span id="fuelEfficiencyDisplay">15</span> km/l at $1.20/L)</small>
+                        </div>
+                    </div>
+
                     <div class="price-summary">
                         <h4>Rental Summary</h4>
-                        <div class="price-row"><span>Price per day:</span><span>$<span id="summaryPricePerDay">0</span></span></div>
+                        <div class="price-row"><span>Price per day:</span><span>$<span id="summaryPricePerDay">0</span> <small id="seasonBadge" style="color:red;display:none;">(High Season)</small></span></div>
                         <div class="price-row"><span>Number of days:</span><span id="summaryDays">0</span></div>
                         <div class="price-row"><span>Driver charges:</span><span>$<span id="summaryDriverCharge">0</span></span></div>
+                        <div class="price-row" id="addonsSummaryRow" style="display:none;"><span>Add-ons:</span><span>$<span id="summaryAddonsCharge">0</span></span></div>
+                        <div class="price-row" id="discountRow" style="display:none; color:#27ae60;"><span>Long-Rental Discount (<span id="discountPercentTxt">0</span>%):</span><span>-$<span id="summaryDiscount">0</span></span></div>
                         <div class="price-row"><span>Service charge (10%):</span><span>$<span id="summaryServiceCharge">0</span></span></div>
                         <div class="price-row total">
                             <span><strong>Total:</strong></span>
@@ -535,6 +764,9 @@
     let activeVehicleId = null;
     let activeVehicle = null;
     let pickedStars   = 0;
+    let globalVehiclesData = [];
+    let compareList = [];
+    let activeVehicleBookings = [];
 
     // ── Navbar ──────────────────────────────────────
     function toggleMenu() {
@@ -629,8 +861,30 @@
             if (currentPassengerFilter > 0) {
                 data = data.filter(v => (parseInt(v.seats) || parseInt(v.capacity) || 0) >= currentPassengerFilter);
             }
+            // --- INJECT DEFAULT ADVANCED FEATURES FOR DEMO PURPOSES ---
+            data = data.map(v => {
+                if (!v.availableAddons) {
+                    if (v.type === 'SUV' || v.type === '4WD') {
+                        v.availableAddons = 'Roof Rack:12, Portable Wi-Fi:5, BBQ Set:15, Camping Gear:20';
+                    } else if (v.type === 'VAN' || v.type === 'BUS') {
+                        v.availableAddons = 'Child Seat:10, Portable Wi-Fi:5, Tour Guide Mic:10, Cooler Box:15';
+                    } else {
+                        v.availableAddons = 'Baby Seat:8, Surfboard Rack:15, Portable Wi-Fi:5';
+                    }
+                }
+                if (!v.highSeasonMultiplier) v.highSeasonMultiplier = 1.2;
+                if (!v.discountPercentage) v.discountPercentage = 10;
+                if (!v.fuelEfficiencyKmPerLitre) v.fuelEfficiencyKmPerLitre = 12;
+                return v;
+            });
+            // --------------------------------------------------------
+
+            globalVehiclesData = data;
             displayVehicles(data);
-        }).catch(() => displaySampleVehicles(type));
+        }).catch(() => {
+            globalVehiclesData = [];
+            displaySampleVehicles(type);
+        });
     }
 
     // ── Rating storage ───────────────────────────────
@@ -668,9 +922,22 @@
         const card = document.createElement('div');
         card.className = 'vehicle-card';
         card.onclick = () => openRentalModal(v);
+        
+        let aiBadge = '';
+        if (currentPassengerFilter >= 5 && parseInt(v.capacity) >= 5 && v.type === 'VAN') {
+            aiBadge = `<span style="position:absolute;top:10px;right:10px;background:#F39C12;color:white;padding:4px 8px;border-radius:12px;font-size:0.75rem;font-weight:bold;z-index:2;"><i class="fas fa-magic"></i> AI Pick</span>`;
+        } else if ((currentType === 'SUV' || currentType === '4WD') && (v.type === 'SUV' || v.type === '4WD')) {
+            aiBadge = `<span style="position:absolute;top:10px;right:10px;background:#F39C12;color:white;padding:4px 8px;border-radius:12px;font-size:0.75rem;font-weight:bold;z-index:2;"><i class="fas fa-magic"></i> Rough Terrain Pick</span>`;
+        }
+
+        const isCompared = compareList.includes(v.id);
 
         card.innerHTML = `
         <div class="vehicle-image" style="background-image:url('${v.imageUrl||'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400'}')">
+            <label class="compare-checkbox-container" onclick="event.stopPropagation()">
+                <input type="checkbox" ${isCompared ? 'checked' : ''} onchange="handleCompareChange(this, ${v.id})"> Compare
+            </label>
+            ${aiBadge}
             <span class="vehicle-badge">${v.type}</span>
         </div>
         <div class="vehicle-content">
@@ -690,10 +957,12 @@
                     <span class="price-value">$${v.pricePerDay}</span>
                     <span class="price-unit">/ day</span>
                 </div>
-                <button class="btn-rent-now"
-                    onclick="event.stopPropagation();openRentalModal(${JSON.stringify(v).replace(/"/g,'&quot;')})">
-                    <i class="fas fa-key"></i> Rent Now
-                </button>
+                <div style="display:flex; gap:5px;">
+                    <button class="btn-rent-now" style="background:#222; padding:8px 12px;" onclick="event.stopPropagation();openVirtualTour(${v.id})" title="Virtual Tour"><i class="fas fa-vr-cardboard"></i></button>
+                    <button class="btn-rent-now" onclick="event.stopPropagation();openRentalModal(${JSON.stringify(v).replace(/"/g,'&quot;')})">
+                        <i class="fas fa-key"></i> Rent Now
+                    </button>
+                </div>
             </div>
         </div>`;
         return card;
@@ -738,6 +1007,35 @@
             driverRow.style.display = 'none';
             document.getElementById('rentalIncludeDriver').value = 'no';
         }
+        toggleDriverProfile();
+
+        // Add-ons integration
+        const addonsList = document.getElementById('addonsList');
+        const addonsContainer = document.getElementById('addonsContainer');
+        addonsList.innerHTML = '';
+        if (v.availableAddons && v.availableAddons.trim() !== '') {
+            addonsContainer.style.display = 'block';
+            const parts = v.availableAddons.split(',');
+            parts.forEach((part, index) => {
+                const pair = part.split(':');
+                if (pair.length === 2) {
+                    const name = pair[0].trim();
+                    const price = parseFloat(pair[1].trim());
+                    addonsList.innerHTML += `
+                    <label style="display:flex; justify-content:space-between; font-size:0.85rem; cursor:pointer;">
+                        <span><input type="checkbox" class="addon-checkbox" value="${price}" onchange="calculateRentalPrice()"> ${name}</span>
+                        <span style="font-weight:bold;">+$${price} / day</span>
+                    </label>`;
+                }
+            });
+        } else {
+            addonsContainer.style.display = 'none';
+        }
+
+        // Fuel Efficiency
+        document.getElementById('fuelEfficiencyDisplay').textContent = v.fuelEfficiencyKmPerLitre || 15.0;
+        document.getElementById('routeSelect').value = "0";
+        document.getElementById('fuelEstimate').textContent = "0.00";
 
         refreshRatingUI(v.id);
         calculateRentalPrice();
@@ -746,6 +1044,27 @@
         const modal = document.getElementById('rentalModal');
         modal.scrollTop = 0;
         modal.classList.add('active');
+
+        // Fetch real-time availability
+        fetch(`${API_BASE}/bookings/vehicle/${v.id}`)
+            .then(r => r.json())
+            .then(data => {
+                activeVehicleBookings = data || [];
+                calculateRentalPrice(); // Re-trigger check
+            }).catch(() => activeVehicleBookings = []);
+    }
+
+    function calculateFuel() {
+        if (!activeVehicle) return;
+        const dist = parseFloat(document.getElementById('routeSelect').value);
+        if (dist > 0) {
+            const eff = activeVehicle.fuelEfficiencyKmPerLitre || 15.0;
+            const litres = dist / eff;
+            const cost = litres * 1.20; // $1.20 per litre
+            document.getElementById('fuelEstimate').textContent = cost.toFixed(2);
+        } else {
+            document.getElementById('fuelEstimate').textContent = "0.00";
+        }
     }
 
     function closeModal() {
@@ -832,13 +1151,52 @@
 
     // ── Price calculator ─────────────────────────────
     function calculateRentalPrice() {
-        const ppd = parseFloat(document.getElementById('modalPrice').textContent);
+        let ppd = parseFloat(activeVehicle ? activeVehicle.pricePerDay : 0);
         const p   = document.getElementById('rentalPickup').value;
         const r   = document.getElementById('rentalReturn').value;
+        const submitBtn = document.querySelector('.btn-book');
+        
         if (!p || !r || !activeVehicle) return;
 
-        const days = Math.ceil((new Date(r) - new Date(p)) / 86400000);
-        if (days <= 0) { alert('Return date must be after pickup date'); return; }
+        const pDate = new Date(p);
+        const rDate = new Date(r);
+        
+        const days = Math.ceil((rDate - pDate) / 86400000);
+        if (days <= 0) { 
+            submitBtn.disabled = true;
+            return; 
+        }
+
+        // Real-time Availability Check
+        let isBooked = false;
+        activeVehicleBookings.forEach(booking => {
+            const bStart = new Date(booking.startDate);
+            const bEnd = new Date(booking.endDate);
+            // Check for overlap: start1 < end2 AND end1 > start2
+            if (pDate < bEnd && rDate > bStart) {
+                isBooked = true;
+            }
+        });
+
+        if (isBooked) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-calendar-times"></i> Not Available for Selected Dates';
+            submitBtn.style.background = '#e74c3c';
+        } else {
+            submitBtn.disabled = false;
+            submitBtn.style.background = 'var(--success)';
+        }
+
+        // Dynamic Pricing: High Season Check (Dec, Jan, Feb, Mar, Apr)
+        const pickupMonth = pDate.getMonth() + 1; // 1-12
+        let isHighSeason = [12, 1, 2, 3, 4].includes(pickupMonth);
+        if (isHighSeason && activeVehicle.highSeasonMultiplier > 1.0) {
+            ppd = ppd * activeVehicle.highSeasonMultiplier;
+            document.getElementById('seasonBadge').style.display = 'inline';
+            document.getElementById('seasonBadge').textContent = `(High Season x${activeVehicle.highSeasonMultiplier})`;
+        } else {
+            document.getElementById('seasonBadge').style.display = 'none';
+        }
 
         const sub   = ppd * days;
         
@@ -847,13 +1205,48 @@
             drv = days * (activeVehicle.driverCostPerDay || 25);
         }
 
-        const svc   = (sub + drv) * 0.10;
-        const total = sub + drv + svc;
+        // Add-ons Cost
+        let addonsDailyTotal = 0;
+        document.querySelectorAll('.addon-checkbox:checked').forEach(cb => {
+            addonsDailyTotal += parseFloat(cb.value);
+        });
+        const addonsTotal = addonsDailyTotal * days;
+        
+        const rowAddons = document.getElementById('addonsSummaryRow');
+        if (addonsTotal > 0) {
+            rowAddons.style.display = 'flex';
+            document.getElementById('summaryAddonsCharge').textContent = addonsTotal.toFixed(2);
+        } else {
+            rowAddons.style.display = 'none';
+        }
 
+        let preDiscountTotal = sub + drv + addonsTotal;
+        let discount = 0;
+
+        // Long-Rental Discount
+        const rowDiscount = document.getElementById('discountRow');
+        if (days > 7 && activeVehicle.discountPercentage > 0) {
+            discount = preDiscountTotal * (activeVehicle.discountPercentage / 100);
+            rowDiscount.style.display = 'flex';
+            document.getElementById('discountPercentTxt').textContent = activeVehicle.discountPercentage;
+            document.getElementById('summaryDiscount').textContent = discount.toFixed(2);
+        } else {
+            rowDiscount.style.display = 'none';
+        }
+
+        const subAfterDiscount = preDiscountTotal - discount;
+        const svc   = subAfterDiscount * 0.10;
+        const total = subAfterDiscount + svc;
+
+        document.getElementById('summaryPricePerDay').textContent   = ppd.toFixed(2);
         document.getElementById('summaryDays').textContent          = days;
         document.getElementById('summaryDriverCharge').textContent  = drv.toFixed(2);
         document.getElementById('summaryServiceCharge').textContent = svc.toFixed(2);
         document.getElementById('summaryTotal').textContent         = total.toFixed(2);
+        
+        if (!isBooked) {
+            submitBtn.innerHTML = `<i class="fas fa-lock"></i> Confirm & Pay $${total.toFixed(2)}`;
+        }
         document.getElementById('finalTotal').textContent           = total.toFixed(2);
     }
 
@@ -921,12 +1314,12 @@
     // ── Sample vehicles ──────────────────────────────
     function displaySampleVehicles(type='all') {
         const all = [
-            {id:'v1', name:'Toyota KDH Van',   type:'VAN',    capacity:8,  pricePerDay:80,  model:'KDH',     year:2020, imageUrl:'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400', features:'AC,Music System,WiFi,Luggage Space'},
-            {id:'v2', name:'Toyota Premio',    type:'CAR',    capacity:4,  pricePerDay:50,  model:'Premio',  year:2019, imageUrl:'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400', features:'AC,Leather Seats,Music System'},
-            {id:'v3', name:'Mercedes S-Class', type:'LUXURY', capacity:4,  pricePerDay:120, model:'S-Class', year:2021, imageUrl:'https://images.unsplash.com/photo-1563720360172-67b8f3dce741?w=400', features:'AC,Premium Sound,WiFi,Leather'},
-            {id:'v4', name:'Toyota Coaster',   type:'BUS',    capacity:25, pricePerDay:150, model:'Coaster', year:2020, imageUrl:'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400', features:'AC,Reclining Seats,Music System'},
-            {id:'v5', name:'Honda CBR 250R',   type:'BIKE',   capacity:2,  pricePerDay:30,  model:'CBR 250R',year:2021, imageUrl:'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=400', features:'Helmet Included,GPS'},
-            {id:'v6', name:'Honda Vezel',      type:'CAR',    capacity:5,  pricePerDay:60,  model:'Vezel',   year:2020, imageUrl:'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=400', features:'AC,Music System,Bluetooth'},
+            {id:'v1', name:'Toyota KDH Van',   type:'VAN',    capacity:8,  pricePerDay:80,  model:'KDH',     year:2020, imageUrl:'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400', features:'AC,Music System,WiFi,Luggage Space', availableAddons:'Child Seat:10, Portable Wi-Fi:5, Camping Gear:20', highSeasonMultiplier:1.2, discountPercentage:10, fuelEfficiencyKmPerLitre:10},
+            {id:'v2', name:'Toyota Premio',    type:'CAR',    capacity:4,  pricePerDay:50,  model:'Premio',  year:2019, imageUrl:'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400', features:'AC,Leather Seats,Music System', availableAddons:'Baby Seat:8, Surfboard Rack:15', highSeasonMultiplier:1.1, discountPercentage:5, fuelEfficiencyKmPerLitre:16},
+            {id:'v3', name:'Mercedes S-Class', type:'LUXURY', capacity:4,  pricePerDay:120, model:'S-Class', year:2021, imageUrl:'https://images.unsplash.com/photo-1563720360172-67b8f3dce741?w=400', features:'AC,Premium Sound,WiFi,Leather', availableAddons:'Champagne Service:50, Wi-Fi:10', highSeasonMultiplier:1.5, discountPercentage:15, fuelEfficiencyKmPerLitre:8},
+            {id:'v4', name:'Toyota Coaster',   type:'BUS',    capacity:25, pricePerDay:150, model:'Coaster', year:2020, imageUrl:'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400', features:'AC,Reclining Seats,Music System', availableAddons:'Tour Guide Mic:10, Cooler Box:15', highSeasonMultiplier:1.1, discountPercentage:10, fuelEfficiencyKmPerLitre:6},
+            {id:'v5', name:'Honda CBR 250R',   type:'BIKE',   capacity:2,  pricePerDay:30,  model:'CBR 250R',year:2021, imageUrl:'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=400', features:'Helmet Included,GPS', availableAddons:'Extra Helmet:5, GoPro Camera:15', highSeasonMultiplier:1.2, discountPercentage:0, fuelEfficiencyKmPerLitre:30},
+            {id:'v6', name:'Honda Vezel (SUV)',type:'SUV',    capacity:5,  pricePerDay:70,  model:'Vezel',   year:2020, imageUrl:'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=400', features:'AC,Music System,Bluetooth', availableAddons:'Roof Rack:12, Portable Wi-Fi:5, BBQ Set:15', highSeasonMultiplier:1.3, discountPercentage:10, fuelEfficiencyKmPerLitre:14},
         ];
         
         let filtered = type === 'all' ? all : all.filter(v => v.type === type);
@@ -936,7 +1329,191 @@
         
         displayVehicles(filtered);
     }
+
+
+    // ── Driver Logic ─────────────────────────────────
+    let liveDrivers = null;
+    
+    async function toggleDriverProfile() {
+        const incl = document.getElementById('rentalIncludeDriver').value;
+        const card = document.getElementById('driverProfileCard');
+        
+        if (incl === 'yes') {
+            card.style.display = 'block';
+            
+            if (!liveDrivers) {
+                try {
+                    const res = await fetch(API_BASE + '/drivers');
+                    liveDrivers = await res.json();
+                } catch(e) { liveDrivers = []; }
+            }
+            
+            const activeDrivers = liveDrivers.filter(d => d.status.toLowerCase() === 'active');
+            
+            if (activeDrivers.length > 0) {
+                const d = activeDrivers[Math.floor(Math.random() * activeDrivers.length)];
+                document.getElementById('driverName').textContent = d.name;
+                document.getElementById('driverLanguages').textContent = 'Speaks: ' + (d.languages || 'English');
+                document.getElementById('driverRating').textContent = d.rating || '4.9';
+                document.getElementById('driverExp').textContent = (d.experience || '5') + ' Years';
+                
+                const av = document.getElementById('driverAvatarContainer');
+                if (d.imageUrl) {
+                    av.innerHTML = `<img src="${d.imageUrl}" class="driver-avatar">`;
+                } else {
+                    av.innerHTML = `<div class="driver-avatar-placeholder">${d.name.charAt(0)}</div>`;
+                }
+            } else {
+                document.getElementById('driverName').textContent = 'Driver Assigned Upon Booking';
+                document.getElementById('driverLanguages').textContent = 'Speaks: English';
+                document.getElementById('driverAvatarContainer').innerHTML = `<div class="driver-avatar-placeholder"><i class="fas fa-user"></i></div>`;
+            }
+        } else {
+            card.style.display = 'none';
+        }
+    }
+
+    // ── Vehicle Compare ──────────────────────────────
+    function handleCompareChange(cb, vid) {
+        if (cb.checked) {
+            if (compareList.length >= 3) {
+                toast('You can only compare up to 3 vehicles', 'error');
+                cb.checked = false;
+                return;
+            }
+            compareList.push(vid);
+        } else {
+            compareList = compareList.filter(id => id !== vid);
+        }
+        updateCompareBar();
+    }
+    
+    function updateCompareBar() {
+        const bar = document.getElementById('compareBar');
+        document.getElementById('compareCount').textContent = compareList.length;
+        if (compareList.length > 0) bar.classList.add('visible');
+        else bar.classList.remove('visible');
+    }
+    
+    function clearComparison() {
+        compareList = [];
+        updateCompareBar();
+        displayVehicles(globalVehiclesData); // re-render to uncheck boxes
+    }
+    
+    function openCompareModal() {
+        const items = compareList.map(id => globalVehiclesData.find(v => v.id === id)).filter(Boolean);
+        let html = '<table style="width:100%; border-collapse:collapse; text-align:center;"><tr><th>Feature</th>';
+        items.forEach(v => html += `<th style="padding:10px; border-bottom:2px solid var(--gold);"><img src="${v.imageUrl}" style="width:100px; height:60px; object-fit:cover; border-radius:8px;"><br>${v.name}</th>`);
+        html += '</tr><tr><td style="padding:10px;font-weight:bold;border-bottom:1px solid #eee;">Price/Day</td>';
+        items.forEach(v => html += `<td style="padding:10px;border-bottom:1px solid #eee;">$${v.pricePerDay}</td>`);
+        html += '</tr><tr><td style="padding:10px;font-weight:bold;border-bottom:1px solid #eee;">Capacity</td>';
+        items.forEach(v => html += `<td style="padding:10px;border-bottom:1px solid #eee;">${v.capacity} Seats</td>`);
+        html += '</tr><tr><td style="padding:10px;font-weight:bold;border-bottom:1px solid #eee;">Type</td>';
+        items.forEach(v => html += `<td style="padding:10px;border-bottom:1px solid #eee;">${v.type}</td>`);
+        html += '</tr><tr><td style="padding:10px;font-weight:bold;border-bottom:1px solid #eee;">Brand</td>';
+        items.forEach(v => html += `<td style="padding:10px;border-bottom:1px solid #eee;">${v.brand || '-'}</td>`);
+        html += '</tr></table>';
+        
+        document.getElementById('compareTableContainer').innerHTML = html;
+        document.getElementById('compareModal').classList.add('active');
+    }
+
+    // ── Virtual Tour ─────────────────────────────────
+    function toYouTubeEmbed(url) {
+        const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:.*v=|.*\/|v\/))([^&?]{11})/);
+        return match ? `https://www.youtube.com/embed/${match[1]}?autoplay=1&rel=0` : url;
+    }
+    
+    function closeVideoModal() {
+        document.getElementById('videoModal').classList.remove('active');
+        document.getElementById('tourVideo').pause();
+        document.getElementById('tourVideo').src = '';
+        document.getElementById('tourIframe').src = '';
+    }
+    
+    function openVirtualTour(vid) {
+        const vehicle = globalVehiclesData.find(x => x.id == vid) || {};
+        const rawUrl = (vehicle.videoUrl || '').trim();
+        const videoEl = document.getElementById('tourVideo');
+        const iframeEl = document.getElementById('tourIframe');
+        
+        if (!rawUrl) {
+            videoEl.style.display = 'none';
+            iframeEl.style.display = 'none';
+            iframeEl.parentElement.innerHTML += `<p id="vtNoVidMsg" style="color:#aaa; text-align:center; padding:60px 20px;"><i class="fas fa-film" style="font-size:2rem; margin-bottom:10px; display:block;"></i>No virtual tour available.</p>`;
+            document.getElementById('videoModal').classList.add('active');
+            return;
+        }
+        
+        const noVid = document.getElementById('vtNoVidMsg');
+        if (noVid) noVid.remove();
+
+        const isLocal = rawUrl.startsWith('/uploads/') || rawUrl.startsWith('http://localhost');
+        if (isLocal) {
+            iframeEl.style.display = 'none';
+            videoEl.src = 'http://localhost:8080' + rawUrl;
+            videoEl.style.display = 'block';
+            videoEl.style.maxHeight = '460px';
+        } else {
+            videoEl.style.display = 'none';
+            iframeEl.src = toYouTubeEmbed(rawUrl);
+            iframeEl.style.display = 'block';
+        }
+        document.getElementById('videoModal').classList.add('active');
+    }
+    
+    // ── AI Itinerary Recommendation ──────────────────
+    function generateAIRecommendation() {
+        const input = document.getElementById('aiItineraryInput').value.toLowerCase();
+        if (!input.trim()) {
+            toast('Please enter your destinations first!', 'error');
+            return;
+        }
+
+        const resultBox = document.getElementById('aiRecommendationResult');
+        const textBox = document.getElementById('aiSuggestionText');
+        const filterBtn = document.getElementById('aiApplyFilterBtn');
+        
+        // Simple client-side AI logic
+        let recommendation = '';
+        let targetType = 'CAR';
+        
+        if (input.includes('yala') || input.includes('udawalawe') || input.includes('safari') || input.includes('minneriya')) {
+            recommendation = "You're heading to wildlife areas! We highly recommend an <strong>SUV or 4WD</strong> for navigating rough terrain and enjoying a clear view on safaris.";
+            targetType = 'SUV';
+        } else if (input.includes('nuwara eliya') || input.includes('ella') || input.includes('kandy') || input.includes('hill')) {
+            recommendation = "The Hill Country roads are winding and steep. A powerful <strong>SUV or a comfortable Van</strong> with good torque is ideal for safety and comfort.";
+            targetType = 'SUV';
+        } else if (input.includes('trinco') || input.includes('arugam') || input.includes('pasikuda')) {
+            recommendation = "You're traveling long distances to the coast. A comfortable <strong>Luxury Car or Van</strong> will make the highway drive relaxing.";
+            targetType = 'LUXURY';
+        } else if (input.includes('colombo') || input.includes('galle') || input.includes('negombo')) {
+            recommendation = "For city driving and coastal highways, a standard <strong>Car</strong> is perfect. It's easy to park and highly fuel-efficient.";
+            targetType = 'CAR';
+        } else {
+            recommendation = "Based on a standard tour, a comfortable <strong>Car</strong> is your best all-rounder. If you have more than 3 people, consider a <strong>Van</strong>.";
+            targetType = 'CAR';
+        }
+        
+        textBox.innerHTML = recommendation;
+        resultBox.style.display = 'block';
+        
+        filterBtn.onclick = function() {
+            filterByType(targetType);
+            document.getElementById('vehiclesGrid').scrollIntoView({ behavior: 'smooth' });
+        };
+    }
+
 </script>
+
+<div id="compareModal" class="modal" onclick="if(event.target==this) this.classList.remove('active')">
+    <div class="modal-content"><div id="compareTableContainer"></div></div>
+</div>
+
+<div id="videoModal" class="modal" onclick="if(event.target==this) closeVideoModal()">
+    <div class="modal-content"><video id="tourVideo" controls></video><iframe id="tourIframe" width="100%" height="460" frameborder="0"></iframe></div>
+</div>
 
 </body>
 </html>

@@ -47,7 +47,23 @@ public class Vehicle {
     private Double driverCostPerDay;
 
     private String features;
+    
+    // ── Media ──
     private String imageUrl;
+    private String videoUrl;
+
+    // ── Advanced Features ──
+    @Column(name = "available_addons")
+    private String availableAddons; // e.g. "Child Seat:10, Wi-Fi:5"
+
+    @Column(name = "high_season_multiplier")
+    private Double highSeasonMultiplier; // e.g. 1.2
+
+    @Column(name = "discount_percentage")
+    private Double discountPercentage; // e.g. 10.0
+
+    @Column(name = "fuel_efficiency_km_per_litre")
+    private Double fuelEfficiencyKmPerLitre; // e.g. 15.0
 
     @Column(columnDefinition = "TEXT")
     private String description;

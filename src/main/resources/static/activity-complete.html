@@ -803,17 +803,43 @@
         <div class="booking-container">
             <!-- Activity Details -->
             <div class="booking-left">
-                <h2 id="modalActivityName">Activity Name</h2>
-                <img id="modalActivityImage" src="" alt="Activity">
-                <div class="activity-info">
-                    <p><i class="fas fa-map-marker-alt"></i> Location: <span id="modalLocation"></span></p>
-                    <p><i class="fas fa-clock"></i> Duration: <span id="modalDuration"></span></p>
-                    <p><i class="fas fa-users"></i> Max Participants: <span id="modalMaxParticipants"></span></p>
-                    <p class="price-tag">$<span id="modalPrice"></span> / person</p>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <h2 id="modalActivityName" style="margin:0;">Activity Name</h2>
+                    <button type="button" id="btnVrPreview" style="display:none; background:var(--primary-color); color:white; border:none; padding:8px 12px; border-radius:20px; cursor:pointer; font-weight:bold; font-size:0.8rem;"><i class="fas fa-vr-cardboard"></i> 360° Preview</button>
                 </div>
+                <img id="modalActivityImage" src="" alt="Activity">
+                
+                <div id="vrVideoContainer" style="display:none; margin-bottom:1.5rem; width:100%; height:250px; background:#000; border-radius:10px; overflow:hidden;"></div>
+
+                <div class="activity-info" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; background:var(--bg-light); padding:15px; border-radius:10px;">
+                    <p style="margin:0;"><i class="fas fa-map-marker-alt" style="color:var(--primary-color);"></i> <span id="modalLocation"></span></p>
+                    <p style="margin:0;"><i class="fas fa-clock" style="color:var(--primary-color);"></i> <span id="modalDuration"></span></p>
+                    <p style="margin:0;"><i class="fas fa-users" style="color:var(--primary-color);"></i> Max: <span id="modalMaxParticipants"></span></p>
+                    <p style="margin:0;"><i class="fas fa-ticket-alt" style="color:var(--primary-color);"></i> Slots: <span id="modalAvailableSlots">Unlimited</span></p>
+                </div>
+                
+                <div id="ecoStatsContainer" style="display:none; margin-top:15px; padding:12px; background:#e8f8f5; border-radius:8px; border:1px solid #a3e4d7;">
+                    <h4 style="color:var(--accent-color); margin-bottom:5px; font-size:0.9rem;"><i class="fas fa-leaf"></i> Sustainability Impact</h4>
+                    <p style="margin:0; font-size:0.85rem;" id="modalEcoDetails"></p>
+                </div>
+
+                <p class="price-tag" style="margin-top:1.5rem;">$<span id="modalPrice"></span> / person</p>
+                
+                <div id="travelBuddyContainer" style="display:none; margin:1rem 0; padding:15px; background:linear-gradient(to right, #fdf2e9, #fff); border-left:4px solid var(--primary-color); border-radius:4px;">
+                    <h4 style="color:var(--primary-color); margin-bottom:5px; font-size:1rem;"><i class="fas fa-user-friends"></i> Solo Traveler?</h4>
+                    <p style="font-size:0.9rem; margin-bottom:10px;">This is a group activity! You can connect with other solo travelers to share the experience.</p>
+                    <button type="button" style="background:var(--secondary-color); color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:0.8rem;"><i class="fas fa-search"></i> Find a Travel Buddy</button>
+                </div>
+
                 <div class="included-list" id="modalIncluded">
                     <!-- Included items will be loaded -->
                 </div>
+                
+                <div id="audioGuideContainer" style="display:none; margin:1rem 0; padding:12px; background:#eaf2f8; border-radius:8px; border:1px solid #d4e6f1;">
+                    <h4 style="color:var(--secondary-color); margin-bottom:5px; font-size:0.9rem;"><i class="fas fa-headphones"></i> Geo-fenced Audio Guide Included</h4>
+                    <p style="margin:0; font-size:0.85rem;">Unlocks automatically when you reach the GPS coordinates.</p>
+                </div>
+
                 <div style="margin-top: 1.5rem; line-height: 1.6; color: var(--text-dark);" id="modalDescription"></div>
             </div>
 
@@ -1062,28 +1088,53 @@
         const card = document.createElement('div');
         card.className = 'activity-card';
         card.onclick = function() { openBookingModal(activity); };
+        
+        let tagsHtml = '';
+        if (activity.tags) {
+            tagsHtml = `<div style="padding: 0 1.5rem; margin-top:-0.5rem; margin-bottom:0.5rem; display:flex; gap:5px; flex-wrap:wrap;">
+                ${activity.tags.split(',').map(tag => `<span style="font-size:0.7rem; background:var(--bg-light); color:var(--text-dark); padding:2px 8px; border-radius:12px; border:1px solid #ddd;">#${tag.trim()}</span>`).join('')}
+            </div>`;
+        }
+        
+        let dynamicPrice = activity.pricePerPerson || activity.price || 0;
+        let originalPriceHtml = '';
+        if (activity.discountPercentage && activity.discountPercentage > 0) {
+            let originalPrice = dynamicPrice / (1 - (activity.discountPercentage / 100));
+            originalPriceHtml = `<span style="text-decoration:line-through; color:var(--text-light); font-size:1rem; margin-right:5px;">$${originalPrice.toFixed(0)}</span>`;
+        }
+        
+        let difficultyBadge = '';
+        if (activity.difficultyLevel) {
+            let diffColor = activity.difficultyLevel === 'Beginner' ? 'var(--success)' : (activity.difficultyLevel === 'Intermediate' ? 'var(--warning)' : 'var(--danger)');
+            difficultyBadge = `<span style="position:absolute; top:1rem; left:1rem; background:${diffColor}; color:var(--white); padding:0.3rem 0.8rem; border-radius:25px; font-weight:bold; font-size:0.8rem; box-shadow:0 2px 5px rgba(0,0,0,0.2);"><i class="fas fa-layer-group"></i> ${activity.difficultyLevel}</span>`;
+        }
 
         card.innerHTML = `
                 <div class="activity-image" style="background-image: url('${activity.imageUrl || 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=400'}')">
-                    <span class="activity-badge">${formatCategory(activity.type)}</span>
+                    ${difficultyBadge}
+                    <span class="activity-badge">${formatCategory(activity.category || activity.type)}</span>
                 </div>
                 <div class="activity-content">
-                    <h3>${activity.name}</h3>
+                    <h3 style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        ${activity.name}
+                        ${activity.carbonFootprint ? `<span style="color:var(--accent-color); font-size:0.8rem; background:#e8f8f5; padding:3px 8px; border-radius:12px;" title="Eco-Friendly"><i class="fas fa-leaf"></i> Eco</span>` : ''}
+                    </h3>
                     <p class="activity-location"><i class="fas fa-map-marker-alt"></i> ${activity.location}</p>
+                    ${tagsHtml}
                     <div class="activity-details">
                         <div class="detail-item">
                             <i class="fas fa-clock"></i>
                             <span>${activity.duration}</span>
                         </div>
                         <div class="detail-item">
-                            <i class="fas fa-users"></i>
-                            <span>Max ${activity.maxParticipants}</span>
+                            <i class="fas fa-users" style="${activity.currentCrowdLevel === 'High' ? 'color:var(--danger)' : ''}"></i>
+                            <span>Crowd: ${activity.currentCrowdLevel || 'Low'}</span>
                         </div>
                     </div>
                     <div class="activity-footer">
                         <div class="activity-price">
-                            <span class="price-value">$${activity.pricePerPerson}</span>
-                            <span class="price-unit">/ person</span>
+                            <div>${originalPriceHtml}<span class="price-value">$${dynamicPrice}</span></div>
+                            <span class="price-unit" style="display:flex; align-items:center; gap:5px;">/ person ${activity.rewardPoints ? `<span style="color:var(--warning); font-size:0.8rem; font-weight:bold;"><i class="fas fa-star"></i> ${activity.rewardPoints} Pts</span>` : ''}</span>
                         </div>
                         <button class="btn-book-activity" onclick="event.stopPropagation(); openBookingModal(${JSON.stringify(activity).replace(/"/g, '&quot;')})">
                             <i class="fas fa-ticket-alt"></i> Book Now
@@ -1098,6 +1149,8 @@
         return type.replace(/_/g, ' ');
     }
 
+    let currentBasePrice = 0;
+    
     function openBookingModal(activity) {
         const modal = document.getElementById('bookingModal');
 
@@ -1107,8 +1160,52 @@
         document.getElementById('modalLocation').textContent = activity.location;
         document.getElementById('modalDuration').textContent = activity.duration;
         document.getElementById('modalMaxParticipants').textContent = activity.maxParticipants;
-        document.getElementById('modalPrice').textContent = activity.pricePerPerson;
+        
+        document.getElementById('modalAvailableSlots').textContent = activity.availableSlots || 'Unlimited';
+        
+        currentBasePrice = activity.pricePerPerson || activity.price || 0;
+        document.getElementById('modalPrice').textContent = currentBasePrice;
         document.getElementById('modalDescription').textContent = activity.description || 'Join us for an unforgettable experience exploring the beauty and adventure of Sri Lanka.';
+
+        // VR Preview
+        const btnVr = document.getElementById('btnVrPreview');
+        const vrContainer = document.getElementById('vrVideoContainer');
+        const imgEl = document.getElementById('modalActivityImage');
+        if (activity.vrVideoUrl) {
+            btnVr.style.display = 'block';
+            vrContainer.style.display = 'none';
+            vrContainer.innerHTML = ''; // reset
+            btnVr.onclick = () => {
+                let embedUrl = activity.vrVideoUrl;
+                if(embedUrl.includes('watch?v=')) embedUrl = embedUrl.replace('watch?v=', 'embed/');
+                vrContainer.innerHTML = `<iframe width="100%" height="100%" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                imgEl.style.display = 'none';
+                vrContainer.style.display = 'block';
+                btnVr.style.display = 'none';
+            };
+        } else {
+            btnVr.style.display = 'none';
+            vrContainer.style.display = 'none';
+            imgEl.style.display = 'block';
+        }
+
+        // Eco Stats
+        const ecoContainer = document.getElementById('ecoStatsContainer');
+        if (activity.carbonFootprint > 0 || activity.communityContributionPercentage > 0) {
+            ecoContainer.style.display = 'block';
+            let txt = '';
+            if(activity.carbonFootprint) txt += `Estimated Footprint: <strong>${activity.carbonFootprint} kg CO2</strong>. `;
+            if(activity.communityContributionPercentage) txt += `<strong>${activity.communityContributionPercentage}%</strong> of your booking goes directly to the local community.`;
+            document.getElementById('modalEcoDetails').innerHTML = txt;
+        } else {
+            ecoContainer.style.display = 'none';
+        }
+
+        // Travel Buddy
+        document.getElementById('travelBuddyContainer').style.display = activity.isGroupActivity ? 'block' : 'none';
+
+        // Audio Guide
+        document.getElementById('audioGuideContainer').style.display = activity.audioGuideUrl ? 'block' : 'none';
 
         // Set included items
         const includedDiv = document.getElementById('modalIncluded');
@@ -1119,7 +1216,37 @@
             includedDiv.innerHTML = '<h4>What\'s Included</h4><span class="included-item"><i class="fas fa-check-circle"></i> Professional Guide</span><span class="included-item"><i class="fas fa-check-circle"></i> Equipment</span><span class="included-item"><i class="fas fa-check-circle"></i> Transportation</span>';
         }
 
-        document.getElementById('summaryPricePerPerson').textContent = activity.pricePerPerson;
+        // Smart Add-ons UI Generation
+        const addonsContainer = document.getElementById('dynamicAddonsContainer');
+        if (!addonsContainer) {
+            const requirementsDiv = document.getElementById('specialRequirements').parentNode;
+            const newDiv = document.createElement('div');
+            newDiv.id = 'dynamicAddonsContainer';
+            requirementsDiv.parentNode.insertBefore(newDiv, requirementsDiv.nextSibling);
+        }
+        
+        let addonsHtml = '';
+        if (activity.availableAddons) {
+            addonsHtml = `<div class="form-group" style="background:var(--bg-light); padding:15px; border-radius:8px;">
+                <label style="color:var(--secondary-color); margin-bottom:10px;"><i class="fas fa-plus-circle"></i> Smart Add-ons</label>`;
+            
+            activity.availableAddons.split(',').forEach((addon, idx) => {
+                const parts = addon.split(':');
+                if(parts.length === 2) {
+                    const name = parts[0].trim();
+                    const price = parseFloat(parts[1].trim());
+                    addonsHtml += `
+                    <label style="display:flex; justify-content:space-between; align-items:center; background:#fff; padding:10px; border-radius:5px; margin-bottom:8px; border:1px solid #ddd; cursor:pointer; font-weight:normal;">
+                        <span><input type="checkbox" class="addon-checkbox" value="${price}" onchange="calculatePrice()" style="width:auto; margin-right:10px;"> ${name}</span>
+                        <span style="font-weight:bold; color:var(--primary-color);">+$${price}</span>
+                    </label>`;
+                }
+            });
+            addonsHtml += `</div>`;
+        }
+        document.getElementById('dynamicAddonsContainer').innerHTML = addonsHtml;
+
+        document.getElementById('summaryPricePerPerson').textContent = currentBasePrice;
 
         calculatePrice();
         modal.scrollTop = 0;
@@ -1131,15 +1258,44 @@
     }
 
     function calculatePrice() {
-        const pricePerPerson = parseFloat(document.getElementById('modalPrice').textContent);
-        const participants = parseInt(document.getElementById('numberOfParticipants').value);
+        const pricePerPerson = currentBasePrice;
+        const participants = parseInt(document.getElementById('numberOfParticipants').value) || 1;
 
-        const subtotal = pricePerPerson * participants;
+        let subtotal = pricePerPerson * participants;
+        
+        // Add Add-ons
+        let addonsTotal = 0;
+        document.querySelectorAll('.addon-checkbox:checked').forEach(cb => {
+            addonsTotal += parseFloat(cb.value);
+        });
+        
+        subtotal += addonsTotal;
+
         const serviceCharge = subtotal * 0.10;
         const total = subtotal + serviceCharge;
 
         document.getElementById('summaryParticipants').textContent = participants;
         document.getElementById('summaryServiceCharge').textContent = serviceCharge.toFixed(2);
+        
+        let addonSummaryHtml = '';
+        if (addonsTotal > 0) {
+            addonSummaryHtml = `<div class="price-row addon-row" style="color:var(--primary-color); font-size:0.9rem;">
+                <span>Smart Add-ons:</span>
+                <span>+$${addonsTotal.toFixed(2)}</span>
+            </div>`;
+        }
+        
+        // Inject addon summary
+        const summaryTotalEl = document.querySelector('.price-row.total');
+        const existingAddonEl = document.querySelector('.price-row.addon-row');
+        if (existingAddonEl) existingAddonEl.remove();
+        
+        if (addonSummaryHtml) {
+            const div = document.createElement('div');
+            div.innerHTML = addonSummaryHtml;
+            summaryTotalEl.parentNode.insertBefore(div.firstElementChild, summaryTotalEl);
+        }
+
         document.getElementById('summaryTotal').textContent = total.toFixed(2);
         document.getElementById('finalTotal').textContent = total.toFixed(2);
     }

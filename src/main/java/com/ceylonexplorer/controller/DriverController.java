@@ -1,7 +1,7 @@
 package com.ceylonexplorer.controller;
 
-import com.ceylonexplorer.model.Itinerary;
-import com.ceylonexplorer.service.ItineraryService;
+import com.ceylonexplorer.model.Driver;
+import com.ceylonexplorer.service.DriverService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,35 +9,41 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/itineraries")
+@RequestMapping("/api/drivers")
 @CrossOrigin(origins = "*")
-public class ItineraryController {
+public class DriverController {
 
     @Autowired
-    private ItineraryService service;
+    private DriverService service;
 
     @GetMapping
-    public List<Itinerary> getAll() {
+    public List<Driver> getAll() {
         return service.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Itinerary> getById(@PathVariable Long id) {
+    public ResponseEntity<Driver> getById(@PathVariable Long id) {
         return service.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Itinerary create(@RequestBody Itinerary entity) {
+    public Driver create(@RequestBody Driver entity) {
+        if (entity.getStatus() == null || entity.getStatus().trim().isEmpty()) {
+            entity.setStatus("ACTIVE");
+        }
         return service.save(entity);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Itinerary> update(@PathVariable Long id, @RequestBody Itinerary entity) {
+    public ResponseEntity<Driver> update(@PathVariable Long id, @RequestBody Driver entity) {
         return service.findById(id)
                 .map(existing -> {
                     entity.setId(id);
+                    if (entity.getStatus() == null || entity.getStatus().trim().isEmpty()) {
+                        entity.setStatus(existing.getStatus() != null ? existing.getStatus() : "ACTIVE");
+                    }
                     return ResponseEntity.ok(service.save(entity));
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -52,5 +58,3 @@ public class ItineraryController {
         return ResponseEntity.notFound().build();
     }
 }
-
-//m
